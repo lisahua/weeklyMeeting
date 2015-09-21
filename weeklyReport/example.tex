@@ -1,0 +1,124 @@
+\begin{figure}[!htb]
+ \begin{minipage}{0.47\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+%  \multicolumn{1}{c}{(A) An inconsistent object name found by both Lancelot and \tool } \\ \hline
+%  \vspace{-4mm}
+%\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+% /* org.elasticsearch.action.DeleteRepositoryRequestBuilder */
+%1.public String setName() \{
+%2.  return setName;
+%3.\}
+%\end{Verbatim}
+%\vspace{-4mm}
+% \\ \hline
+  \multicolumn{1}{c}{(A) Methods queried by user} \\ \hline
+    \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+/* org.apache.jena.json.JsonWriter */
+1. public class JsonWriter implements JsonVisitor \{
+2.  OutputStreamWriter writer;
+3.  public void \bf{visit(JsonNumber jsonNumber)}  \{
+4.   print(jsonNumber.value()) ; 
+5.  \}
+6.  public void \bf{visit(JsonBoolean jsonBoolean)} \{
+7.   String x = Boolean.valueOf(jsonBoolean.value())?"true":"false"; 
+8.   print(x);
+9.  \}
+10. private void \underline{print(Object s)} \{...
+11.  writer.println(s);
+12. \} ...\}
+ \end{Verbatim}
+   \vspace{-4mm}
+  \\ \hline
+   \multicolumn{1}{c}{(B) Callers of these two methods} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+ /* org.apache.accumulo.core.sync.SortedMapIterator */
+1. public class JsonNumber extends JsonValue \{
+2.  Format format;
+3.  @Override
+4.  public Object \underline{value()}
+5.   \{ return format.getValue(value); \}
+6.  @Override
+7.  public void \uwave{visit(JsonVisitor visitor)}
+8.   \{ visitor.visit(this) ; \}
+9. \}
+10. public class JsonBoolean extends JsonValue \{
+11.  @Override
+12.  public Object \underline{value()}
+13.   \{ return value; \}
+14.  @Override
+15.  public void \uwave{visit(JsonVisitor visitor)}
+16.   \{ visitor.visit(this) ; \}
+17. \}
+ /* Three of other 13 callers */
+18. public class JsonFormatNumberHandler extends JsonHandler \{
+19.  public static void \uwave{printNumber(JsonNumber jNum)} \{
+20.   JsonWriter w = new JsonWriter(output);
+21.   jNum.setFormat(format);
+22.   w.visit(jNum);
+23. \} ...\}
+24. public class JSONNumberOptional \{
+25.  JsonBoolean jBool; 
+26.  JsonNumber left, right;
+27.  public static void \uwave{recordOptional()} \{
+28.   JsonWriter w = new JsonWriter(output);
+29.   w.visit(left);
+30.   w.visit(jBool);
+31.   w.visit(right);
+32. \} ...\}
+33. public class JSON \{
+34.  public static void \uwave{write(JsonValue jValue)} \{
+35.   JsonWriter w = new JsonWriter(output);
+36.   w.visit(jValue);
+37. \} ...\}
+\end{Verbatim}
+\vspace{-4mm}
+ \\ \hline
+\end{tabular} 
+\caption{Example of suggested elements given a set of interest}
+\label{fig:compare}
+\end{minipage}
+\end{figure}
+
+
+
+%%%%%%%Usage pattern example %%%%%%%
+
+%
+%\begin{figure}[!htb]
+% \begin{minipage}{0.47\textwidth}
+%\scriptsize 
+%\begin{tabular}{@{}p{1\textwidth}} 
+% \hline 
+% \multicolumn{1}{c}{(A) An inconsistent object name found by both Lancelot and \tool } \\ \hline
+%  \vspace{-4mm}
+%\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+% /* org.elasticsearch.action.delete.DeleteRepositoryRequestBuilder */
+%1.public String setName() \{
+%2.  return setName;
+%3.\}
+%\end{Verbatim}
+%\vspace{-4mm}
+% \\ \hline
+%  \multicolumn{1}{c}{(B) A naming bug from Lancelot} \\ \hline
+%   \vspace{-4mm}
+%\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+%/* org.elasticsearch.action.termvector.TermVectorFields */
+%1.public void size(int size) \{
+%2.  if (size <= 0) 
+%3.   throw new legalArgumentException("Size must be positive"); 
+%4.  this.size = size;
+%5.\}
+% \end{Verbatim}
+% Lancelot said: Methods with this name never return void.
+% \vspace{-4mm}
+%  \\ \hline
+%\end{tabular} 
+%\caption{Name Checker comparison}
+%\label{fig:compare}
+%\end{minipage}
+%\end{figure}
+ 
