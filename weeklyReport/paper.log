@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.5.25)  15 SEP 2015 13:49
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.5.25)  21 SEP 2015 22:24
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -642,102 +642,56 @@ File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 
 LaTeX Warning: No \author given.
 
-(./example.tex
-LaTeX Font Info:    Try loading font information for T1+aett on input line 18.
- (/usr/local/texlive/2014/texmf-dist/tex/latex/ae/t1aett.fd
-File: t1aett.fd 1997/11/16 Font definitions for T1/aett.
-)
-Overfull \hbox (5.4pt too wide) in paragraph at lines 4--81
-[][] 
+
+Overfull \hbox (5.55121pt too wide) in paragraph at lines 113--114
+[]\T1/aer/m/n/9 Although some ap-proaches ad-vo-cate refac-tor-ing code rather
  []
 
-)
-Overfull \hbox (4.85881pt too wide) in paragraph at lines 115--116
-\T1/aer/m/n/9 and \T1/aett/m/n/9 Json-Boolean.value()\T1/aer/m/n/9 ) and caller
-s (\T1/aett/m/n/9 JsonNumber.visit()
- []
-
-
-Overfull \hbox (10.05031pt too wide) in paragraph at lines 115--116
-\T1/aett/m/n/9 tional.recordOptional()\T1/aer/m/n/9 , \T1/aett/m/n/9 Json-For-m
-at-Num-ber-Han-dler.print
- []
-
-(./table.tex
-Underfull \hbox (badness 10000) in alignment at lines 8--15
-[][][][][][][]
- []
-
-) [1{/usr/local/texlive/2014/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
+(./paper.bbl [1{/usr/local/texlive/2014/texmf-var/fonts/map/pdftex/updmap/pdfte
+x.map}
 
 
 ]
-Overfull \hbox (2.35638pt too wide) in paragraph at lines 141--142
-[]\T1/aer/m/n/9 Revelle et al. [[]16[]] ex-ploit re-la-tions cap-tured from the
- source
- []
-
-
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
-een already used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.144 
-       [2] (./paper.bbl
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
-een already used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.161 
-       [3])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 154.
+)
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 192.
 - LAST -
 Extra skip:11.5pt
-Left:96.0pt/1.74596pt
-Right:84.5pt/1.74596pt
-Output:96.0pt
+Left:459.0pt/1.74596pt
+Right:447.5pt/1.74596pt
+Output:459.0pt
 pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.154 \end{document}
-                     [4]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 154.
+l.192 \end{document}
+                     [2]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 192.
  (./paper.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 154.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 154.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 192.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 192.
 Package rerunfilecheck Info: File `paper.out' has not changed.
-(rerunfilecheck)             Checksum: 10E5848E95515F8AF57F24B4C15FAB89;144.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 154.
+(rerunfilecheck)             Checksum: 165DE434F8E3AFBA3797C1DA78DABD9B;97.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 192.
  ) 
 Here is how much of TeX's memory you used:
- 11106 strings out of 493117
- 156105 string characters out of 6135433
- 294713 words of memory out of 5000000
- 14335 multiletter control sequences out of 15000+600000
- 52716 words of font info for 81 fonts, out of 8000000 for 9000
+ 11022 strings out of 493117
+ 155005 string characters out of 6135433
+ 299118 words of memory out of 5000000
+ 14292 multiletter control sequences out of 15000+600000
+ 42172 words of font info for 57 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 41i,16n,35p,1862b,493s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 41i,9n,35p,2274b,431s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2014/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
-exlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmbsy10.pfb></usr/local/t
-exlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx7.pfb></usr/local/tex
-live/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb></usr/local/texli
-ve/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/
-2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/201
-4/texmf-dist/fonts/type1/public/amsfonts/cm/cmti9.pfb></usr/local/texlive/2014/
-texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/local/texlive/2014/te
-xmf-dist/fonts/type1/public/amsfonts/cm/cmtt9.pfb></usr/local/texlive/2014/texm
-f-dist/fonts/type1/public/amsfonts/latxfont/lasy6.pfb></usr/local/texlive/2014/
-texmf-dist/fonts/type1/urw/helvetic/uhvb8a.pfb></usr/local/texlive/2014/texmf-d
-ist/fonts/type1/urw/times/utmb8a.pfb>
-Output written on paper.pdf (4 pages, 154651 bytes).
+exlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texl
+ive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmti9.pfb></usr/local/texliv
+e/2014/texmf-dist/fonts/type1/urw/helvetic/uhvb8a.pfb></usr/local/texlive/2014/
+texmf-dist/fonts/type1/urw/times/utmb8a.pfb>
+Output written on paper.pdf (2 pages, 69355 bytes).
 PDF statistics:
- 169 PDF objects out of 1000 (max. 8388607)
- 150 compressed objects within 2 object streams
- 33 named destinations out of 1000 (max. 500000)
- 25 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 85 PDF objects out of 1000 (max. 8388607)
+ 76 compressed objects within 1 object stream
+ 21 named destinations out of 1000 (max. 500000)
+ 17 words of extra memory for PDF output out of 10000 (max. 10000000)
 

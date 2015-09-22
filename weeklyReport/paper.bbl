@@ -1,30 +1,5 @@
 \begin{thebibliography}{10}
 
-\bibitem{Hassan:ICSE10}
-B.~Adams, Z.~M. Jiang, and A.~E. Hassan.
-\newblock Identifying crosscutting concerns using historical code changes.
-\newblock In {\em Proceedings of the 32nd {ACM/IEEE} International Conference
-  on Software Engineering - Volume 1, {ICSE} 2010, Cape Town, South Africa, 1-8
-  May 2010}, pages 305--314, 2010.
-
-\bibitem{Agrawal:dynamicSlice90}
-H.~Agrawal and J.~R. Horgan.
-\newblock Dynamic program slicing.
-\newblock In {\em Proceedings of the {ACM} SIGPLAN'90 Conference on Programming
-  Language Design and Implementation (PLDI), White Plains, New York, USA, June
-  20-22, 1990}, pages 246--256, 1990.
-
-\bibitem{Briand:dynamicTSE04}
-E.~Arisholm, L.~C. Briand, and A.~F{\o}yen.
-\newblock Dynamic coupling measurement for object-oriented software.
-\newblock {\em {IEEE} Trans. Software Eng.}, 30(8):491--506, 2004.
-
-\bibitem{Briand:structural99}
-L.~C. Briand, J.~W. Daly, and J.~W{\"{u}}st.
-\newblock A unified framework for coupling measurement in object-oriented
-  systems.
-\newblock {\em {IEEE} Trans. Software Eng.}, 25(1):91--121, 1999.
-
 \bibitem{sniff:Sen09}
 S.~Chatterjee, S.~Juvekar, and K.~Sen.
 \newblock {SNIFF:} {A} search engine for java using free-form queries.
@@ -33,26 +8,36 @@ S.~Chatterjee, S.~Juvekar, and K.~Sen.
   Conferences on Theory and Practice of Software, {ETAPS} 2009, York, UK, March
   22-29, 2009. Proceedings}, pages 385--400, 2009.
 
-\bibitem{Gall:changeCouple05}
-B.~Fluri, H.~C. Gall, and M.~Pinzger.
-\newblock Fine-grained analysis of change couplings.
-\newblock In {\em 5th {IEEE} International Workshop on Source Code Analysis and
-  Manipulation {(SCAM} 2005), 30 September - 1 October 2005, Budapest,
-  Hungary}, pages 66--74, 2005.
+\bibitem{Cottrell:jigsaw08}
+R.~Cottrell, R.~J. Walker, and J.~Denzinger.
+\newblock Semi-automating small-scale source code reuse via structural
+  correspondence.
+\newblock In {\em Proceedings of the 16th {ACM} {SIGSOFT} International
+  Symposium on Foundations of Software Engineering, 2008, Atlanta, Georgia,
+  USA, November 9-14, 2008}, pages 214--225, 2008.
 
-\bibitem{Gyimothy:metrics05}
-T.~Gyim{\'{o}}thy, R.~Ferenc, and I.~Siket.
-\newblock Empirical validation of object-oriented metrics on open source
-  software for fault prediction.
-\newblock {\em {IEEE} Trans. Software Eng.}, 31(10):897--910, 2005.
+\bibitem{fowler:refactoring}
+M.~Fowler.
+\newblock {\em Refactoring - Improving the Design of Existing Code}.
+\newblock Addison Wesley object technology series. Addison-Wesley, 1999.
 
-\bibitem{Hill:neighbor07}
-E.~Hill, L.~L. Pollock, and K.~Vijay{-}Shanker.
-\newblock Exploring the neighborhood with dora to expedite software
-  maintenance.
-\newblock In {\em 22nd {IEEE/ACM} International Conference on Automated
-  Software Engineering {(ASE} 2007), November 5-9, 2007, Atlanta, Georgia,
-  {USA}}, pages 14--23, 2007.
+\bibitem{Frakes:reuseStatus05}
+W.~B. Frakes and K.~Kang.
+\newblock Software reuse research: Status and future.
+\newblock {\em {IEEE} Trans. Software Eng.}, 31(7):529--536, 2005.
+
+\bibitem{Holmes:reuseStudy09}
+R.~Holmes, R.~Cottrell, R.~J. Walker, and J.~Denzinger.
+\newblock The end-to-end use of source code examples: An exploratory study.
+\newblock In {\em 25th {IEEE} International Conference on Software Maintenance
+  {(ICSM} 2009), September 20-26, 2009, Edmonton, Alberta, Canada}, pages
+  555--558, 2009.
+
+\bibitem{Holmes:structural05}
+R.~Holmes and G.~C. Murphy.
+\newblock Using structural context to recommend source code examples.
+\newblock In {\em 27th International Conference on Software Engineering {(ICSE}
+  2005), 15-21 May 2005, St. Louis, Missouri, {USA}}, pages 117--125, 2005.
 
 \bibitem{Holmes:ASE09}
 R.~Holmes, T.~Ratchford, M.~P. Robillard, and R.~J. Walker.
@@ -62,20 +47,26 @@ R.~Holmes, T.~Ratchford, M.~P. Robillard, and R.~J. Walker.
   Automated Software Engineering, Auckland, New Zealand, November 16-20, 2009},
   pages 397--408, 2009.
 
-\bibitem{Denys:impactMetrics13}
-H.~H. Kagdi, M.~Gethers, and D.~Poshyvanyk.
-\newblock Integrating conceptual and logical couplings for change impact
-  analysis in software.
-\newblock {\em Empirical Software Engineering}, 18(5):933--969, 2013.
+\bibitem{Holmes:reuse07}
+R.~Holmes and R.~J. Walker.
+\newblock Supporting the investigation and planning of pragmatic reuse tasks.
+\newblock In {\em 29th International Conference on Software Engineering {(ICSE}
+  2007), Minneapolis, MN, USA, May 20-26, 2007}, pages 447--457, 2007.
 
-\bibitem{PRMiner:FSE05}
-Z.~Li and Y.~Zhou.
-\newblock Pr-miner: automatically extracting implicit programming rules and
-  detecting violations in large software code.
+\bibitem{Kim:cloneGenealogy05}
+M.~Kim, V.~Sazawal, D.~Notkin, and G.~C. Murphy.
+\newblock An empirical study of code clone genealogies.
 \newblock In {\em Proceedings of the 10th European Software Engineering
   Conference held jointly with 13th {ACM} {SIGSOFT} International Symposium on
   Foundations of Software Engineering, 2005, Lisbon, Portugal, September 5-9,
-  2005}, pages 306--315, 2005.
+  2005}, pages 187--196, 2005.
+
+\bibitem{Mandelin:jungloid05}
+D.~Mandelin, L.~Xu, R.~Bod{\'{\i}}k, and D.~Kimelman.
+\newblock Jungloid mining: helping to navigate the {API} jungle.
+\newblock In {\em Proceedings of the {ACM} {SIGPLAN} 2005 Conference on
+  Programming Language Design and Implementation, Chicago, IL, USA, June 12-15,
+  2005}, pages 48--61, 2005.
 
 \bibitem{Denys:portfolio11}
 C.~McMillan, M.~Grechanik, D.~Poshyvanyk, Q.~Xie, and C.~Fu.
@@ -84,33 +75,11 @@ C.~McMillan, M.~Grechanik, D.~Poshyvanyk, Q.~Xie, and C.~Fu.
   Engineering, {ICSE} 2011, Waikiki, Honolulu , HI, USA, May 21-28, 2011},
   pages 111--120, 2011.
 
-\bibitem{Nagappan:ICSE06}
-N.~Nagappan, T.~Ball, and A.~Zeller.
-\newblock Mining metrics to predict component failures.
-\newblock In {\em 28th International Conference on Software Engineering {(ICSE}
-  2006), Shanghai, China, May 20-28, 2006}, pages 452--461, 2006.
-
-\bibitem{Orso:impactDynamic03}
-A.~Orso, T.~Apiwattanapong, and M.~J. Harrold.
-\newblock Leveraging field data for impact analysis and regression testing.
-\newblock In {\em Proceedings of the 11th {ACM} {SIGSOFT} Symposium on
-  Foundations of Software Engineering 2003 held jointly with 9th European
-  Software Engineering Conference, {ESEC/FSE} 2003, Helsinki, Finland,
-  September 1-5, 2003}, pages 128--137, 2003.
-
-\bibitem{Murphy:nlConcern11}
-S.~Rastkar, G.~C. Murphy, and A.~W.~J. Bradley.
-\newblock Generating natural language summaries for crosscutting source code
-  concerns.
-\newblock In {\em {IEEE} 27th International Conference on Software Maintenance,
-  {ICSM} 2011, Williamsburg, VA, USA, September 25-30, 2011}, pages 103--112,
-  2011.
-
-\bibitem{Denys:couple11}
-M.~Revelle, M.~Gethers, and D.~Poshyvanyk.
-\newblock Using structural and textual information to capture feature coupling
-  in object-oriented software.
-\newblock {\em Empirical Software Engineering}, 16(6):773--811, 2011.
+\bibitem{Parsons:cognitiveReuse04}
+J.~Parsons and C.~Saunders.
+\newblock Cognitive heuristics in software engineering: Applying and extending
+  anchoring and adjustment to artifact reuse.
+\newblock {\em {IEEE} Trans. Software Eng.}, 30(12):873--888, 2004.
 
 \bibitem{Robillard:FSE05}
 M.~P. Robillard.
@@ -120,11 +89,12 @@ M.~P. Robillard.
   Foundations of Software Engineering, 2005, Lisbon, Portugal, September 5-9,
   2005}, pages 11--20, 2005.
 
-\bibitem{Robillard:TSE04}
-M.~P. Robillard, W.~Coelho, and G.~C. Murphy.
-\newblock How effective developers investigate source code: An exploratory
-  study.
-\newblock {\em {IEEE} Trans. Software Eng.}, 30(12):889--903, 2004.
+\bibitem{Xsnippet:OOPSLA06}
+N.~Sahavechaphan and K.~T. Claypool.
+\newblock Xsnippet: mining for sample code.
+\newblock In {\em Proceedings of the 21th Annual {ACM} {SIGPLAN} Conference on
+  Object-Oriented Programming, Systems, Languages, and Applications, {OOPSLA}
+  2006, October 22-26, 2006, Portland, Oregon, {USA}}, pages 413--430, 2006.
 
 \bibitem{Devanbu:randomWalk07}
 Z.~M. Saul, V.~Filkov, P.~T. Devanbu, and C.~Bird.
@@ -134,48 +104,17 @@ Z.~M. Saul, V.~Filkov, P.~T. Devanbu, and C.~Bird.
   Foundations of Software Engineering, 2007, Dubrovnik, Croatia, September 3-7,
   2007}, pages 15--24, 2007.
 
-\bibitem{Hill:locateConcern07}
-D.~C. Shepherd, Z.~P. Fry, E.~Hill, L.~L. Pollock, and K.~Vijay{-}Shanker.
-\newblock Using natural language program analysis to locate and understand
-  action-oriented concerns.
-\newblock In {\em Proceedings of the 6th International Conference on
-  Aspect-Oriented Software Development, {AOSD} 2007, Vancouver, British
-  Columbia, Canada, March 12-16, 2007}, pages 212--224, 2007.
+\bibitem{Selby:largeReuse05}
+R.~W. Selby.
+\newblock Enabling reuse-based software development of large-scale systems.
+\newblock {\em {IEEE} Trans. Software Eng.}, 31(6):495--510, 2005.
 
-\bibitem{Bodik:slicePLSI07}
-M.~Sridharan, S.~J. Fink, and R.~Bod{\'{\i}}k.
-\newblock Thin slicing.
-\newblock In {\em Proceedings of the {ACM} {SIGPLAN} 2007 Conference on
-  Programming Language Design and Implementation, San Diego, California, USA,
-  June 10-13, 2007}, pages 112--122, 2007.
-
-\bibitem{Weiser:slice84}
-M.~Weiser.
-\newblock Program slicing.
-\newblock {\em {IEEE} Trans. Software Eng.}, 10(4):352--357, 1984.
-
-\bibitem{Ying:cochangeTSE04}
-A.~T.~T. Ying, G.~C. Murphy, R.~T. Ng, and M.~Chu{-}Carroll.
-\newblock Predicting source code changes by mining change history.
-\newblock {\em {IEEE} Trans. Software Eng.}, 30(9):574--586, 2004.
-
-\bibitem{sniafl:TSE06}
-W.~Zhao, L.~Zhang, Y.~Liu, J.~Sun, and F.~Yang.
-\newblock {SNIAFL:} towards a static noninteractive approach to feature
-  location.
-\newblock {\em {ACM} Trans. Softw. Eng. Methodol.}, 15(2):195--226, 2006.
-
-\bibitem{Gall:changeCouple08}
-Y.~Zhou, M.~W{\"{u}}rsch, E.~Giger, H.~C. Gall, and J.~L{\"{u}}.
-\newblock A bayesian network based approach for change coupling prediction.
-\newblock In {\em {WCRE} 2008, Proceedings of the 15th Working Conference on
-  Reverse Engineering, Antwerp, Belgium, October 15-18, 2008}, pages 27--36,
-  2008.
-
-\bibitem{Zimmermann:ICSE08}
-T.~Zimmermann and N.~Nagappan.
-\newblock Predicting defects using network analysis on dependency graphs.
-\newblock In {\em 30th International Conference on Software Engineering {(ICSE}
-  2008), Leipzig, Germany, May 10-18, 2008}, pages 531--540, 2008.
+\bibitem{Xie:ParseWeb07}
+S.~Thummalapenta and T.~Xie.
+\newblock Parseweb: a programmer assistant for reusing open source code on the
+  web.
+\newblock In {\em 22nd {IEEE/ACM} International Conference on Automated
+  Software Engineering {(ASE} 2007), November 5-9, 2007, Atlanta, Georgia,
+  {USA}}, pages 204--213, 2007.
 
 \end{thebibliography}
