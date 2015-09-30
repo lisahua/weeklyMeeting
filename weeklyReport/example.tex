@@ -3,83 +3,128 @@
 \scriptsize 
 \begin{tabular}{@{}p{1\textwidth}} 
  \hline 
-%  \multicolumn{1}{c}{(A) An inconsistent object name found by both Lancelot and \tool } \\ \hline
-%  \vspace{-4mm}
-%\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
-% /* org.elasticsearch.action.DeleteRepositoryRequestBuilder */
-%1.public String setName() \{
-%2.  return setName;
-%3.\}
-%\end{Verbatim}
-%\vspace{-4mm}
-% \\ \hline
-  \multicolumn{1}{c}{(A) Methods queried by user} \\ \hline
+  \multicolumn{1}{c}{(A) Drag-and-Drop View in the Table Format } \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+public class TableViewDisplay extends Display \{
+@override
+  public void run(Composite parent) \{
+    TableViewer table = new Table(parent, SWT.BORDER | 
+      SWT.H_SCROLL | SWT.V_SCROLL);
+    GridLayout layout = new GridLayout();
+    layout.numColumns = 2;
+    layout.makeColumnsEqualWidth = true;
+    table.setLayout(layout);
+    Transfer[] types = new Transfer[] \{TextTransfer.getInstance()\};
+    int dnd = DND.DROP_MOVE | DND.DROP_COPY;
+    table.setTransfer(types);
+    table.setOperation(dnd);
+    table.addDragSupport(new DragListener());
+    table.addDropSupport(new DropListener(table));
+  \} \}
+\end{Verbatim}
+\vspace{-4mm}
+ \\ \hline
+  \multicolumn{1}{c}{(B) DropListener that is related to the main functionality} \\ \hline
     \vspace{-4mm}
 \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
-/* org.apache.jena.json.JsonWriter */
-1. public class JsonWriter implements JsonVisitor \{
-2.  OutputStreamWriter writer;
-3.  public void \bf{visit(JsonNumber jsonNumber)}  \{
-4.   print(jsonNumber.value()) ; 
-5.  \}
-6.  public void \bf{visit(JsonBoolean jsonBoolean)} \{
-7.   String x = Boolean.valueOf(jsonBoolean.value())?"true":"false"; 
-8.   print(x);
-9.  \}
-10. private void \underline{print(Object s)} \{...
-11.  writer.println(s);
-12. \} ...\}
+public class DropListener implements DropTargetListener \{
+    private TableViewer table;
+    public DropListener(TableView table) 
+       \{ this.table = table; \}
+ @Override
+    public void drop(DropTargetEvent event) \{
+      TableItem item = (TableItem) event.data;
+       table.add(item);
+   \} \}
  \end{Verbatim}
    \vspace{-4mm}
   \\ \hline
-   \multicolumn{1}{c}{(B) Callers of these two methods} \\ \hline
+   \multicolumn{1}{c}{(C) DragListener  that is related to the main functionality} \\ \hline
   \vspace{-4mm}
 \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
- /* org.apache.accumulo.core.sync.SortedMapIterator */
-1. public class JsonNumber extends JsonValue \{
-2.  Format format;
-3.  @Override
-4.  public Object \underline{value()}
-5.   \{ return format.getValue(value); \}
-6.  @Override
-7.  public void \uwave{visit(JsonVisitor visitor)}
-8.   \{ visitor.visit(this) ; \}
-9. \}
-10. public class JsonBoolean extends JsonValue \{
-11.  @Override
-12.  public Object \underline{value()}
-13.   \{ return value; \}
-14.  @Override
-15.  public void \uwave{visit(JsonVisitor visitor)}
-16.   \{ visitor.visit(this) ; \}
-17. \}
- /* Three of other 13 callers */
-18. public class JsonFormatNumberHandler extends JsonHandler \{
-19.  public static void \uwave{printNumber(JsonNumber jNum)} \{
-20.   JsonWriter w = new JsonWriter(output);
-21.   jNum.setFormat(format);
-22.   w.visit(jNum);
-23. \} ...\}
-24. public class JSONNumberOptional \{
-25.  JsonBoolean jBool; 
-26.  JsonNumber left, right;
-27.  public static void \uwave{recordOptional()} \{
-28.   JsonWriter w = new JsonWriter(output);
-29.   w.visit(left);
-30.   w.visit(jBool);
-31.   w.visit(right);
-32. \} ...\}
-33. public class JSON \{
-34.  public static void \uwave{write(JsonValue jValue)} \{
-35.   JsonWriter w = new JsonWriter(output);
-36.   w.visit(jValue);
-37. \} ...\}
+public class DragListener implements DragSourceListener \{
+   @Override
+  public void dragSetData(DragSourceEvent event) \{
+    TableItem item = (TableItem) event.getSelection();
+    event.data = item.toString();
+  \}
 \end{Verbatim}
 \vspace{-4mm}
  \\ \hline
 \end{tabular} 
-\caption{Example of suggested elements given a set of interest}
-\label{fig:compare}
+\caption{Drag-and-Drop Example for shopping cart}
+\label{fig:cartTable}
+\end{minipage}
+\end{figure}
+
+
+\begin{figure}[!htb]
+ \begin{minipage}{0.47\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+  \multicolumn{1}{c}{(A) Drag-and-Drop View in Eclipse Viewer } \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+public class ListViewPart extends ViewPart \{
+  @Override
+  public void createPartControl(Composite parent) \{
+    ListViewer viewer = new ListViewer(parent, 
+       SWT.H_SCROLL|SWT.V_SCROLL);
+    int ops = DND.DROP_COPY | DND.DROP_MOVE;
+    Transfer[] transT = new Transfer[]\{TextTransfer.getInstance()\};
+    viewer.setTransfer(transT);
+    viewer.setOperation(ops);
+    viewer.addDragSupport(new DragListener());
+    viewer.addDropSupport(new DropListener(viewer));
+    viewer.setContentProvider(new TodoModelProvider());
+  \} \}
+\end{Verbatim}
+\vspace{-4mm}
+ \\ \hline
+  \multicolumn{1}{c}{(B) DropListener that is related to the main functionality } \\ \hline
+    \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+public class DropListener implements DropTargetListener \{
+  private ListViewer viewer;
+  public DragListener() 
+  \{ this.viewer = viewer; \}
+ @Override
+    public void drop(DropTargetEvent event) \{
+        ISelection sel=(ISelection) event.data;
+        viewer.add(sel.toString());
+   \} \}
+ \end{Verbatim}
+   \vspace{-4mm}
+  \\ \hline
+   \multicolumn{1}{c}{(C) DragListener that is related to the main functionality} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+public class DragListener implements DragSourceListener \{
+   @Override
+  public void dragSetData(DragSourceEvent event) \{
+    ISelection sel = event.getSelection();
+    event.data = sel.toString();
+  \}
+\end{Verbatim}
+\vspace{-4mm}
+ \\ \hline
+    \multicolumn{1}{c}{(D) Structured Data Provider for Drag-and-Drop} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+public class TodoModelProvider implements IStructuredContentProvider \{
+  @override
+    public Object[] getElements(Object inputElement) \{
+    List<Todo> list = (List<Todo>) inputElement;
+    return list.toArray();
+  \}
+  \end{Verbatim}
+\vspace{-4mm}
+ \\ \hline
+\end{tabular} 
+\caption{Drag-and-Drop Example for TODO labels}
+\label{fig:todoList}
 \end{minipage}
 \end{figure}
 
