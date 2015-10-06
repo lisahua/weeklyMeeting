@@ -1,169 +1,119 @@
 \begin{figure}[!htb]
- \begin{minipage}{0.47\textwidth}
+ \begin{minipage}{0.5\textwidth}
 \scriptsize 
 \begin{tabular}{@{}p{1\textwidth}} 
  \hline 
-  \multicolumn{1}{c}{(A) Drag-and-Drop View in the Table Format } \\ \hline
+  \multicolumn{1}{c}{(A) Common facts} \\ \hline
   \vspace{-4mm}
 \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
-public class TableViewDisplay extends Display \{
-@override
-  public void run(Composite parent) \{
-    TableViewer table = new Table(parent, SWT.BORDER | 
-      SWT.H_SCROLL | SWT.V_SCROLL);
-    GridLayout layout = new GridLayout();
-    layout.numColumns = 2;
-    layout.makeColumnsEqualWidth = true;
-    table.setLayout(layout);
-    Transfer[] types = new Transfer[] \{TextTransfer.getInstance()\};
-    int dnd = DND.DROP_MOVE | DND.DROP_COPY;
-    table.setTransfer(types);
-    table.setOperation(dnd);
-    table.addDragSupport(new DragListener());
-    table.addDropSupport(new DropListener(table));
-  \} \}
+import javax.swing.undo.UndoManager;
+import javax.swing.event.UndoableEditListener;
+import javax.swing.AbstractAction;
+
+public class Foo \{
+  public void run() \{
+   UndoManager undoManager = new UndoManager();
+  \}\}
+  class UndoListener implements UndoableEditListener \{
+  public void undoableEditHappened(UndoableEditEvent e) \{
+    undoManager.addEdit(e.getEdit());
+  \}\}
+class UndoAction extends AbstractAction \{
+   public void actionPerformed(ActionEvent e) \{   
+     undoManager.undo();  
+  \}\}
+class RedoAction extends AbstractAction \{
+  public void actionPerformed(ActionEvent e) \{
+     undoManager.redo();
+  \}\}
 \end{Verbatim}
 \vspace{-4mm}
  \\ \hline
-  \multicolumn{1}{c}{(B) DropListener that is related to the main functionality} \\ \hline
+  \multicolumn{1}{c}{(B) Auxiliary facts: Menu} \\ \hline
     \vspace{-4mm}
 \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
-public class DropListener implements DropTargetListener \{
-    private TableViewer table;
-    public DropListener(TableView table) 
-       \{ this.table = table; \}
- @Override
-    public void drop(DropTargetEvent event) \{
-      TableItem item = (TableItem) event.data;
-       table.add(item);
-   \} \}
+import com.sun.java.swing.*;
+
+public class Foo \{
+  public void run() \{
+   UndoManager undoManager = new UndoManager();
+   new TextComposite().getDocument().addUndoableEditListener(new UndoListener());
+   new JMenuItem(new UndoAction());
+   new JMenuItem(new RedoAction());
+  \}\}
  \end{Verbatim}
    \vspace{-4mm}
   \\ \hline
-   \multicolumn{1}{c}{(C) DragListener  that is related to the main functionality} \\ \hline
+   \multicolumn{1}{c}{(C) Auxiliary facts: Button} \\ \hline
   \vspace{-4mm}
 \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
-public class DragListener implements DragSourceListener \{
-   @Override
-  public void dragSetData(DragSourceEvent event) \{
-    TableItem item = (TableItem) event.getSelection();
-    event.data = item.toString();
-  \}
-\end{Verbatim}
-\vspace{-4mm}
- \\ \hline
+import javax.swing.undo.UndoableEditSupport;
+import com.sun.java.swing.Button;
+
+public class Foo \{
+  public void run() \{
+   UndoManager undoManager = new UndoManager();
+   new Button.addActionListener(new UndoAction());
+   new Button.addActionListener(new RedoAction());
+   new UndoableEditSupport().addUndoableEditListener(new UndoListener());
+  \}\}
+  \end{Verbatim}
+        \vspace{-4mm}
+     \\ \hline
 \end{tabular} 
-\caption{Drag-and-Drop Example for shopping cart}
-\label{fig:cartTable}
+\caption{Common features and auxiliary features extracted from informal resources}
+\label{fig:fact}
 \end{minipage}
 \end{figure}
+
 
 
 \begin{figure}[!htb]
- \begin{minipage}{0.47\textwidth}
+ \begin{minipage}{0.5\textwidth}
 \scriptsize 
 \begin{tabular}{@{}p{1\textwidth}} 
  \hline 
-  \multicolumn{1}{c}{(A) Drag-and-Drop View in Eclipse Viewer } \\ \hline
+  \multicolumn{1}{c}{(D) User's context} \\ \hline
   \vspace{-4mm}
 \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
-public class ListViewPart extends ViewPart \{
-  @Override
-  public void createPartControl(Composite parent) \{
-    ListViewer viewer = new ListViewer(parent, 
-       SWT.H_SCROLL|SWT.V_SCROLL);
-    int ops = DND.DROP_COPY | DND.DROP_MOVE;
-    Transfer[] transT = new Transfer[]\{TextTransfer.getInstance()\};
-    viewer.setTransfer(transT);
-    viewer.setOperation(ops);
-    viewer.addDragSupport(new DragListener());
-    viewer.addDropSupport(new DropListener(viewer));
-    viewer.setContentProvider(new TodoModelProvider());
-  \} \}
+import com.sun.java.swing.*;
+
+public class MyTextEditor \{
+  public void init() \{
+    JFrame frame = new JFrame("Undo Sample");
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    JTextArea textArea = new JTextArea();
+   JButton undoBtn_;
+   //add undo and redo action to text editor
+  \}\} 
 \end{Verbatim}
-\vspace{-4mm}
- \\ \hline
-  \multicolumn{1}{c}{(B) DropListener that is related to the main functionality } \\ \hline
     \vspace{-4mm}
+     \\ \hline
+  \multicolumn{1}{c}{(E) Suggested reuse plan based on user's context} \\ \hline
 \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
-public class DropListener implements DropTargetListener \{
-  private ListViewer viewer;
-  public DragListener() 
-  \{ this.viewer = viewer; \}
- @Override
-    public void drop(DropTargetEvent event) \{
-        ISelection sel=(ISelection) event.data;
-        viewer.add(sel.toString());
-   \} \}
- \end{Verbatim}
-   \vspace{-4mm}
-  \\ \hline
-   \multicolumn{1}{c}{(C) DragListener that is related to the main functionality} \\ \hline
-  \vspace{-4mm}
-\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
-public class DragListener implements DragSourceListener \{
-   @Override
-  public void dragSetData(DragSourceEvent event) \{
-    ISelection sel = event.getSelection();
-    event.data = sel.toString();
-  \}
-\end{Verbatim}
-\vspace{-4mm}
- \\ \hline
-    \multicolumn{1}{c}{(D) Structured Data Provider for Drag-and-Drop} \\ \hline
-  \vspace{-4mm}
-\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
-public class TodoModelProvider implements IStructuredContentProvider \{
-  @override
-    public Object[] getElements(Object inputElement) \{
-    List<Todo> list = (List<Todo>) inputElement;
-    return list.toArray();
-  \}
+import com.sun.java.swing.*;
+import javax.swing.undo.UndoManager;
+import javax.swing.event.UndoableEditListener;
+import javax.swing.AbstractAction;
+
+public class MyTextEditor \{
+    JFrame frame = new JFrame("Undo Sample");
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    JTextArea textArea = new JTextArea();
+   JButton undoBtn_;
+   JButton redoButton; //added
+  public void init() \{
+   //add undo and redo action to text editor
+   textArea.getDocument().addUndoableEditListener(new UndoListener());
+   undoBtn_ = new Button.addActionListener(new UndoAction());
+   redoButton  = new Button.addActionListener(new RedoAction());
+  \}\}
   \end{Verbatim}
-\vspace{-4mm}
- \\ \hline
+      \vspace{-4mm}
+     \\ \hline
 \end{tabular} 
-\caption{Drag-and-Drop Example for TODO labels}
-\label{fig:todoList}
+\caption{User's context and best-fit reuse plan based on the context}
+\label{fig:context}
 \end{minipage}
 \end{figure}
 
-
-
-%%%%%%%Usage pattern example %%%%%%%
-
-%
-%\begin{figure}[!htb]
-% \begin{minipage}{0.47\textwidth}
-%\scriptsize 
-%\begin{tabular}{@{}p{1\textwidth}} 
-% \hline 
-% \multicolumn{1}{c}{(A) An inconsistent object name found by both Lancelot and \tool } \\ \hline
-%  \vspace{-4mm}
-%\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
-% /* org.elasticsearch.action.delete.DeleteRepositoryRequestBuilder */
-%1.public String setName() \{
-%2.  return setName;
-%3.\}
-%\end{Verbatim}
-%\vspace{-4mm}
-% \\ \hline
-%  \multicolumn{1}{c}{(B) A naming bug from Lancelot} \\ \hline
-%   \vspace{-4mm}
-%\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
-%/* org.elasticsearch.action.termvector.TermVectorFields */
-%1.public void size(int size) \{
-%2.  if (size <= 0) 
-%3.   throw new legalArgumentException("Size must be positive"); 
-%4.  this.size = size;
-%5.\}
-% \end{Verbatim}
-% Lancelot said: Methods with this name never return void.
-% \vspace{-4mm}
-%  \\ \hline
-%\end{tabular} 
-%\caption{Name Checker comparison}
-%\label{fig:compare}
-%\end{minipage}
-%\end{figure}
- 
