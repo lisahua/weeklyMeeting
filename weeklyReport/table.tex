@@ -1,283 +1,55 @@
-\begin{table*}[ht]
-
+\begin{table}[ht]
 \begin{center}
-\caption{Table of different structural measure to identify related elements}
+\caption{Comparison of representative code search tools, code reuse tools, and code transformation tools}
 \label{tab:total}
 \vspace{1mm}
 \scriptsize{
-\begin{tabular*}{1\textwidth}{@{}c|c|c|c|c|c|c@{}} \hline
-Type&Citation&Level&Represent&Input&Application&Limitation\\\hline
-Metrics& coupling~\cite{Briand:structural99}, fault prediction~\cite{ Gyimothy:metrics05, Nagappan:ICSE06} &class&metrics&a single class&impact analysis&coarse-grained\\ \hline
-Slicing&Weiser~\cite{Weiser:slice84}, Thin slice~\cite{Bodik:slicePLSI07}&method&graph&a single element&navigation, code search&expensive, large slice\\ \hline
-Topology& Suade ~\cite{Robillard:FSE05, Devanbu:randomWalk07}, network~\cite{Zimmermann:ICSE08},&method&fuzzy set, &1 or more elements&navigation,&limited scope\\ 
--based&dependency graph~\cite{PRMiner:FSE05, Orso:impactDynamic03, Murphy:nlConcern11} &&network&& impact analysis &\\\hline
+\begin{tabular*}{0.5\textwidth}{@{}l|ccccccc@{}} \hline
+Tool&I&$O_{m}$&Related&Cluster&Partial&Transfer\\\hline
+RecoDoc~\cite{RecoDoc:ICSE12}&D&&&&\checkmark\\
+ACE~\cite{PeterACE:ICSE13}&D&&&&\checkmark\\
+MAPO~\cite{MAPO:ECOOP09}&M&&&\checkmark&\checkmark\\
+Buse et al.~\cite{Buse:apiICSE12}&M&&&\checkmark&\checkmark\\
+SNIFF~\cite{sniff:Sen09}&Q&&&\checkmark&\checkmark\\
+%Strathcona~\cite{Holmes:structural05}&C&C&&\checkmark&&\\
+%Prompter~\cite{Prompter:MSR14}&W&C&&\checkmark&&\\ 
+%Portfolio~\cite{Portfolio:DenysICSE11}&W&Q&&\checkmark&&\\
+%Export~\cite{Export:DenysASE13}&C&M&&\checkmark&&\\
+%Sourcerer~\cite{Sourcerer:SC14}&C&Q&&\checkmark&&\\ 
+%CodeGenie~\cite{TDCS:SAC09}&C&Q&&\checkmark&&\\
 
+%Prospector~\cite{Mandelin:jungloid05}&C&T&&\checkmark\\ 
+%PRIME~\cite{Prime:OOPSLA12}&C&Q&&\checkmark&&\\
+MUSE~\cite{MUSE:MarcusICSE15}&M&&\checkmark&\checkmark&\\ 
+Keivanloo~\cite{spotWork:ICSE14}&Q&&\checkmark&\checkmark&\\
+PRIME~\cite{Prime:OOPSLA12}&Q&&\checkmark&&\checkmark\\
+%\hline
+%SSI~\cite{SSI:FSE10}&C&Q&&\checkmark&&\\
+%PARSEWeb~\cite{parseWeb:ASE07}&\\
+%CodeHint~\cite{CodeHint:ICSE14}&\\  \hline
+Gilligan~\cite{Holmes:reuse07}&E&\checkmark&\checkmark&&\\
+%Procrustes~\cite{Holmes:ASE09}&E&\checkmark&\checkmark&&\\ 
+Jigsaw~\cite{Cottrell:jigsaw08}&E&&\checkmark&&&\checkmark\\ 
+LASE~\cite{LASE:ICSE13}&E&&\checkmark&\checkmark&&\checkmark\\ \hline
+%Grapacc~\cite{Grapacc:ICSE12}&C&E&&&&\checkmark\\ \hline
+Ours&Q&\checkmark&\checkmark&\checkmark&\checkmark&\checkmark\\
 \end{tabular*}
  \label{tab:dataset}
 \vspace{0.1cm}
 
-
+%The {\bf Source} column specifies the input source ({\bf C}orpus, {\bf W}eb, {\bf U}ser);
+The {\bf I} column specifies the input  format (Informal {\bf D}ocument, {\bf M}ethod, free-form {\bf Q}uery, {\bf E}xample); 
+The {\bf $O_{m}$} column specifies if the  output is across the method boundary; The {\bf Related} column specifies if the tool considers related methods when recommending example or performing transformation; 
+The {\bf Cluster} column specifies if the output results are clustered to reduce redundancy; 
+The {\bf Partial} column specifies if the tool supports partial program as input.
+The {\bf Transfer} column specifies if the tool is able to transfer the code to another context.
 }
  \end{center}
-\end{table*}
+\end{table}
+
+
+%MAPO:ECOOP09, Buse:apiICSE12, sniff:Sen09, Holmes:structural05, Prompter:MSR14, Portfolio:DenysICSE11, Export:DenysASE13, Prime:OOPSLA12, MUSE:MarcusICSE15, spotWork:ICSE14
 
 
 
-
-
-%%%%%Lisa: comment out as we delete use pattern - M column
-%\begin{table*}[ht]
-%
-%\begin{center}
-%\caption{Project Dataset}
-%\label{tab:total}
-%\scriptsize{
-%\begin{tabular*}{1\textwidth}{@{}l|rrrr|rr|rrrrr@{}}
-%\multicolumn{7}{c}{~}& \multicolumn{5}{c}{\textbf{Inconsistent Names}}\\
-% & \multicolumn{4}{c|}{~} & \multicolumn{2}{c|}{Versions}  & &
-% \multicolumn{2}{c}{Purity analysis}  & \multicolumn{2}{c}{Use Pattern}      \\ 
-%{Project} & {Days}  &
-%{LOC} & {Methods}  &
-%{P+V+F} & {Commits} &
-%{Fixes}  & All & Pure & Impure &  P+V+F & M \\\midrule
-%accumulo-1.3.5--1.6.0&1,205&151,431&13,769&30,693&3,635&699&902&654&157&11&80\\
-%airavata-0.5--0.10&813&87,657&8,219&21,292&1,750&546&688&453&145&6&84\\
-%archiva-1.3--2.1.0&2,237&83,196&5,091&12,599&2,120&592&392&262&45&3&82\\
-%cayenne-3.0--3.1&1,912&197,865&18,414&39,920&1,817&265&1,720&1,344&166&39&171\\
-%collections-3.0--4.0&4,000&45,963&4,807&7,598&1,194&194&622&427&170&3&22\\
-%commons-io-1.0--2.2&3,898&4,185&449&862&1,023&144&18&12&5&0&1\\
-%commons-lang-3.0-3.3.2&1,286&49,992&4,224&8,508&810&83&206&153&33&0&20\\
-%commons-vfs-1.0--2.0&2,951&26,518&2,472&4,207&752&117&327&242&61&1&23\\
-%continuum-1.0--1.4.2&3,162&17,292&1,233&3,466&1,631&312&127&92&21&0&14\\
-%curator-1.0--2.7.0&1,108&51,111&1,024&2,351&671&94&103&59&15&3&26\\
-%cxf-2.3.0--3.0.0&1,566&355,626&3,807&74,947&6,252&947&312&239&44&4&25\\
-%deltaspike-0.4--1.2.0&588&33,212&2,193&3,984&463&71&220&180&33&0&7\\
-%giraph-0.1--1.1.0&1,080&15,244&983&2,385&519&48&92&66&12&0&14\\
-%gora-0.2--0.5&1,379&7,457&1,412&2,921&595&100&53&34&12&0&7\\
-%hama-0.2--0.6.4&1,529&154,015&3,763&1,762&5,417&590&1,723&1,387&184&0&152\\
-%hbase-0.90--1.0.0&1,859&245,919&22,999&53,227&1,887&269&2,448&1,970&175&12&291\\
-%jackrabbit-2.0--2.9.0&3,041&37,372&20,531&52,118&2,813&394&305&202&38&29&36\\
-%james-2.3.2-3.0&1,585&211,729&2,796&6,976&4,272&750&997&814&124&6&53\\
-%jclouds-1.0--1.8.1&2,090&30,460&10,346&38,286&2,109&399&325&224&85&0&16\\
-%mahout-0.1--0.9&846&144,907&2,985&7,761&1,574&200&979&670&181&1&127\\
-%manifoldcf-1.0--1.8&653&65,788&7,423&29,436&1,104&335&492&393&49&5&45\\
-%marmotta-import-3.3.0&1,566&68,261&6,037&14,311&547&94&646&465&160&0&21\\
-%maven-3.0--3.2.5&2,995&25,183&5,797&13,920&1,729&450&251&134&76&5&36\\
-%mina-1.0.0--2.0.9&1,098&89,406&2,397&4,032&965&190&823&595&139&6&83\\
-%myfaces-2.0--2.1.11&2,327&59,972&8,147&14,459&874&206&688&458&176&3&51\\
-%ode-1.0--1.3.6&2,828&187,008&6,014&13,742&7,584&2,622&1,557&1,189&218&11&139\\
-%openjpa-1.0--2.3.0&2,706&151,562&12,059&36,448&2,912&426&1,560&1,267&166&0&127\\
-%opennlp-asf--1.6.0&2,272&49,952&9,275&24,135&1,573&185&1,008&818&183&4&3\\
-%phoenix-2.2--3.2.2&358&82,949&5,993&19,098&629&70&661&489&132&2&38\\
-%pig-0.1--0.14.0&2,148&28,695&1,033&6,209&2,002&233&73&58&11&2&2\\
-%pivot-1.0--2.0.4&2,365&43,728&4,648&11,386&3,383&860&352&212&92&3&45\\
-%roller-2.0--5.0.1&3,337&46,997&7,340&20,006&2,154&574&840&636&151&2&51\\
-%stratos-3.0.0-4.1.0&491&39,459&3,518&9,254&3,036&723&437&276&125&5&31\\
-%struts-2.1--2.3.21&2,618&52,931&5,972&11,259&1,335&167&515&341&119&1&54\\
-%syncope-0.2--1.2.2&1,516&23,903&1,944&3,855&1,367&321&228&173&25&0&30\\
-%tez-0.2.0--0.6.0&421&55,853&1,908&11,323&700&71&248&147&82&1&18\\
-%wicket-1.5--6.18.0&1,243&160,997&13,061&25,534&2,609&319&1,291&961&212&6&112\\
-%zookeeper-3.0--2.6.0&2,223&21,566&1,761&4,410&602&64&195&103&61&2&29\\
-%hadoop-1.0--2.6.0&959&282,144&19,885&64,481&5,816&1,858&1,393&847&284&40&222\\  \midrule
-%\textbf{Total}&N/A&3,487,505&255,729&713,161&82,225&16,582&25,817&19,046&4,167&216&2,388\\
-%\textbf{Average}&1,853&89,423&6,557&18,286&2,108&425&662&488&107&6&61\\ 
-%\end{tabular*}
-% \label{tab:dataset}
-%\vspace{0.1cm}
-%P+V+F: parameters, local variables, and fields; M: Methods; }
-% \end{center}
-%\end{table*}
-
-%\begin{table*}[ht]
-%
-%\begin{center}
-%\caption{Project Dataset}
-%\label{tab:total}
-%\scriptsize{
-%\begin{tabular*}{1\textwidth}{l|rrrrr|rr|rrrr}
-%%{p{1.5cm}p{0.3cm}p{0.8cm}p{0.3cm}p{0.2cm}p{0.9cm}|p{0.7cm}p{0.4cm}|p{0.5cm}p{0.3cm}p{0.3cm}p{0.5cm}|p{1cm}p{1cm}p{1.5cm}p{1.5cm}} 
-% \hline
-%  & \multicolumn{5}{c|}{Project Details} & \multicolumn{2}{c|}{Versions}  & \multicolumn{4}{c}{Inconsistent Names}      \\ \hline
-%\multirow{2}{*}{Project} & \multirow{2}{*}{Days}  &  \multirow{2}{*}{\#Files} & \multirow{2}{*}{LOC} & \multirow{2}{*}{\#Methods}  & \multirow{2}{*}{\#P+V+F} & \multirow{2}{*}{\#Commits} & \multirow{2}{*}{\#Fix}  & \multirow{2}{*}{$\sum IN$} & \multirow{2}{*}{Purity} &  \multicolumn{2}{c}{Usage Pattern} \\
-%		&						 & &&&&& &&	  &P+V+F & M \\ \hline
-%accumulo-1.3.5--1.6.0&1,205&749&151,431&13,769&30,693&3,635&699&902&811&11&80\\
-%airavata-0.5--0.10&813&1028&87,657&8,219&21,292&1,750&546&688&598&6&84\\
-%archiva-1.3--2.1.0&2,237&728&83,196&5,091&12,599&2,120&592&492&407&3&82\\
-%cayenne-3.0--3.1&1,912&2779&197,865&18,414&39,920&1,817&265&1,720&1,510&39&171\\
-%collections-3.0--4.0&4,000&417&45,963&4,807&7,598&1,194&194&622&597&3&22\\
-%commons-io-1.0--2.2&3,898&56&4,185&449&862&1,023&144&158&157&0&1\\
-%commons-lang-3.0-3.3.2&1,286&214&49,992&4,224&8,508&810&83&306&286&0&20\\
-%commons-vfs-1.0--2.0&2,951&303&26,518&2,472&4,207&752&117&387&363&1&23\\
-%continuum-1.0--1.4.2&3,162&214&17,292&1,233&3,466&1,631&312&247&233&0&14\\
-%curator-1.0--2.7.0&1,108&206&51,111&1,024&2,351&671&94&273&244&3&26\\
-%cxf-2.3.0--3.0.0&1,566&4078&355,626&3,807&74,947&6,252&947&412&383&4&25\\
-%deltaspike-0.4--1.2.0&588&721&33,212&2,193&3,984&463&71&320&313&0&7\\
-%giraph-0.1--1.1.0&1,080&150&15,244&983&2,385&519&48&262&248&0&14\\
-%gora-0.2--0.5&1,379&81&7,457&1,412&2,921&595&100&161&154&0&7\\
-%hama-0.2--0.6.4&1,529&1304&154,015&763&1,762&5,417&590&1,735&1,571&0&152\\
-%hbase-0.90--1.0.0&1,859&2399&245,919&22,999&53,227&1,887&269&2,465&2,145&12&291\\
-%jackrabbit-2.0--2.9.0&3,041&375&37,372&23,531&52,118&2,813&394&372&330&29&36\\
-%james-2.3.2-3.0&1,585&3704&211,729&2,796&6,976&4,272&750&991&938&6&53\\
-%jclouds-1.0--1.8.1&2,090&455&30,460&10,346&38,286&2,109&399&426&409&0&16\\
-%mahout-0.1--0.9&846&806&144,907&2,985&7,761&1,574&200&983&851&1&127\\
-%manifoldcf-1.0--1.8&653&823&65,788&7,423&29,436&1,104&335&587&542&5&45\\
-%marmotta-import-3.3.0&1,566&830&68,261&6,037&14,311&547&94&651&625&0&21\\
-%maven-3.0--3.2.5&2,995&268&25,183&5,797&13,920&1,729&450&352&310&5&36\\
-%mina-1.0.0--2.0.9&1,098&980&89,406&2,397&4,032&965&190&820&734&6&83\\
-%myfaces-2.0--2.1.11&2,327&954&59,972&8,147&14,459&874&206&696&634&3&51\\
-%ode-1.0--1.3.6&2,828&988&187,008&6,014&13,742&7,584&2,622&1,546&1,407&11&139\\
-%openjpa-1.0--2.3.0&2,706&1271&151,562&12,059&36,448&2,912&426&1,560&1,433&0&127\\
-%opennlp-asf--1.6.0&2,272&1783&49,952&9,275&24,135&1,573&185&1,008&1,001&4&3\\
-%phoenix-2.2--3.2.2&358&697&82,949&5,993&19,098&629&70&661&621&2&38\\
-%pig-0.1--0.14.0&2,148&306&28,695&1,033&6,209&2,002&233&213&209&2&2\\
-%pivot-1.0--2.0.4&2,365&458&43,728&4,648&11,386&3,383&860&452&404&3&45\\
-%roller-2.0--5.0.1&3,337&780&46,997&7,340&20,006&2,154&574&840&787&2&51\\
-%stratos-3.0.0-4.1.0&491&489&39,459&3,518&9,254&3,036&723&437&401&5&31\\
-%struts-2.1--2.3.21&2,618&837&52,931&5,972&11,259&1,335&167&515&460&1&54\\
-%syncope-0.2--1.2.2&1,516&272&23,903&1,944&3,855&1,367&321&418&388&0&30\\
-%tez-0.2.0--0.6.0&421&492&55,853&1,908&11,323&700&71&348&329&1&18\\
-%wicket-1.5--6.18.0&1,243&2527&160,997&13,061&25,534&2,609&319&1,291&1,173&6&112\\
-%zookeeper-3.0--2.6.0&2,223&189&21,566&1,761&4,410&602&64&295&264&2&29\\
-%hadoop-1.0--2.6.0&959&1988&282,144&19,885&64,481&5,816&1,858&1,393&1,131&40&222\\ \hline
-%Average&1,853&967&89,423&6,557&18,286&2,108&425&718&651&6&61\\ \hline
-%Total&&37,699&3,487,505&255,729&713,161&82,225&16,582&28,005&25,401&216&2,388\\ \hline
-%
-%%Total & avg: 1825 		& 1053 & 3,931,365 & 41,887 & 395,568 & 111,776 & 
-%\end{tabular*}
-%
-%\vspace{0.1cm}
-%P+V+F: parameters, local variables, and fields; M: Methods; $\sum IN$: The total number of inconsistent names;
-% }
-% \end{center}
-%\end{table*}
-
-
-
-
-
-%
-%
-\begin{comment}
-\begin{table*}[ht]
-\begin{center}
-\caption{Probability of  bug fixes (F) and inconsistent names (I) at the method level}
-\label{tab:bayes}
-\vspace{1mm}
-\scriptsize{
-\begin{tabular*}{0.83\textwidth}{@{}l|rrrr|rr|rrrr@{}}
-%{p{1.5cm}p{0.5cm}p{0.5cm}p{0.5cm}c|cccc|p{0.4cm}p{0.4cm}p{0.4cm}|p{0.5cm}p{0.5cm}p{0.5cm}p{0.5cm}p{0.5cm}p{0.5cm}}  \hline
-project  &{Methods}&$|I|$&$|F|$&$|F \cap I|$&$P(I)$&$P(F)$&$P(I|F)$&$P(I|\neg F)$ &$P(F|I)$&$P(F|\neg I)$\\ \midrule
-accumulo&13,769&817&7,635&531&0.06&0.55&0.07&0.05&0.65&0.55\\
-airavata&8,219&601&4,552&373&0.07&0.55&0.08&0.06&0.62&0.55\\
-archiva&5,091&309&1,779&158&0.06&0.35&0.09&0.05&0.51&0.34\\
-cayenne&18,414&1,527&6,485&779&0.08&0.35&0.12&0.06&0.51&0.34\\
-commons/collect&4,807&598&2,994&419&0.12&0.62&0.14&0.10&0.70&0.61\\
-commons/io&449&57&198&25&0.13&0.44&0.12&0.13&0.43&0.44\\
-commons/lang&4,224&426&1,558&260&0.10&0.37&0.17&0.06&0.61&0.34\\
-commons/vfs&2,472&304&956&140&0.12&0.39&0.15&0.11&0.46&0.38\\
-continuum&1,233&113&647&71&0.09&0.52&0.11&0.07&0.63&0.51\\
-curator&1,024&77&461&49&0.08&0.45&0.11&0.05&0.64&0.43\\
-cxf&3,807&285&1542&143&0.07&0.41&0.09&0.06&0.50&0.40\\
-deltaspike&2,193&213&1,137&115&0.10&0.52&0.10&0.09&0.54&0.52\\
-giraph&983&78&650&51&0.08&0.66&0.08&0.08&0.66&0.66\\
-gora&1,412&146&886&110&0.10&0.63&0.12&0.07&0.75&0.61\\
-hama&3,763&271&1726&160&0.07&0.46&0.09&0.05&0.59&0.45\\
-hbase&22,999&2,152&14,989&1636&0.09&0.65&0.11&0.06&0.76&0.64\\
-jackrabbit&20,531&1249&14,043&1037&0.06&0.68&0.07&0.03&0.83&0.67\\
-james&2,796&242&1,376&152&0.09&0.49&0.11&0.06&0.63&0.48\\
-jclouds&10,346&709&6,771&553&0.07&0.65&0.08&0.04&0.78&0.65\\
-mahout&2,985&372&908&171&0.12&0.30&0.19&0.10&0.46&0.28\\
-manifoldcf&7,423&847&3,439&457&0.11&0.46&0.13&0.10&0.54&0.45\\
-marmotta&6,037&625&3,733&431&0.10&0.62&0.12&0.08&0.69&0.61\\
-maven&5,797&513&1,929&292&0.09&0.33&0.15&0.06&0.57&0.31\\
-mina&2,397&240&1,025&156&0.10&0.43&0.15&0.06&0.65&0.40\\
-myfaces&8,147&635&1995&406&0.08&0.24&0.20&0.04&0.64&0.21\\
-ode&6,014&913&2578&484&0.15&0.43&0.19&0.12&0.53&0.41\\
-openjpa&12,059&1,433&8,201&1032&0.12&0.68&0.13&0.10&0.72&0.67\\
-opennlp&9,275&1,003&4,225&592&0.11&0.46&0.14&0.08&0.59&0.44\\
-phoenix&5,993&623&2,996&355&0.10&0.50&0.12&0.09&0.57&0.49\\
-pig&1,033&71&602&41&0.07&0.58&0.07&0.07&0.58&0.58\\
-pivot&4,648&307&1585&160&0.07&0.34&0.10&0.05&0.52&0.33\\
-roller&7,340&789&3,145&410&0.11&0.43&0.13&0.09&0.52&0.42\\
-stratos&3,518&403&1,973&246&0.11&0.56&0.12&0.10&0.61&0.55\\
-struts&5,972&461&3,431&286&0.08&0.57&0.08&0.07&0.62&0.57\\
-syncope&1,944&198&836&105&0.10&0.43&0.13&0.08&0.53&0.42\\
-tez&1,908&230&901&120&0.12&0.47&0.13&0.11&0.52&0.47\\
-wicket&13,061&1,175&4,207&646&0.09&0.32&0.15&0.06&0.55&0.30\\
-zookeeper&1,761&166&563&65&0.09&0.32&0.11&0.08&0.39&0.31\\
-hadoop&19,885&2,145&12,512&1630&0.11&0.63&0.13&0.07&0.76&0.61\\ \midrule
-\textbf{Total}&255,729&23,323&131,169&14,845&\multicolumn{6}{c}{N/A}\\
-\textbf{Average}&6,557&598&3,363&381&0.09&0.51&0.11&0.07&0.64&0.50\\
-
-\end{tabular*}
-
-$|I|$: Number of methods that have inconsistent names;  $|F|$: Number of methods that have bug fixes. 
-%Notice that one bug fixes can change multiple methods thus $|F|$ is bigger than the number of bug fix commits. 
-}
-\end{center}
-\end{table*}
-
-%%%%%%%%%%%%%%
-
-
-
-
-%\begin{table*}[ht]
-%
-%\begin{center}
-%\caption{Bayesian probability of  bug fixes (F) and inconsistent names (I) at the method level}
-%\label{tab:bayes}
-%\scriptsize{
-%\begin{tabular}{l|rrrrr|rr|rrrr}  \hline
-%%{p{1.5cm}p{0.5cm}p{0.5cm}p{0.5cm}c|cccc|p{0.4cm}p{0.4cm}p{0.4cm}|p{0.5cm}p{0.5cm}p{0.5cm}p{0.5cm}p{0.5cm}p{0.5cm}}  \hline
-%project&Abbr&\# Method & $|I|$   & $|F|$  & $|F \cap I|$ & $P(I)$&$P(F)$& $P(I|F)$ & $P(I|\neg F)$ & $P(F|I)$ & $P(F|\neg I)$ \\ \hline
-%accumulo&AC& 13,769 & 741 & 7,635 & 482 & 0.05 & 0.55 & 0.06 & 0.04 & 0.65 & 0.55 \\ 
-%airavata &AI& 8,219 & 539 & 4,552 & 291 & 0.07 & 0.55 & 0.07 & 0.07 & 0.54 & 0.55 \\ 
-%archiva &AR& 5,091 & 337 & 1,779 & 239 & 0.07 & 0.35 & 0.14 & 0.03 & 0.71 & 0.32 \\ 
-%cayenne&CA& 18,414 & 1,545 & 6,485 & 942 & 0.08 & 0.35 & 0.14 & 0.05 & 0.61 & 0.33 \\ 
-%commons-collection &CO& 4,807 & 445 & 2,994 & 223 & 0.09 & 0.62 & 0.07 & 0.12 & 0.50 & 0.63 \\ 
-%commons-io &IO& 449 & 13 & 198 & 6 & 0.03 & 0.44 & 0.03 & 0.03 & 0.46 & 0.44 \\ 
-%commons-lang &LA& 4,224 & 167 & 1,558 & 115 & 0.04 & 0.37 & 0.07 & 0.02 & 0.69 & 0.36 \\ 
-%commons-vfs &VF& 2,472 & 257 & 956 & 118 & 0.10 & 0.39 & 0.12 & 0.09 & 0.46 & 0.38 \\ 
-%continuum&CT& 1,233 & 94 & 347 & 40 & 0.08 & 0.28 & 0.12 & 0.06 & 0.43 & 0.27 \\ 
-%curator &CU& 1,024 & 88 & 161 & 56 & 0.09 & 0.16 & 0.37 & 0.04 & 0.64 & 0.11 \\ 
-%cxf &CX& 3,807 & 262 & 442 & 131 & 0.07 & 0.12 & 0.30 & 0.04 & 0.50 & 0.09 \\ 
-%deltaspike &DE& 2,193 & 185 & 1,137 & 100 & 0.08 & 0.52 & 0.08 & 0.08 & 0.54 & 0.52 \\ 
-%giraph &GI& 983 & 75 & 650 & 31 & 0.08 & 0.66 & 0.05 & 0.14 & 0.41 & 0.68 \\ 
-%gora &GO& 1,412 & 138 & 1,086 & 62 & 0.10 & 0.77 & 0.06 & 0.24 & 0.45 & 0.80 \\ 
-%hama &HA& 763 & 37 & 426 & 18 & 0.05 & 0.56 & 0.04 & 0.06 & 0.49 & 0.56 \\ 
-%hbase &HB& 22,999 & 1,501 & 17,989 & 540 & 0.07 & 0.78 & 0.03 & 0.21 & 0.36 & 0.81 \\ 
-%jackrabbit &JA& 23,531 & 2,263 & 16,243 & 1,041 & 0.10 & 0.69 & 0.07 & 0.17 & 0.46 & 0.72 \\ 
-%james &JM& 2,796 & 235 & 2,376 & 125 & 0.08 & 0.85 & 0.05 & 0.25 & 0.53 & 0.88 \\ 
-%jclouds &JC& 10,346 & 856 & 6,771 & 325 & 0.08 & 0.65 & 0.05 & 0.14 & 0.38 & 0.68 \\ 
-%mahout &MH& 2,985 & 234 & 708 & 108 & 0.08 & 0.24 & 0.16 & 0.06 & 0.46 & 0.22 \\ 
-%manifoldcf &MN& 7,423 & 788 & 1,439 & 426 & 0.11 & 0.19 & 0.31 & 0.06 & 0.54 & 0.15 \\ 
-%marmotta &MR& 6,037 & 429 & 3,733 & 245 & 0.07 & 0.62 & 0.06 & 0.08 & 0.57 & 0.62 \\ 
-%maven &MA& 5,797 & 482 & 1,929 & 275 & 0.08 & 0.33 & 0.14 & 0.05 & 0.57 & 0.31 \\ 
-%mina &MI& 2,397 & 165 & 1,025 & 107 & 0.07 & 0.43 & 0.11 & 0.04 & 0.65 & 0.41 \\ 
-%myfaces &MY& 8,147 & 671 & 995 & 228 & 0.08 & 0.12 & 0.34 & 0.10 & 0.42 & 0.08 \\ 
-%ode &OD& 6,014 & 508 & 578 & 269 & 0.08 & 0.10 & 0.44 & 0.04 & 0.53 & 0.06 \\ 
-%openjpa &OJ& 12,059 & 1,354 & 10,201 & 812 & 0.11 & 0.85 & 0.08 & 0.29 & 0.60 & 0.88 \\ 
-%opennlp &ON& 9,275 & 818 & 4,225 & 417 & 0.09 & 0.46 & 0.10 & 0.08 & 0.51 & 0.45 \\ 
-%phoenix &PH& 5,993 & 517 & 2,996 & 243 & 0.09 & 0.50 & 0.08 & 0.10 & 0.47 & 0.50 \\ 
-%pig &PG& 1,033 & 58 & 202 & 24 & 0.06 & 0.20 & 0.13 & 0.04 & 0.41 & 0.18 \\ 
-%pivot &PV& 4,648 & 242 & 585 & 111 & 0.05 & 0.13 & 0.18 & 0.03 & 0.46 & 0.11 \\ 
-%roller &RO& 7,340 & 679 & 2,145 & 265 & 0.09 & 0.29 & 0.12 & 0.08 & 0.39 & 0.28 \\ 
-%stratos &ST& 3,518 & 302 & 1,973 & 160 & 0.09 & 0.56 & 0.09 & 0.10 & 0.53 & 0.56 \\ 
-%struts &SR& 5,972 & 382 & 3,431 & 183 & 0.06 & 0.57 & 0.05 & 0.07 & 0.48 & 0.58 \\ 
-%syncope &SY&1,944 & 193 & 836 & 83 & 0.10 & 0.43 & 0.10 & 0.10 & 0.43 & 0.43 \\ 
-%tez &TE& 1,908 & 142 & 901 & 55 & 0.07 & 0.47 & 0.06 & 0.08 & 0.39 & 0.48 \\ 
-%wicket &WI& 13,061 & 997 & 2,207 & 548 & 0.08 & 0.17 & 0.26 & 0.04 & 0.55 & 0.14 \\ 
-%zookeeper &ZO& 1,761 & 119 & 563 & 46 & 0.07 & 0.32 & 0.09 & 0.06 & 0.39 & 0.31 \\ 
-%hadoop &HD& 19,885 & 1,623 & 12,512 & 1,233 & 0.08 & 0.63 & 0.10 & 0.05 & 0.76 & 0.62 \\   \hline
-%Average && 6,557 & 525 & 3,256 & 275 & 0.08 & 0.45 & 0.11 & 0.09 & 0.51 & 0.44 \\   \hline
-%\end{tabular}
-%\vspace{0.1cm}
-%
-%$|I|$: Number of methods that have inconsistent names;  $|F|$: Number of methods that have bug fixes. 
-%%Notice that one bug fixes can change multiple methods thus $|F|$ is bigger than the number of bug fix commits. 
-%}
-%\end{center}
-%\end{table*}
-\end{comment} 
 

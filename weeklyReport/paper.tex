@@ -62,8 +62,8 @@
 
 %\title{How Universal are Naming Rules?}
 
-\title{Weekly Meeting } %
-
+\title{Weekly Meeting 10/6/2015} %
+\subtitle{Add: discover examples from informal document}
 % \numberofauthors{3} 
 % \author{
 % You can go ahead and credit any number of authors here,
@@ -101,107 +101,17 @@
 
 \maketitle
 
-\input{related}
-
 \input{problem}
 
+\input{related}
+
 \input{motivating}
-\begin{figure*}[!htb]
-    \begin{minipage}{0.45\textwidth}
-    \centering
-\includegraphics[width=1\textwidth]{fig/clipboard.jpeg}
-       \caption{Drag-and-drop example for systematic editing}
-        \label{fig:clipboard}
- \end{minipage}%
-  \hfill
-     \begin{minipage}{0.45\textwidth}
-     \centering
- \includegraphics[width=1\textwidth]{fig/clipboard-grid.jpeg}
-       \caption{Example for Drag-and-drop}
-        \label{fig:dndweb}
-%  \includegraphics[width=1\textwidth]{fig/select.jpeg}
-%       \caption{Example for selection}
-%        \label{fig:selectWeb}       
-  \end{minipage}
-    \hfill
-   \end{figure*}
-   
-   \input{example}
-   
-
-
-% yet developers still have to manually go through all related elements and rely on their intuition to determine where to look.  
-
-
-%balance two competing concerns: the desire to reuse as much code as possible to obtain the needed functionality of their task, and the desire to eliminate as much irrelated reused code as practical.  save time and to increase the quality of their code
-
-
-%Gilligan~\cite{Holmes:reuse07} and Procrustes~\cite{Holmes:ASE09} suggest to reuse program elements based on structural relevance and cost of reuse, yet developers still have to manually go through all related elements and rely on their intuition to determine where to look.  
-
-%developers have to select the `best' example that provides desired functionality for the task and integrate well to the target context; second, even though the user is able to select the      
-
-%Gilligan~\cite{Holmes:reuse07} and Procrustes~\cite{Holmes:ASE09} try to address this problem in the context of large-scale reuse tasks by suggesting program elements that are easy to  based on structural relevance and cost of reuse, while Jigsaw~\cite{Cottrell:jigsaw08} supports small-scale integration of source code into target system by considering structural and semantic similarity measures between the example and target context. However, in any non-trivial software system, the number of strut yet these approaches present information in terms of relevance to the user query thus the choice of examples and the order does not consider the developer's need to find an example that integrates well. The next step to identify if the problem can be This process is not trivial: first, in any non  investigate these examples to identify those that match the task and can be integrate to the target context,  developers still have to investigate related elements for each example manually and integrate 
-
-%Reuse tasks can be divided into three phases: {\em location}, in which developers queries for a set of examples considering the task; {\em selection}, in which users investigate these examples to identify those that match the task and can be integrate to the target context;  and {\em integration}, in which developers copies and modifies the chosen example to fit for the target context~\cite{Holmes:reuseStudy09}. These phases can be iterative as there is no guarantee that a selected example will be appropriate until the integration results are examined. When exploring the source code they want to reuse, developers balance two competing concerns: the desire to reuse as much code as possible to obtain the needed functionality of their task, and the desire to eliminate as much irrelated reused code as practical to save maintenance cost. an API by investigating examples of its use. perform reuse tasks to obtain the needed functionality of their task efficiently~\cite{Frakes:reuseStatus05, Parsons:cognitiveReuse04}.  integrating existing usage within target system.  
-
-
-
-%Reuse tasks can be divided into two phases: location, in which developers queries for a set of examples considering the task; and integration, in which developers copies and modifies the chosen example to fit for the target context. Both phases can be iterative as there is no guarantee that a selected examples will be appropriate until the integration results are examined.  It is common to start a reuse task by finding related examples, investigating these examples to consider its related functionality for the task, eliminating spurious code that will increase maintenance costs, and modifying the chosen example to fit for the target context. Although some approaches advocate refactoring code rather than reuse code in this manner, recent researches have found that these kind of clone cannot be easily refactored and have to be modified to meeting requirements in new context. Numerous studies have shown the necessity of a so-called `white box' reuse that modify existing example to fit for the new context: Frake et al.\/note that most software systems are variant on existing ones and reuse strategies within companies. Serly shows that reused code analyzes 25 projects at NASA and finds that 32\% of modules within these were reused from prior projects, of these reused modules, 47\%  Parsons et al.\/present that developers always anchor their understanding to existing code and adjust code to meet their needs. locating source code examples based on user query and return When exploring the source code they want to reuse, developers balance two competing concerns: the desire to reuse as much code as possible to obtain the needed functionality of their task, and the desire to eliminate as much irrelated reused code as practical.  save time and to increase the quality of their code. Numerous approaches exist to help developers locate source code examples, in which the developers queries for a set of examples to consider for relevance to the task; some helps developers investigates those examples. Reuse in this manner can be seen as crating code clones. While these clones have in the past been perceived negatively, recent research has found that there are a large amount of clones that are not easily refactored. non-refactorable clones 
-
-
-
-
-
-
-
-
-
-
-%Software maintainers spend a lot of time trying to understand the existing software before performing the actual modification. For modification tasks such as debugging, finding and understanding program elements related to a bug fix tends to take more time than actually fixing the bug.  Finding related code elements  is used in a variety of software development and maintenance activities. For instance, defect prediction tools identify fault-prone elements via dependency graphs \cite{Nagappan:ICSE06, Zimmermann:ICSE08, PRMiner:FSE05}, impact analysis tools estimate potentially impacted entities by analyzing related elements of a proposed change  \cite{Denys:impactMetrics13, Orso:impactDynamic03}, API search tools identify related elements in the call graph based on user query  \cite{Denys: portfolio11, sniff:Sen09}, and feature localization tools find related elements which represent a specific concern  \cite{sniafl: TSE06, Hassan:ICSE10, Hill:locateConcern07}.  
-
-
-%Numerous measures have been proposed to identify related program elements by leveraging execution trace~\cite{Briand:dynamicTSE04}, historical changes~\cite{Ying:cochangeTSE04, Gall:changeCouple08}, and lexical information in identifiers and documents~\cite{Denys:couple11, Hill:neighbor07}, yet these data may not always be available and reliable compared to source code.  A study on program investigation \cite{Robillard:TSE04} shows that effective developers tend to find related elements by following structural dependencies. However, in any non-trivial software system, the number of structural dependencies to follow is much too large to be completely covered by a developer. As a result, developers must rely on their intuition to determine where to look. Based on the hypothesis that {\em it is possible to find  related elements following program's structural dependency,}  a variety of approaches have been reported to suggest elements of potential interest via structural metrics \cite{Briand:structural99}, program slicing \cite{Bodik:slicePLSI07}, and topology-based analysis~\cite{Robillard:FSE05, Zimmermann:ICSE08}.  We observe several limitations for existing approaches: First, we find that most techniques only support a single queried elements and work at a fixed granularity in a limited scope, e.g., direct callers/callees or sibling elements that share callers/callees, but they do not have a good representation for relations in different level, such as separating overriding relations across different classes and calling relations within a single method.  Second, existing tools are sensitive to specific callers/callees but do not consider how queried elements are related with them  in a common manner, i.e., existing tools do not consider which relations are more common and should be more interesting to users. Third, existing tools assume that it takes equal effort to explore each relation, yet recent study shows that elements with many nearby dependencies require more effort for investigation~\cite{Holmes:ASE09} and hierarchical relations are easier to follow and may have a higher potential to find interesting elements than calling relations~\cite{Murphy:nlConcern11}. 
-
-%To overcome these limitations, we propose to merge and cluster similar couplings in a layered-order given a set of program elements queried by users, and return a set of grouped elements that are related to the given set.  We hypothesize that when users query one or more elements, they are  interested in not only which elements are directly related to these elements, but also how these elements are coupled with other related elements in a common way, and these commonly related elements should be prioritized.  
-
-
-%For example, user selects two bolded methods in class \codefont{JsonWriter}:  \codefont{visit(JsonNumber)} and \codefont{visit(JsonBoolean)}. The underline elements represent methods that are invoked in queried ones: \codefont{print()} method, \codefont{JsonNumber.value}, and \codefont{JsonBoolean.value}. Suade~\cite{Robillard:FSE05}, the only approach that supports multiple elements of interest, reports these three invoked methods, as well as other 13 callers of these two methods based on class hierarchy analysis to include all methods potentially called. These results can be useful, but a) Suade fails to detect any direct relations between two queried methods and investigates direct related elements for them separately, and report invoked methods (\codefont{JsonNumber.value()} and \codefont{JsonBoolean.value()}) and callers (\codefont{JsonNumber.visit()} and \codefont{JsonBoolean.visit()}) separately; b) the results are sensitive to the callers of queried elements (\codefont{JsonNumberOp- tional.recordOptional()}, \codefont{JsonFormatNumberHandler.print Number()}, \codefont{JSON.write()}, and the rest 10 callers). I hypothesize that related elements that users are interested in should be \codefont{<JsonValue>.visit()} and \codefont{JSON.write()} as callers, and \codefont{<JsonValue>.value()}  and \codefont{print()} as methods invoked by queried elements. 
-
-
-%We state our research question as: {\em Given a set of program elements defined by users, which elements are related to the set of interest with respect to a relation vocabulary?}
-% and code reuse \cite{Holmes:ASE09, Holmes:structural05}
-%\input{table}
-%\section{Related Work}
-
-
-%Most measures for related element identification are {\em structural} by following method call chains, control flow, and variable def-use. These works leverage coupling metrics~\cite{Briand:structural99}, program slicing \cite{Bodik:slicePLSI07}, and topology-based search~\cite{Robillard:FSE05, Zimmermann:ICSE08}. 
-
-
-%\noindent{\bf{Static Metrics.}} Briand et al.\/ propose a set of structural coupling metrics to measure coupling between two classes. such as Coupling Between Objects (CBO) and Response for a Class (RFC). A set of metrics are proposed to predict defects based on the complexity or defect history~\cite{Gyimothy:metrics05, Nagappan:ICSE06}. Yet static metrics are usually too coarse-grained that limits their usefulness to recommend code of immediate interest.
-
-%\noindent{\bf{Program slicing.}} Weiser~\cite{Weiser:slice84} proposes to identify  a part of program that may affect the values computed at some point of interest. Thin slicing~\cite{Bodik:slicePLSI07} only consists of producer statements for the seed and hierarchically expanded to include statements explaining how producers affect the seed. Yet computing slicing can be expensive and slices are often too large to be useful for users. 
-
-
-%\noindent{\bf{Topology-based analysis.}} Suade algorithm \cite{Robillard:FSE05}  ranks elements based on the closeness of their structural association with program elements in a set of interest. It only returns elements that are directly related to the set of interest. FRAN~\cite{Devanbu:randomWalk07} extends Suade by considering the sibling elements that share common caller or callee with queried elements. FRAN focuses on calling relation in C given a single queried function. Zimmermann and Nagappan \cite{Zimmermann:ICSE08} use network analysis to identify  {\em central binaries} based on dependency graph, aiming to predict fault-prone modules based on defect history. Other usage of identifying related elements rely on calling graphs with class hierarchy analysis for dynamic binding \cite{PRMiner:FSE05, Orso:impactDynamic03, Murphy:nlConcern11}. However, none of them groups relations in different granularities and identifies commonly used relations in layered-order. 
- 
-%Considering that structural coupling often results in a large number of relationships within a limited scope, researchers have proposed other alternative measures to identify related elements.
-
-%Briand et al.~\cite{Briand:dynamicTSE04} handle dynamic binding in object-oriented programs by analyzing of the execution of a program. Dynamic slicing is a variant of slicing that select related code piece considering program execution trace \cite{Agrawal:dynamicSlice90}. Specifically, dynamic slicing only considers program dependencies that occur in a specific execution of the program. In contrast to static approaches, dynamic measures relies on the availability and quality of test cases for an executable program, thus they cannot be applied to incomplete code or code that cannot be executed. 
-
- %Ying et al.\cite{Ying:cochangeTSE04} report elements that are often changed together during program evolution tasks at the file level, Fluri et al.\/ identify frequently co-changed files and filter co-changed methods that result from structural changes \cite{Gall:changeCouple05}. However, reliance on change history implies that the approach cannot be used when queried elements are never changed before. 
-
-
-%Revelle et al.~\cite{Denys:couple11} exploit relations captured from the source code lexicon using Information Retrieval techniques and propose a set of semantic metrics to define a coupling between classes based on textural information from code and comments. Hill et al.~\cite{Hill:neighbor07} use lexical information to identify related methods  corresponding to queried ones and expand call chains to find related elements missed by lexical search.  The main tradeoff for these measures is that they assume that similar terms always indicate related functionality.  
-
-%In summary, these alternative measures  aim to capture relations that are missed by existing structural coupling by leveraging revision history, lexical information, and execution traces. Our approach aims to extend the structural measures to group relations in different granularities and identify commonly used relations based on available and reliable structural dependency.  
-
-
 
 %\bibliographystyle{abbrvnat}
 % \renewcommand{\bibfont}{\footnotesize} % <--- change bib font size here
 % \setlength{\bibsep}{0.5ex}             % <--- change space between bib entries here
 \bibliographystyle{abbrv}
-\bibliography{coupling,reuse} 
+\bibliography{coupling,reuse,cluster} 
 %\bibliography{strings-short,paper}  % <--- use short strings in case of emergency
 
 \end{document}
