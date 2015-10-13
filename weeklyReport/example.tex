@@ -1,3 +1,4 @@
+\begin{comment}
 \begin{figure}[!htb]
  \begin{minipage}{0.5\textwidth}
 \scriptsize 
@@ -65,6 +66,19 @@ public class Foo \{
 \label{fig:fact}
 \end{minipage}
 \end{figure}
+\end{comment}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -73,7 +87,7 @@ public class Foo \{
 \scriptsize 
 \begin{tabular}{@{}p{1\textwidth}} 
  \hline 
-  \multicolumn{1}{c}{(D) User's context} \\ \hline
+  \multicolumn{1}{c}{(A) User's context} \\ \hline
   \vspace{-4mm}
 \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
 import com.sun.java.swing.*;
@@ -100,20 +114,175 @@ public class MyTextEditor \{
     JFrame frame = new JFrame("Undo Sample");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     JTextArea textArea = new JTextArea();
-   JButton undoBtn_;
-   JButton redoButton; //added
-  public void init() \{
+    JButton undoBtn_;
+\textcolor{blue}{    JButton redoBtn_; }
+  
+\textcolor{blue}{   public void init() \{}
    //add undo and redo action to text editor
-   textArea.getDocument().addUndoableEditListener(new UndoListener());
-   undoBtn_ = new Button.addActionListener(new UndoAction());
-   redoButton  = new Button.addActionListener(new RedoAction());
+\textcolor{blue}{   UndoManager undoManager = new UndoManager(); }
+\textcolor{blue}{   textArea.getDocument().addUndoableEditListener(new UndoListener());}
+\textcolor{blue}{   undoBtn_ = new Button();}
+\textcolor{blue}{   undoBtn_.addActionListener(new UndoAction());}
+\textcolor{blue}{   redoBtn_ = new Button().addActionListener(new RedoAction());}
+\textcolor{blue}{   redoBtn_.addActionListener(new RedoAction());}
+\textcolor{blue}{   \}}
+\textcolor{blue}{ private class UndoListener implements UndoableEditListener \{}
+\textcolor{blue}{  public void undoableEditHappened(UndoableEditEvent e) \{}
+\textcolor{blue}{    undoManager.addEdit(e.getEdit());}
+\textcolor{blue}{  \}\}}
+\textcolor{blue}{private class UndoAction extends AbstractAction \{}
+\textcolor{blue}{  public void actionPerformed(ActionEvent e) \{   }
+\textcolor{blue}{    undoManager.undo(); }
+\textcolor{blue}{  \}\}}
+\textcolor{blue}{private class RedoAction extends AbstractAction \{}
+\textcolor{blue}{  public void actionPerformed(ActionEvent e) \{}
+\textcolor{blue}{     undoManager.redo();}
+\textcolor{blue}{  \}\}\}}
+  \end{Verbatim}
+      \vspace{-4mm}
+     \\ \hline
+\end{tabular} 
+\caption{Scenario 1: add undo/redo to a TextEditor}
+\label{fig:undoEditor}
+\end{minipage}
+\end{figure}
+
+
+
+
+
+
+\begin{figure}[!htb]
+ \begin{minipage}{0.5\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+  \multicolumn{1}{c}{(A) TextEditor} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+public class TextEditor extends JTextPane \{
+ public UndoAction undoAction = new UndoAction();
+ public RedoAction redoAction = new RedoAction();
+ public CompoundUndoManager undo;
+ public TextEditor(Workspace workspace) \{
+  this.workspace = workspace;
+  undo = new CompoundUndoManager(workspace);
+  Action[] actionsArray = getActions();
+  for (int i = 0; i < actionsArray.length; i++) \{
+   Action a = actionsArray[i];
+   actions.put(a.getValue(Action.NAME), a);
+   \}
+   actions.put("undo", undoAction);
+   actions.put("redo", redoAction);
+   \}
+   public void discardUndoRedo() \{
+    undo.discardAllEdits();
+    undoAction.updateUndoState();
+    redoAction.updateRedoState();
+   \}
+  public class UndoAction extends AbstractAction \{
+   public UndoAction() \{
+    super("Undo");
+   \}
+   public void actionPerformed(ActionEvent e) \{
+    try \{
+     undo.undo();
+     updateUndoState();
+     redoAction.updateRedoState();
+    \} catch (CannotUndoException ex) \{
+    \}\}
+   public void updateUndoState() \{
+    setEnabled(undo.canUndo());
+   \}\}
+   public class RedoAction extends AbstractAction \{
+    public RedoAction() \{
+     super("Redo");
+    \}
+    public void actionPerformed(ActionEvent e) \{
+     try \{
+      undo.redo();
+      updateRedoState();
+      undoAction.updateUndoState();
+     \} catch (CannotRedoException ex) \{
+     \}\}
+      public void updateRedoState() \{
+       setEnabled(undo.canRedo());
+     \}\}
+  \end{Verbatim}
+      \vspace{-4mm}
+     \\ \hline
+\end{tabular} 
+\caption{Result No 1: textmash:TextEditor}
+\label{fig:textEditor}
+\end{minipage}
+\end{figure}
+
+
+
+
+
+\begin{figure}[!htb]
+ \begin{minipage}{0.5\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+  \multicolumn{1}{c}{(B) No. 5.6,8, ConsoleTextEditor} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+public class ConsoleTextEditor extends JScrollPane \{
+  private UndoAction undoAction = new UndoAction();
+    private RedoAction redoAction = new RedoAction();
+    private TextUndoManager undoManager;
+    public ConsoleTextEditor () \{
+     this.undoManager = new TextUndoManager();
+     doc.addUndoableEditListener(undoManager);
+     undoManager.addPropertyChangeListener(undoAction);
+     undoManager.addPropertyChangeListener(redoAction);
+     doc.addDocumentListener(undoAction);
+     doc.addDocumentListener(redoAction);
+     InputMap im = textEditor.getInputMap(JComponent.IN_FOCUSED);
+     KeyStroke ks = KeyStroke.getKeyStroke(InputEvent.CTRL, false);
+     im.put(ks, StructuredSyntaxResources.UNDO);
+     ActionMap am = textEditor.getActionMap();
+     am.put(StructuredSyntaxResources.UNDO, undoAction);
+  \}
+ private class RedoAction extends UpdateCaretListener
+  implements PropertyChangeListener \{
+  public RedoAction() \{
+   setEnabled(false);
+  \}
+  public void actionPerformed(ActionEvent ae) \{
+   undoManager.redo();
+   setEnabled(undoManager.canRedo());
+   undoAction.setEnabled(undoManager.canUndo());
+   super.actionPerformed(ae);
+  \}
+    public void propertyChange(PropertyChangeEvent pce) \{
+     setEnabled(undoManager.canRedo());
+        \} \}
+ private class UndoAction extends UpdateCaretListener 
+ implements PropertyChangeListener \{
+   public UndoAction() \{
+    setEnabled(false);
+   \}
+   public void actionPerformed(ActionEvent ae) \{
+    undoManager.undo();
+    setEnabled(undoManager.canUndo());
+    redoAction.setEnabled(undoManager.canRedo());
+    super.actionPerformed(ae);
+ \}
+  public void propertyChange(PropertyChangeEvent pce) \{
+    setEnabled(undoManager.canUndo());
   \}\}
   \end{Verbatim}
       \vspace{-4mm}
      \\ \hline
 \end{tabular} 
-\caption{User's context and best-fit reuse plan based on the context}
-\label{fig:context}
+\caption{Result No 5,6,8: groovy: DocumentUndoManagerImpl}
+\label{fig:textEditor}
 \end{minipage}
 \end{figure}
+
+
+
 

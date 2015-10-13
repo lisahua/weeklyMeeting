@@ -1,6 +1,93 @@
 
-\section{Problem Statement}
+\section{Last week}
 
+Based on our discussion last week, our problem statement includes:
+
+\begin{enumerate}
+\item Developers do not know the name of API elements a priori, though locating code example through existing search engine often expects the developers to know API elements' names.
+\item Reuse tasks involve multiple related classes and methods, rather than a single method/class. Yet code search engines do not help developers recognize the latent structure among related classes/methods. (at the granularity of multiple methods)
+\item During copy/paste based reuse, developers must remove irrelevant parts. Our hypothesis is that having multiple examples of the same kind will help winnow out irrelevant parts. (at the granularity of multiple examples)
+\end{enumerate}
+
+%We have three hypotheses correspondingly:
+%\begin{enumerate}
+%\item We believe that NLP text with partial code snippet could help us identify the name of API elements based on keywords from free-form query. 
+%
+%\item Our hypothesis is that we can find related elements by following the structural dependencies of seed API elements in code and by ranking other API elements potentially mentioned in natural language text. 
+%
+%\item We believe that clustering multiple examples of the same kind and finding the commonality may help remove irrelevant parts. 
+%
+%\end{enumerate}
+
+I focus on the second and third problems, perform a preliminary study using three popular code search engines to illustrate these two problems, and revise the hypotheses based on our use of code search engine. 
+
+\section{Problem 2}
+Problem: Reuse tasks involve multiple related classes and methods, yet code search engines do not help developers recognize the latent structure among related classes/methods.
+
+Hypothesis: We can find related elements by following the structural dependencies of seed API elements in code and by ranking these related API elements based on their topology structure. 
+
+Input: a free-form query that user provides to present her reuse intention.
+
+Output: a list of classes/methods implementation that complete this reuse task.
+
+Sub questions: Do reuse tasks involve multiple related classes and methods? Can existing tools find reusable examples that involve multiple related classes and methods?
+
+To answer these two subquestions, I search for the evaluation dataset for existing code search tools using free-form query (SNIFF~\cite{sniff:Sen09}, Portfolio~\cite{Portfolio:DenysICSE11}, Sourcer~\cite{Sourcerer:SC14}, anyCode~\cite{Gvero:ICSE15}, and Keivanloo et al.~\cite{spotWork:ICSE14}), feature location/concern mining tools~\cite{Denys:FCA12, Hill:FindConcept07, Hassan:concernHistory10, Breu:DynamicAspect04},   and reuse tools~\cite{Holmes:reuse07, Holmes:ASE09}. Other code search engines such as Koders~\cite{Koders}, Krugle~\cite{Krugle}, and SearchCode~\cite{SearchCode} are available on the web, which can be used to assist programmers by providing relevant code examples with usages of the given free-form query from a large number of public source code repositories. Yet the results are sorted based on the text matching and they fail to recognize the latent structure among related classes/methods. 
+
+Based on Table~\ref{tab:concern} and Table~\ref{tab:reuse}, most medium-scale or large-scale reuse tasks involve multiple methods and classes.  However, existing code search tools and  feature location tools  do not help developers recognize the latent structure among related classes/methods. We do not focus on large-scale reuse task mentioned in~\cite{Holmes:reuse07, Holmes:ASE09}. 
+
+\input{eval-table}
+\input{example}
+
+In summary,  a feature/concern reuse task involves multiple related classes and methods. The developer should implement multiple methods and classes to finish the reuse task. Existing  code completion tools can complete a single method which involves in multiple API calls, yet they assume that all related APIs or  objects used in their suggested code already exist. We argue that it requires multiple methods to implement a non-trivial feature/concern. 
+
+\section{Scenario}
+\noindent{\textbf{Add undo and redo action for TextEditor.}}
+
+\begin{table}[ht]
+\begin{center}
+\caption{Search Result from Code Search Engine}
+\label{tab:total}
+\scriptsize{
+\begin{tabular*}{0.5\textwidth}{@{}c|llrr@{}} \hline
+No.&Name&Project&LOC&\# M\\\hline
+1&TextEditor&textmash&1270&12\\
+2,3&AndroidTextEditor&android&576&9\\
+4&DocumentUndoManagerImpl&ide&1227&17\\
+5,6,8&ConsoleTextEditor&groovy&321&7\\ 
+7&PapyrusCDTEditor&eclipse.papyrus&393&7\\
+9,10&AspectEditorContributor&eclipse&88&2\\ \hline
+\end{tabular*}
+ \label{tab:undoResult}
+ \textbf{ \# M} represents the number of methods that contain the query terms. 
+ {\bf No.} represents the rank from CSE. Note that CSE may return the same results for multiple times, as the same file may exist in multiple branches. For instance, we regard 5,6,8 as identical with manual inspection. 
+ 
+}
+ \end{center}
+\end{table}
+
+Figure~\ref{fig:undoEditor} illustrates the implementation of `add undo/redo' concern mentioned in~\cite{Murphy:nlConcern11}.  Consider that user wants to add undo and redo actions for her Java Swing text editor application with undo/redo buttons.  Without knowing any APIs, developer  first queries code search engine (CSE) with a free-form query \codefont{`undo redo TextEditor'}. Table~\ref{tab:undoResult} shows top 10 results returned from SearchCode CSE. For each partial program returned from CSE, I select the top k (k=5) methods that are related to the given query. 
+
+
+
+
+
+
+
+
+
+%\subsection{Problem 3}
+%Problem: During copy/paste based reuse, developers must remove irrelevant parts and find salient API elements based on the context. 
+
+%Hypothesis: Our hypothesis is that having multiple examples of the same kind will help winnow out irrelevant parts, i.e, clustering multiple examples of the same kind and finding the commonality may help remove irrelevant parts. 
+
+%We use the results for  the last three concerns implementation in Table~\ref{tab:concern} found by the code search engine SearchCode to illustrate the Problem 3. 
+
+
+
+
+
+\begin{comment}
 Developers frequently use source code examples as the basis for interacting with an  application programming interface (API) to obtain the needed functionality~\cite{CodeSearch:FSE15}.  In this case, the source code example serves as the explicit origin for a reuse task which transforms a sequence of APIs with corresponding control structure to the target context~\cite{Frakes:reuseStatus05}.  During the process of reuse task such as `add undo and redo actions in my Graphics Editor', developers often query for a set of examples considering the task, and integrate examples that match the task into their system~\cite{Parsons:cognitiveReuse04}. 
 
 Both location and integration of reusable examples are not trivial. For the phase of location, existing tools that search for specific API usage examples~\cite{MAPO:ECOOP09, Buse:apiICSE12, Export:DenysASE13, Sourcerer:SC14} might not be able to support such reuse tasks that always involve in multiple classes and related methods.  As a result, developers always query general search engines like Google or expert sites like StackOverflow to investigate potential tutorials for desired features. These search engines will return a list of informal documentations and users have to search for source code elements in these resources. Although some linking recovery  tools~\cite{PeterACE:ICSE13, RecoDoc:ICSE12} can help identify a partial program in the form of code snippet, they are not  sufficient to create a pragmatic reuse plan as the main functionality is always interleaving with auxiliary ones and  it is unlikely to find a `perfect' example that provides all desired features for the reuse task~\cite{Holmes:reuseStudy09}. Considering that a single example is not enough for a given task, developers need to investigate multiple example variants manually for the desired features (i.e., common API calls). For the phase of integration, developers should not only  measure structural and semantic similarity between the example and target context for the main API calls that provide desired features~\cite{Cottrell:jigsaw08}, but also determine which unnecessary code should be eliminated to save maintenance cost~\cite{Holmes:ASE09, Holmes:reuse07} and which related elements should be transformed with structural correspondence~\cite{Cottrell:generalize07} to the target context. Unfortunately, for any selected example in non-trivial system, the number of structural dependencies to follow is much too large to be completely covered by developers. The partial programs~\cite{partialProgram:OOPSLA08} extracted from the location phase make it even harder to  tease out irrelevant elements  without knowing a full scenario of precise type information and method implementation details.  Moreover,  the location and integration phase can be iterative as there is no guarantee that a selected example will be appropriate until the integration results are examined~\cite{Holmes:reuseStudy09}. 
@@ -26,5 +113,5 @@ Our approach helps identify and integrate reusable examples in three phases:
        \caption{System process overview}
         \label{fig:system}
    \end{figure*}
-
+\end{comment}
 

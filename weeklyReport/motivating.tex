@@ -1,9 +1,16 @@
 
-\section{Motivating Example}
-
-Consider that user wants to add undo and redo actions for their Java Swing text editor application with undo/redo buttons.  Without knowing any APIs, developer  first queries our tool with a free-form query \codefont{`java undo redo example'}. Our tool investigates top 10 web pages returned from Google, because empirical evidence indicates that developers rarely look beyond this limit when searching~\cite{Starke:searchNum09}. Our tool uses `expert' heuristic to filter and rank web pages: it favors pages that have complete code snippet and text description because these pages are more likely to be written by experts. Thus it removes 3 pages without explicit code snippets, and performs the initial parsing for the informal documentations to identify code-like terms. 
+%\section{Motivating Example}
 
 
+
+
+
+
+
+
+
+
+\begin{comment}
 \noindent{\textbf{Example collection phase.}} With 7  partial programs at hand, it first extracts class-level structural facts for each code example. Based on a relative match threshold to measure the relative occurrence of the number of matched facts out of all class-level facts,  our tool clusters these examples in three groups using complete linkage technique: 5 examples use classes in Java Swing like `AbstractAction' and `UndoableEditListener', another example uses a `Node' data structure to illustrate how to implement undo/redo actions using command design pattern, and the last example is the javadoc for `UndoManager'.  Our tool starts from the first cluster as it has the highest relative occurrence out of all examples. Based on partial program analysis, we generate a list of type facts to infer types and bind methods.
 
 The common facts our tool extracts include: 
@@ -37,11 +44,11 @@ actionPerformed():actionPerformed(ActionEvent)
  \end{center}
 \end{table}
 
-\input{example}
+
 
 \noindent{\textbf{Example clustering phase.}} After extracting facts for each example, our tool identifies main facts shared in all 5 examples shown in Figure~\ref{fig:fact} part A. It leverages slicing to group related facts. In this example, 3 of them add \codefont{Undo*Action} to \codefont{JMenuItem} by invoking \codefont{JMenuItem.add (ActionEvent)} and support undo and redo actions for Text Editor shown in Figure~\ref{fig:fact} part B. The other two of them invoke \codefont{JButton.addActionListener(ActionEvent)} to add these two actions to \codefont{JButton}, and support \codefont{JApplet} Shape drawing shown in Figure~\ref{fig:fact} part C. After extracting both main facts and related facts, we generate two reuse tasks by combining main facts with each related fact group.  
 
 \noindent{\textbf{Example integration phase.}} Given a context like Figure~\ref{fig:context} part D, our tool identifies the best-fit reuse task based on the number of matched facts in the user's context.  If our tool fails to identify any matched facts in the user's context, it will simply rank the reuse task based on its occurrence in the code examples. Our tool asks for user's selection by presenting the generated main facts and related facts to the user in the form of code snippet. 
 After confirmed by users, our tool automatically fills the rest facts that do not exist in the context shown in Figure~\ref{fig:context} part E. 
-
+\end{comment}
 

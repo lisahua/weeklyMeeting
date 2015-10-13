@@ -1,0 +1,110 @@
+
+
+\begin{table*}[ht]
+\begin{center}
+\caption{Evaluation dataset for feature location tools and concern mining tools}
+\label{tab:total}
+\scriptsize{
+\begin{tabular*}{1\textwidth}{@{}l|l|l@{}} \hline
+Source&Query&\# methods\\\hline
+FCA~\cite{Denys:FCA12}&jEdit: support for `thick' caret &6 (org.eclipse.swt.widgets.Table.createHandle(), createWidget(), etc)\\
+&jEdit: rename project source&5 (org.eclipse.core.internal.localstore.FileSystemStore.move, etc)\\ \hline
+FindConcept~\cite{Hill:FindConcept07}&Add Textfield&5\\
+&Compile Report&8\\ \hline
+%COMMIT~\cite{Hassan:concernHistory10}&Error logging&It focuses on improving crosscutting concerns using co-evolving history.\\
+%&Debugging&\\ \hline
+Portfolio~\cite{Portfolio:DenysICSE11}&mip map dithering texture image graphics&6 methods: ImageTexture:createTextureFromImage, TiledTexture:\\ 
+&&buildGaussianGlareTexture, LoadTextureFromFile:initReaderer, etc  \\
+&adjust parameters such as brightness for a picture*\\
+&read and play midi files*\\ \hline
+Rastkar, Murphy&jEdit: add autosave capabilities&They assume that there already exist multiple instances of this concern.\\
+ et al.~\cite{Murphy:nlConcern11}&add undo functionality for a command&`All of the methods named `undo': \\ 
+ &&override method `org.jhotdraw.util.UndoableAdapter.undo';\\
+ &&are a member of the class `undoActivity';\\ \hline
+ Strathcona~\cite{Holmes:structural05}&update status line&protected void updateStatusLine(IStructuredSelection selection) \{\\
+&&String msg = getStatusLineMessage(selection);\\
+&&getViewSite().getActionBars().getStatusLineManager().setMessage(msg); \}\\ 
+&&\\
+&generate method signature&public boolean visit(MethodDeclaration node) \{\\
+&& node.getModifiers();\\
+&& node.getName.getIdentifiers();\\
+&& return super.visit(node); \} \\ \hline
+ GraPacc~\cite{Nguyen:GraPaccICSE12}&SWT usage pattern&Display display = new Display();\\
+ && Shell shell = new Shell(display); // fill the rest\\
+ && shell.open()\\
+ && while (!shell.isDisposed()) \{\\
+ &&  if (!display.readAndDispatch())\\
+ &&   display.sleep();\\
+ && \}\\
+ && display.dispose();\\ \hline
+ 
+\end{tabular*}
+ \label{tab:concern}
+ 
+* represents tasks given to the users. However, the free-form query users use to finish the task is unknown.
+}
+
+ \end{center}
+\end{table*}
+
+
+\begin{table*}[ht]
+\begin{center}
+\caption{Evaluation dataset for reuse tool }
+\label{tab:total}
+\vspace{1mm}
+\scriptsize{
+\begin{tabular*}{1\textwidth}{@{}l|l|l|l@{}} \hline
+Source&Task&LOC&Result / Description\\\hline
+Gilligan~\cite{Holmes:reuse07}&reuse BMP image file parsing in SWT&497&They try to address the problem of source code integration \\
+&reuse  module that serializes objects to XML&900& in the context of medium or large-scale reuse tasks. They  \\
+&reuse virtual file system from a third-party app&3000& suggest program elements that are easy to reuse based on \\
+&reuse GraphML parsing code from Jung&200& structural  relevance and cost of reuse in the source  \\ 
+&reuse charting component from Azureus&& context,  and guide  users to  plan a non-trivial reuse task.  \\
+&reuse NMEA parser from the Gpsylon project&&They assume that developers have a perfect example at \\
+&reuse the lines of code counter from Metrics project&&hand,  and they can finish the reuse task by resolving all\\
+&reuse QIF parser from jGnash project&& dependency conflicts.\\ \hline
+
+\end{tabular*}
+ \label{tab:reuse}
+
+LOC represents the lines of code that are reused.
+
+}
+ \end{center}
+\end{table*}
+
+
+
+\begin{table*}[ht]
+\begin{center}
+\caption{Evaluation dataset for code search tools that use free-form query or keyword query}
+\label{tab:total}
+\vspace{1mm}
+\scriptsize{
+\begin{tabular*}{1\textwidth}{@{}l|l|l@{}} \hline
+Source&Query&Result\\\hline
+SNIFF~\cite{sniff:Sen09}&get active editor window from&IWorkbenchWindow window = PlatformUI.\\
+& eclipse workbench&getWorkbench().getActiveWorkbenchWindow();\\
+&parse a java source and create ast&ASTParser parser = ASTParser.newParser(AST.JLS3);\\
+&&CompilationUnit cu = (CompilationUnit) parser.createAST(null);\\
+&connect to a database using jdbc&Connection conn = DriverManager.getConnection(path)\\ \hline
+Sourcer~\cite{Sourcerer:SC14}&Find a XML parser&org.apache.jasper.xmlparser\\
+&Find the use of Depth First Search&org.jeat.search.dfs.BasicDepthFirstSearch\\
+&Find the use of Newton Raphson Method&org.cdk.NewtonRaphsonMethod\\ \hline
+anyCode~\cite{Gvero:ICSE15}&copy file fname to destination&FileUtils.copyFile(new File(fname), new File(destination))\\
+&does x begin with y&x.startsWith(y)\\
+&get the current year&new Date().getYear()\\ \hline
+EVOLIZER~\cite{gall:nlQueryICSE10}&What methods call addChart?&ServletUtilities: registerChartForDeletion(File, HttpSession)\\
+&What method accesses the&DefaultAxisEditor:attemptLabelFontSelection()\\
+& attribute labelFontField?\\
+&What are the classes that extend JPanel?&DefaultAxisEditor \\ \hline
+Keivanloo et al.~\cite{spotWork:ICSE14}&\{getOptionValue, CommandLine\}&CommandLine.getValue(Option)\\
+&\{ISelection, isEmpty\}&ISelection.isEmpty()\\
+&\{WebElement, click\}&WebElement.click() \\\hline
+\end{tabular*}
+ \label{tab:freeform}
+}
+ \end{center}
+\end{table*}
+

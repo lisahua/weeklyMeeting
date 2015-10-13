@@ -1,0 +1,297 @@
+
+
+
+
+\begin{figure*}[!htb]
+ \begin{minipage}{1\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+  \multicolumn{1}{c}{(A) User's context} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+public abstract class AndroidTextEditor extends FormEditor implements IResourceChangeListener \{
+ protected void createAndroidPages() \{
+  mIsCreatingPage = true;
+  createFormPages();
+  createTextEditor();
+  createUndoRedoActions();
+  postCreatePages();
+  mIsCreatingPage = false;
+ \}
+ private void createUndoRedoActions() \{
+  IActionBars bars = getEditorSite().getActionBars();
+  if (bars != null) \{
+    IAction action = mTextEditor.getAction(ActionFactory.UNDO.getId());
+    bars.setGlobalActionHandler(ActionFactory.UNDO.getId(), action);
+    action = mTextEditor.getAction(ActionFactory.REDO.getId());
+    bars.setGlobalActionHandler(ActionFactory.REDO.getId(), action);
+    bars.updateActionBars();
+  \}\}
+ private void createTextEditor() \{
+   mTextEditor = new TextEditor();
+   int index = addPage(mTextEditor, getEditorInput());
+   mTextPageIndex = index;
+   setPageText(index, mTextEditor.getTitle());
+   IDocumentProvider provider = mTextEditor.getDocumentProvider();
+   mDocument = provider.getDocument(getEditorInput());
+   mDocument.addDocumentListener(new IDocumentListener() \{
+    public void documentChanged(DocumentEvent event) \{
+    onDocumentChanged(event);
+ \}); \} \}
+ protected void selectDefaultPage(String defaultPageId) \{
+  if (defaultPageId == null) \{
+   if (getEditorInput() instanceof IFileEditorInput) \{
+    IFile file = ((IFileEditorInput) getEditorInput()).getFile();
+    QualifiedName qname = new QualifiedName(AdtPlugin.PLUGIN_ID, getClass().getSimpleName() + PREF_CURRENT_PAGE);
+    String pageId = file.getPersistentProperty(qname);
+    if (pageId != null) \{ defaultPageId = pageId; \}
+   \} \}
+ @Override
+ protected void pageChange(int newPageIndex) \{
+  super.pageChange(newPageIndex);
+  if (mIsCreatingPage) \{ return; \}
+  if (getEditorInput() instanceof IFileEditorInput) \{
+   IFile file = ((IFileEditorInput) getEditorInput()).getFile();
+   QualifiedName qname = new QualifiedName(AdtPlugin.PLUGIN_ID, getClass().getSimpleName() + PREF_CURRENT_PAGE);
+   file.setPersistentProperty(qname, Integer.toString(newPageIndex));
+  \} \}
+ public void resourceChanged(final IResourceChangeEvent event) \{
+  if (event.getType() == IResourceChangeEvent.PRE_CLOSE) \{
+   Display.getDefault().asyncExec(new Runnable() \{
+   public void run() \{
+    IWorkbenchPage[] pages = getSite().getWorkbenchWindow().getPages();
+    for (int i = 0; i < pages.length; i++) \{
+     if (((FileEditorInput)mTextEditor.getEditorInput()).getFile().getProject().equals(event.getResource())) \{
+      IEditorPart editorPart = pages[i].findEditor(mTextEditor.getEditorInput());
+      pages[i].closeEditor(editorPart, true);
+    \}  \} \}); \} \}
+  \end{Verbatim}
+      \vspace{-4mm}
+     \\ \hline
+\end{tabular} 
+\caption{Result No 4.: add undo/redo to a TextEditor}
+\label{fig:undoEditor}
+\end{minipage}
+\end{figure*}
+
+
+
+
+
+
+
+
+
+
+\begin{figure*}[!htb]
+ \begin{minipage}{1\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+  \multicolumn{1}{c}{(A) User's context} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+public class AspectEditorContributor extends MultiPageEditorActionBarContributor \{
+ private IEditorPart activeEditorPart;
+ private AspectEditor aspectEditor;
+ @Override
+ public void setActivePage(IEditorPart part) \{
+  if (activeEditorPart == part)   return;
+  activeEditorPart = part;
+  IActionBars actionBars = getActionBars();
+  if (activeEditorPart != null && activeEditorPart instanceof ITextEditor) \{
+   IActionBars siteActionBars = ((IEditorSite)activeEditorPart.getEditorSite()).getActionBars();
+   siteActionBars.setGlobalActionHandler(ITextEditorActionConstants.UNDO, getAction((ITextEditor)activeEditorPart, ITextEditorActionConstants.UNDO));
+   siteActionBars.setGlobalActionHandler(ITextEditorActionConstants.REDO, getAction((ITextEditor)activeEditorPart, ITextEditorActionConstants.REDO));
+   siteActionBars.updateActionBars();              
+  \} else \{
+   if (part instanceof AspectEditor) \{  aspectEditor = (AspectEditor) part; \}
+   IWorkbenchPartSite site = aspectEditor.getSite();
+   if (site instanceof IEditorSite) \{
+    ITextEditor textEditor = aspectEditor.getMultipageEditor().getTextEditor();
+    IActionBars siteActionBars = ((IEditorSite) site).getActionBars();
+    siteActionBars.setGlobalActionHandler(ITextEditorActionConstants.UNDO, getAction(textEditor, ITextEditorActionConstants.UNDO));
+    siteActionBars.setGlobalActionHandler(ITextEditorActionConstants.REDO, getAction(textEditor, ITextEditorActionConstants.REDO));
+    siteActionBars.updateActionBars();              
+ \} \}\}
+ protected IAction getAction(ITextEditor editor, String actionID) \{
+   return (editor == null ? null : editor.getAction(actionID));
+ \} \}
+   \end{Verbatim}
+      \vspace{-4mm}
+     \\ \hline
+\end{tabular} 
+\caption{Result No 4.: add undo/redo to a TextEditor}
+\label{fig:undoEditor}
+\end{minipage}
+\end{figure*}
+
+
+
+\begin{figure*}[!htb]
+ \begin{minipage}{1\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+  \multicolumn{1}{c}{(A) User's context} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+public class PapyrusCDTEditor extends CEditor \{
+ protected IAction gmfUndo, gmfRedo;
+ protected IAction textUndo, textRedo;
+ @Override
+ public void createPartControl(Composite parent) \{
+  IActionBars actionBars = getEditorSite().getActionBars();
+  if((actionBars != null) && (gmfUndo == null)) \{
+   gmfUndo = actionBars.getGlobalActionHandler(ITextEditorActionConstants.UNDO);
+    gmfRedo = actionBars.getGlobalActionHandler(ITextEditorActionConstants.REDO);
+  \}
+  super.createPartControl(parent);
+  if(actionBars != null) \{
+   textUndo = actionBars.getGlobalActionHandler(ITextEditorActionConstants.UNDO);
+   textRedo = actionBars.getGlobalActionHandler(ITextEditorActionConstants.REDO);
+   actionBars.setGlobalActionHandler(ITextEditorActionConstants.UNDO, gmfUndo);
+   actionBars.setGlobalActionHandler(ITextEditorActionConstants.REDO, gmfRedo);
+   actionBars.updateActionBars();
+  \}
+  @Override
+  public ISourceViewer createSourceViewer(Composite parent, IVerticalRuler ruler, int styles) \{
+   final ISourceViewer viewer = super.createSourceViewer(parent, ruler, styles);
+   focusListener = new FocusListener() \{
+   public void focusLost(FocusEvent e) \{
+    if(isDirty()) \{
+     syncCpp.syncCDTtoModel();
+     Classifier classifier = (Classifier)papyrusTextInstance.getEditedObject();
+     doSave(new NullProgressMonitor());
+     SyncModelToCDT.syncModelToCDT(classifier);
+    \}
+     IActionBars actionBars = getEditorSite().getActionBars();
+     if(actionBars != null) \{
+      if((gmfUndo != null) && (gmfRedo != null)) \{
+       actionBars.setGlobalActionHandler(ITextEditorActionConstants.UNDO, gmfUndo);
+       actionBars.setGlobalActionHandler(ITextEditorActionConstants.REDO, gmfRedo);
+       actionBars.updateActionBars();
+     \} \} \}
+   public void focusGained(FocusEvent e) \{
+    IActionBars actionBars = getEditorSite().getActionBars();
+    if(actionBars != null) \{
+     if((textUndo != null) && (textRedo != null)) \{
+      actionBars.setGlobalActionHandler(ITextEditorActionConstants.UNDO, textUndo);
+      actionBars.setGlobalActionHandler(ITextEditorActionConstants.REDO, textRedo);
+      actionBars.updateActionBars();
+     \} \} \} \};
+  return viewer;
+\} \}
+ \end{Verbatim}
+      \vspace{-4mm}
+     \\ \hline
+\end{tabular} 
+\caption{Result No 4.: add undo/redo to a TextEditor}
+\label{fig:undoEditor}
+\end{minipage}
+\end{figure*}
+
+
+
+
+
+
+
+
+
+
+\begin{figure*}[!htb]
+ \begin{minipage}{1\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+  \multicolumn{1}{c}{(A) User's context} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+public class DocumentUndoManagerImpl implements DocumentUndoManager \{
+ private static class UndoableTextChange extends AbstractOperation \{
+ protected long fUndoModificationStamp = Document.UNKNOWN;
+ protected long fRedoModificationStamp = Document.UNKNOWN;
+ protected void reinitialize() \{
+   fUndoModificationStamp = Document.STAMP;
+   fRedoModificationStamp = Document.STAMP;
+  \}
+ protected void undoTextChange() \{
+  try \{
+     if (fDocumentUndoManager.fDocument instanceof Document)
+         ((Document)fDocumentUndoManager.fDocument).replace(fStart, fText.length(), fPreservedText,fUndoModificationStamp);
+     else
+          fDocumentUndoManager.fDocument.replace(fStart, fText.length(), fPreservedText);
+            \} catch (BadLocationException x) \{
+   \} \}
+ public boolean canUndo() \{
+   if (isValid()) \{
+    if (fDocumentUndoManager.fDocument instanceof Document) \{
+      long docStamp = ((Document)fDocumentUndoManager.fDocument).getModificationStamp();
+      boolean canUndo = docStamp == Document.STAMP ||  docStamp >= getRedoModificationStamp();
+      return canUndo;
+  \}
+  return false; 
+\}
+public boolean canExecute() \{
+  return fDocumentUndoManager.isConnected();
+  \}
+public IStatus undo() \{
+  if (isValid()) \{
+    fDocumentUndoManager.fireDocumentUndo(fStart, fPreservedText, fText, null, DocumentUndoEvent.ABOUT_TO_UNDO, false);
+    undoTextChange();
+    fDocumentUndoManager.resetProcessChangeState();
+    fDocumentUndoManager.fireDocumentUndo(fStart, fPreservedText, fText, null);
+    return Status.OK_STATUS;
+  \}
+ return IOperationHistory.OPERATION_INVALID_STATUS;
+ \}
+ protected void redoTextChange() \{
+  try \{
+    if (fDocumentUndoManager.fDocument instanceof Document)
+       ((Document)fDocumentUndoManager.fDocument).replace(fStart, fEnd - fStart, fText, fRedoModificationStamp);
+   else
+     fDocumentUndoManager.fDocument.replace(fStart, fEnd - fStart, fText);
+   \} catch (BadLocationException x) \{
+  \}\}
+protected void updateTextChange() \{
+   fText = fDocumentUndoManager.fTextBuffer.toString();
+   fDocumentUndoManager.fTextBuffer.setLength(0);
+   fPreservedText = fDocumentUndoManager.fPreservedTextBuffer.toString();
+   fDocumentUndoManager.fPreservedTextBuffer.setLength(0);
+\}
+ protected UndoableTextChange createCurrent() \{
+   if (fDocumentUndoManager.fFoldingIntoCompoundChange)
+     return new UndoableCompoundTextChange(fDocumentUndoManager);
+  return new UndoableTextChange(fDocumentUndoManager);
+ \}
+protected void commit() \{
+  if (fStart < 0) \{
+  if (fDocumentUndoManager.fFoldingIntoCompoundChange) \{
+   fDocumentUndoManager.fCurrent = createCurrent();
+  \} else \{
+   reinitialize();
+  \} \} else \{
+   updateTextChange();
+   fDocumentUndoManager.fCurrent = createCurrent();
+  \} \}
+ protected void pretendCommit() \{
+    if (fStart > -1) \{
+       fText = fDocumentUndoManager.fTextBuffer.toString();
+       fPreservedText = fDocumentUndoManager.fPreservedTextBuffer.toString();
+ \} \}
+  \end{Verbatim}
+      \vspace{-4mm}
+     \\ \hline
+\end{tabular} 
+\caption{Result No 4.: add undo/redo to a TextEditor}
+\label{fig:undoEditor}
+\end{minipage}
+\end{figure*}
+
+
+
+
+
+
