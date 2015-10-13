@@ -1,3 +1,5 @@
+
+
 \section{Approach}
 
 To identify methods that implement concerns, I build a prototype which invokes Code Search Engine (CSE) API and analyzes the results from CSE using partial program analysis~\cite{partialProgram:OOPSLA08}. I select SearchCode~\cite{SearchCode} because it is an open source code search engine with over 7000 projects from  Github, Bitbucket, Google Code, and Sourceforge, with complete API documentations. To identify queried features in the returned source code,  I use the mean of TF-IDF weight  for each query term as a weighting factor and select top k (k=5) methods that are related to the given query.  This approach is similar to prior works that use  IR~\cite{Denys:FCA12} and NL analysis~\cite{Hill:FindConcept07} for feature location. I choose IR approach because other approaches require history or structural analysis that might not be feasible for partial program. TF-IDF =  $avg( \log (1 + f_{t,d}) \times  \log \frac {N} {n_t}), f_{t,d}$ is the frequency of term $t$ in method $d$, $N$ is the total number of methods, $n_t$ is the number of methods that have the term $t$.

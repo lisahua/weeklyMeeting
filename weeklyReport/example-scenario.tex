@@ -1,0 +1,114 @@
+
+
+
+\begin{figure}[!htb]
+ \begin{minipage}{0.5\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+%  \multicolumn{1}{c}{(A) TextEditor} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+public class TextEditor extends JTextPane \{
+\textcolor{purple}{ public UndoAction undoAction = new UndoAction();}
+\textcolor{purple}{ public RedoAction redoAction = new RedoAction();}
+\textcolor{purple}{ public CompoundUndoManager undo;}
+ HashMap<Object, Action> actions = new HashMap<Object, Action>();
+ public TextEditor(Workspace workspace) \{
+   this.workspace = workspace;
+\textcolor{purple}{   undo = new CompoundUndoManager(workspace);}
+   actions.put("undo", undoAction);
+   actions.put("redo", redoAction);
+   \}
+ public void discardUndoRedo() \{
+    undo.discardAllEdits();
+    undoAction.updateUndoState();
+    redoAction.updateRedoState();
+   \}
+\textcolor{purple}{ public class UndoAction extends AbstractAction \{}
+\textcolor{purple}{  public void actionPerformed(ActionEvent e) \{}
+   try \{
+\textcolor{purple}{     undo.undo();}
+     updateUndoState();
+     redoAction.updateRedoState();
+    \} catch (CannotUndoException ex) \{
+    \}\}
+   public void updateUndoState() \{
+    \uwave{setEnabled(undo.canUndo());}
+   \}\}
+\textcolor{purple}{ public class RedoAction extends AbstractAction \{}
+\textcolor{purple}{   public void actionPerformed(ActionEvent e) \{}
+    try \{
+\textcolor{purple}{      undo.redo();}
+      updateRedoState();
+      undoAction.updateUndoState();
+     \} catch (CannotRedoException ex) \{
+     \}\}
+      public void updateRedoState() \{
+       \uwave{setEnabled(undo.canRedo());}
+     \}\}
+  \end{Verbatim}
+      \vspace{-4mm}
+     \\ \hline
+\end{tabular} 
+\caption{Result No 1: textmash:TextEditor}
+\label{fig:textEditor}
+\end{minipage}
+\end{figure}
+
+
+
+
+
+\begin{figure}[!htb]
+ \begin{minipage}{0.5\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+%  \multicolumn{1}{c}{(B) No. 5.6,8, ConsoleTextEditor} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+public class ConsoleTextEditor extends JScrollPane \{
+\textcolor{purple}{  private UndoAction undoAction = new UndoAction();}
+\textcolor{purple}{    private RedoAction redoAction = new RedoAction();}
+\textcolor{purple}{    private TextUndoManager undoManager;}
+    public ConsoleTextEditor () \{
+     this.undoManager = new TextUndoManager();
+\textcolor{purple}{     doc.addUndoableEditListener(undoManager);}
+     undoManager.addPropertyChangeListener(undoAction);
+     undoManager.addPropertyChangeListener(redoAction);
+\textcolor{purple}{     doc.addDocumentListener(undoAction);}
+\textcolor{purple}{     doc.addDocumentListener(redoAction);}
+  \}
+\textcolor{purple}{ private class RedoAction extends UpdateCaretListener}
+  implements PropertyChangeListener \{
+\textcolor{purple}{  public void actionPerformed(ActionEvent ae) \{}
+\textcolor{purple}{   undoManager.redo();}
+   \uwave{setEnabled(undoManager.canRedo());}
+   \uwave{undoAction.setEnabled(undoManager.canUndo());}
+  \}
+    public void propertyChange(PropertyChangeEvent pce) \{
+     setEnabled(undoManager.canRedo());
+   \} \}
+\textcolor{purple}{ private class UndoAction extends UpdateCaretListener }
+ implements PropertyChangeListener \{
+\textcolor{purple}{   public void actionPerformed(ActionEvent ae) \{}
+\textcolor{purple}{    undoManager.undo();}
+    \uwave{setEnabled(undoManager.canUndo());}
+    \uwave{redoAction.setEnabled(undoManager.canRedo());}
+ \}
+  public void propertyChange(PropertyChangeEvent pce) \{
+    setEnabled(undoManager.canUndo());
+  \}\}
+  \end{Verbatim}
+      \vspace{-4mm}
+     \\ \hline
+\end{tabular} 
+\caption{Result No 5,6,8: groovy: DocumentUndoManagerImpl}
+\label{fig:textEditor}
+\end{minipage}
+\end{figure}
+
+
+
+

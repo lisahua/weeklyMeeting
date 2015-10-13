@@ -1,5 +1,60 @@
-
+\input{example-scenario}
 %\section{Motivating Example}
+\section{Usage Scenario}
+\noindent{\textbf{Add undo and redo action for TextEditor.}}
+
+\begin{table}[ht]
+\begin{center}
+\caption{Search Result from Code Search Engine}
+\label{tab:total}
+\scriptsize{
+\begin{tabular*}{0.5\textwidth}{@{}c|llrr@{}} \hline
+No.&Name&Project&LOC&\# M\\\hline
+1&TextEditor&textmash&1270&12\\
+2,3&AndroidTextEditor&android&576&9\\
+4&DocumentUndoManagerImpl&ide&1227&17\\
+5,6,8&ConsoleTextEditor&groovy&321&7\\ 
+7&PapyrusCDTEditor&eclipse.papyrus&393&7\\
+9,10&AspectEditorContributor&eclipse&88&2\\ \hline
+\end{tabular*}
+ \label{tab:undoResult}
+ \textbf{ \# M} represents the number of methods that contain the query terms. 
+ {\bf No.} represents the rank from CSE. Note that CSE may return the same results for multiple times, as the same file may exist in multiple branches. For instance, we regard 5,6,8 as identical with manual inspection. 
+ 
+}
+ \end{center}
+\end{table}
+
+To further illustrate that reuse task involves in multiple methods and classes, and the reuse task is hard without tool support, I imagine a scenario that user wants to add undo and redo actions for her Java Swing text editor application with undo/redo buttons, inspired by the evaluation task used in~\cite{Murphy:nlConcern11}. Without knowing any APIs, developer  first queries code search engine (CSE) with a free-form query \codefont{`undo redo TextEditor'}. Figure~\ref{fig:undoEditor} illustrates the implementation of `add undo/redo' concern mentioned in~\cite{Murphy:nlConcern11} and blue part represents source code that implements this feature.  Table~\ref{tab:undoResult} shows top 10 results returned from SearchCode CSE. We find that all code examples require multiple methods and classes to implement a feature. We also find that all code examples include other auxiliary features that are not directed related to the undo and redo feature. 
+
+We assume that user provides a seed code example for the reuse task. She selects the first result from CSE. She uses keyword search to locate undo and redo feature in 6 methods and regards them as  seed API calls. Shown in Figure~\ref{fig:undoEditor}, she removes  the other  11 methods (865 LOC) that she regards as irrelevant to her reuse task. She recognizes that she needs to implement an \codefont{UndoAction} and \codefont{RedoAction} which are the subclass of \codefont{AbstractAction}, and overrides their actionPerform() method. In the actionPerformed() methods, she should invokes the \codefont{CompoundUndoManager.undo()} and  \codefont{CompoundUndoManager.redo()} correspondingly. Without knowing anything about \codefont{CompoundUndoManager}, she has to query CSE again for `CompoundUndoManager textmash'. This class consists of 17 methods (221 LOC) and she has to repeat to keyword search again to locate undo and redo feature in this class. With manual inspection, she notices that this \codefont{CompoundUndoManager} is a subclass of \codefont{javax.swing.UndoManager} and it overrides four methods \{\codefont{canUndo, canRedo, undo, redo}\} that are related to the feature. She notices that she actually does not need this \codefont{CompoundUndoManager} and decides to invoke its parent class \codefont{UndoManager}  instead. She also notices that she does not need the \codefont{CannotRedoException} by using \codefont{UndoManager}. 
+
+After she integrates \codefont{UndoManager, UndoAction, and RedoAction} to her context, she tests it and it fails to perform the feature. She has to look at other examples, and she finds the No.5 example returned from CSE.  This example seems promising because it is also an implementation of a TextEditor. She notice that  the API \codefont{doc.addUndoableEditListener (undoManager)} seems the one that she misses now, but again, she has to investigate the class   \codefont{TextUndoManager} again. 
+
+With this example, we illustrate that salient API calls that implement a desired feature are always interleaving with other related elements. To finish a reuse task, developer has to remove irrelevant parts.  However, it  requires significant effort to tease out these auxiliary features without tool support. Since the examples always contain both main feature and auxiliary features,  there seldom exists a perfect example for reuse and developers has to iteratively search for new examples and integrate it to their context until the integration results are examined.     
+
+\section{Problem 3}
+Problem: During copy/paste based reuse, developers must remove irrelevant parts and find salient API elements based on the context. 
+
+Hypothesis: Our hypothesis is that having multiple examples of the same kind will help winnow out irrelevant parts, i.e, clustering multiple examples of the same kind and finding the commonality may help remove irrelevant parts. 
+
+%We use the results for  the last three concerns implementation in Table~\ref{tab:concern} found by the code search engine SearchCode to illustrate the Problem 3. 
+
+
+
+%  a feature location approach that is similar to~\cite{Denys:FCA12} to identify seed API calls shown in Figure~\ref{fig:undoEditor}. We remove the other  11 methods (865 LOC) that we believe is irrelevant to our reuse task. 
+
+%For each partial program returned from CSE, we select the top k (k=5) methods that are related to the given query. I present No. 1, 5, 6, 8 to show that it requires multiple methods and classes to implement a concern. The other four examples are shown in Appendix.
+
+%In this example, we use feature location approach~\cite{Denys:FCA12} to identify salient API calls, 
+
+
+
+
+
+
+
+
 
 
 

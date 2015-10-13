@@ -9,22 +9,24 @@ Based on our discussion last week, our problem statement includes:
 \item During copy/paste based reuse, developers must remove irrelevant parts. Our hypothesis is that having multiple examples of the same kind will help winnow out irrelevant parts. (at the granularity of multiple examples)
 \end{enumerate}
 
-%We have three hypotheses correspondingly:
-%\begin{enumerate}
-%\item We believe that NLP text with partial code snippet could help us identify the name of API elements based on keywords from free-form query. 
-%
-%\item Our hypothesis is that we can find related elements by following the structural dependencies of seed API elements in code and by ranking other API elements potentially mentioned in natural language text. 
-%
-%\item We believe that clustering multiple examples of the same kind and finding the commonality may help remove irrelevant parts. 
-%
-%\end{enumerate}
+We have three hypotheses correspondingly:
+\begin{enumerate}
+\item We believe that NLP text with partial code snippet could help us identify the name of API elements based on keywords from free-form query. 
 
-I focus on the second and third problems, perform a preliminary study using three popular code search engines to illustrate these two problems, and revise the hypotheses based on our use of code search engine. 
+\item Our hypothesis is that we can find related elements by following the structural dependencies of seed API elements in code and by ranking other API elements potentially mentioned in natural language text. 
 
+\item We believe that clustering multiple examples of the same kind and finding the commonality may help remove irrelevant parts. 
+
+\end{enumerate}
+
+I focus on the second  problem, and perform a preliminary study using popular code search engines to illustrate this problem. 
+
+\input{example}
+\input{eval-table}
 \section{Problem 2}
 Problem: Reuse tasks involve multiple related classes and methods, yet code search engines do not help developers recognize the latent structure among related classes/methods.
 
-Hypothesis: We can find related elements by following the structural dependencies of seed API elements in code and by ranking these related API elements based on their topology structure. 
+Hypothesis: We can find and rank related elements by following the structural dependencies of seed API elements in code. 
 
 Input: a free-form query that user provides to present her reuse intention.
 
@@ -32,46 +34,19 @@ Output: a list of classes/methods implementation that complete this reuse task.
 
 Sub questions: Do reuse tasks involve multiple related classes and methods? Can existing tools find reusable examples that involve multiple related classes and methods?
 
-To answer these two subquestions, I search for the evaluation dataset for existing code search tools using free-form query (SNIFF~\cite{sniff:Sen09}, Portfolio~\cite{Portfolio:DenysICSE11}, Sourcer~\cite{Sourcerer:SC14}, anyCode~\cite{Gvero:ICSE15}, and Keivanloo et al.~\cite{spotWork:ICSE14}), feature location/concern mining tools~\cite{Denys:FCA12, Hill:FindConcept07, Hassan:concernHistory10, Breu:DynamicAspect04},   and reuse tools~\cite{Holmes:reuse07, Holmes:ASE09}. Other code search engines such as Koders~\cite{Koders}, Krugle~\cite{Krugle}, and SearchCode~\cite{SearchCode} are available on the web, which can be used to assist programmers by providing relevant code examples with usages of the given free-form query from a large number of public source code repositories. Yet the results are sorted based on the text matching and they fail to recognize the latent structure among related classes/methods. 
-
-Based on Table~\ref{tab:concern} and Table~\ref{tab:reuse}, most medium-scale or large-scale reuse tasks involve multiple methods and classes.  However, existing code search tools and  feature location tools  do not help developers recognize the latent structure among related classes/methods. We do not focus on large-scale reuse task mentioned in~\cite{Holmes:reuse07, Holmes:ASE09}. 
-
-\input{eval-table}
-\input{example}
-
-In summary,  a feature/concern reuse task involves multiple related classes and methods. The developer should implement multiple methods and classes to finish the reuse task. Existing  code completion tools can complete a single method which involves in multiple API calls, yet they assume that all related APIs or  objects used in their suggested code already exist. We argue that it requires multiple methods to implement a non-trivial feature/concern. 
-
-\section{Scenario}
-\noindent{\textbf{Add undo and redo action for TextEditor.}}
-
-\begin{table}[ht]
-\begin{center}
-\caption{Search Result from Code Search Engine}
-\label{tab:total}
-\scriptsize{
-\begin{tabular*}{0.5\textwidth}{@{}c|llrr@{}} \hline
-No.&Name&Project&LOC&\# M\\\hline
-1&TextEditor&textmash&1270&12\\
-2,3&AndroidTextEditor&android&576&9\\
-4&DocumentUndoManagerImpl&ide&1227&17\\
-5,6,8&ConsoleTextEditor&groovy&321&7\\ 
-7&PapyrusCDTEditor&eclipse.papyrus&393&7\\
-9,10&AspectEditorContributor&eclipse&88&2\\ \hline
-\end{tabular*}
- \label{tab:undoResult}
- \textbf{ \# M} represents the number of methods that contain the query terms. 
- {\bf No.} represents the rank from CSE. Note that CSE may return the same results for multiple times, as the same file may exist in multiple branches. For instance, we regard 5,6,8 as identical with manual inspection. 
- 
-}
- \end{center}
-\end{table}
-
-Figure~\ref{fig:undoEditor} illustrates the implementation of `add undo/redo' concern mentioned in~\cite{Murphy:nlConcern11}.  Consider that user wants to add undo and redo actions for her Java Swing text editor application with undo/redo buttons.  Without knowing any APIs, developer  first queries code search engine (CSE) with a free-form query \codefont{`undo redo TextEditor'}. Table~\ref{tab:undoResult} shows top 10 results returned from SearchCode CSE. For each partial program returned from CSE, I select the top k (k=5) methods that are related to the given query. 
 
 
+To answer these two subquestions, I search for the evaluation dataset for existing feature location/concern mining tools~\cite{Denys:FCA12, Hill:FindConcept07, Hassan:concernHistory10, Breu:DynamicAspect04} shown in Table~\ref{tab:concern},    reuse tools~\cite{Holmes:reuse07, Holmes:ASE09} shown in Table~\ref{tab:reuse}, and code search tools using free-form query ~\cite{sniff:Sen09, Portfolio:DenysICSE11, Sourcerer:SC14, Gvero:ICSE15, spotWork:ICSE14} shown in Table~\ref{tab:freeform}. We find that most medium-scale or large-scale reuse tasks involve multiple methods and classes,  and the developer should implement multiple methods and classes to finish the reuse task. Existing  code completion tools can complete a single method which involves in multiple API calls, yet they assume that all related APIs or  objects used in their suggested code snippet already exist. We argue that this assumption might not hold for a non-trivial reuse task, because developers need to implement the salient API calls that provide the main functionality as well as other related elements based on the latent structure.  
+
+% existing code search tools and  feature location tools  do not help developers recognize the latent structure among related classes/methods. 
+
+%Other code search engines such as Koders~\cite{Koders}, Krugle~\cite{Krugle}, and SearchCode~\cite{SearchCode} are available on the web, %which can be used to assist programmers by providing relevant code examples with usages of the given free-form query from a large number of public source code repositories. 
+%yet the results are sorted based on the text matching and they also fail to recognize the latent structure among related classes/methods. 
+
+%Based on Table~\ref{tab:concern} and Table~\ref{tab:reuse}, most medium-scale or large-scale reuse tasks involve multiple methods and classes.  However, existing code search tools and  feature location tools  do not help developers recognize the latent structure among related classes/methods. We do not focus on large-scale reuse task mentioned in~\cite{Holmes:reuse07, Holmes:ASE09}. 
 
 
-
+%In summary,  a feature/concern reuse task involves multiple related classes and methods. The developer should implement multiple methods and classes to finish the reuse task. Existing  code completion tools can complete a single method which involves in multiple API calls, yet they assume that all related APIs or  objects used in their suggested code already exist. We argue that it requires multiple methods to implement a non-trivial feature/concern. 
 
 
 

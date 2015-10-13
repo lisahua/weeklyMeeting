@@ -7,134 +7,8 @@
 \scriptsize 
 \begin{tabular}{@{}p{1\textwidth}} 
  \hline 
-  \multicolumn{1}{c}{(A) User's context} \\ \hline
-  \vspace{-4mm}
-\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
-public abstract class AndroidTextEditor extends FormEditor implements IResourceChangeListener \{
- protected void createAndroidPages() \{
-  mIsCreatingPage = true;
-  createFormPages();
-  createTextEditor();
-  createUndoRedoActions();
-  postCreatePages();
-  mIsCreatingPage = false;
- \}
- private void createUndoRedoActions() \{
-  IActionBars bars = getEditorSite().getActionBars();
-  if (bars != null) \{
-    IAction action = mTextEditor.getAction(ActionFactory.UNDO.getId());
-    bars.setGlobalActionHandler(ActionFactory.UNDO.getId(), action);
-    action = mTextEditor.getAction(ActionFactory.REDO.getId());
-    bars.setGlobalActionHandler(ActionFactory.REDO.getId(), action);
-    bars.updateActionBars();
-  \}\}
- private void createTextEditor() \{
-   mTextEditor = new TextEditor();
-   int index = addPage(mTextEditor, getEditorInput());
-   mTextPageIndex = index;
-   setPageText(index, mTextEditor.getTitle());
-   IDocumentProvider provider = mTextEditor.getDocumentProvider();
-   mDocument = provider.getDocument(getEditorInput());
-   mDocument.addDocumentListener(new IDocumentListener() \{
-    public void documentChanged(DocumentEvent event) \{
-    onDocumentChanged(event);
- \}); \} \}
- protected void selectDefaultPage(String defaultPageId) \{
-  if (defaultPageId == null) \{
-   if (getEditorInput() instanceof IFileEditorInput) \{
-    IFile file = ((IFileEditorInput) getEditorInput()).getFile();
-    QualifiedName qname = new QualifiedName(AdtPlugin.PLUGIN_ID, getClass().getSimpleName() + PREF_CURRENT_PAGE);
-    String pageId = file.getPersistentProperty(qname);
-    if (pageId != null) \{ defaultPageId = pageId; \}
-   \} \}
- @Override
- protected void pageChange(int newPageIndex) \{
-  super.pageChange(newPageIndex);
-  if (mIsCreatingPage) \{ return; \}
-  if (getEditorInput() instanceof IFileEditorInput) \{
-   IFile file = ((IFileEditorInput) getEditorInput()).getFile();
-   QualifiedName qname = new QualifiedName(AdtPlugin.PLUGIN_ID, getClass().getSimpleName() + PREF_CURRENT_PAGE);
-   file.setPersistentProperty(qname, Integer.toString(newPageIndex));
-  \} \}
- public void resourceChanged(final IResourceChangeEvent event) \{
-  if (event.getType() == IResourceChangeEvent.PRE_CLOSE) \{
-   Display.getDefault().asyncExec(new Runnable() \{
-   public void run() \{
-    IWorkbenchPage[] pages = getSite().getWorkbenchWindow().getPages();
-    for (int i = 0; i < pages.length; i++) \{
-     if (((FileEditorInput)mTextEditor.getEditorInput()).getFile().getProject().equals(event.getResource())) \{
-      IEditorPart editorPart = pages[i].findEditor(mTextEditor.getEditorInput());
-      pages[i].closeEditor(editorPart, true);
-    \}  \} \}); \} \}
-  \end{Verbatim}
-      \vspace{-4mm}
-     \\ \hline
-\end{tabular} 
-\caption{Result No 4.: add undo/redo to a TextEditor}
-\label{fig:undoEditor}
-\end{minipage}
-\end{figure*}
 
-
-
-
-
-
-
-
-
-
-\begin{figure*}[!htb]
- \begin{minipage}{1\textwidth}
-\scriptsize 
-\begin{tabular}{@{}p{1\textwidth}} 
- \hline 
-  \multicolumn{1}{c}{(A) User's context} \\ \hline
-  \vspace{-4mm}
-\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
-public class AspectEditorContributor extends MultiPageEditorActionBarContributor \{
- private IEditorPart activeEditorPart;
- private AspectEditor aspectEditor;
- @Override
- public void setActivePage(IEditorPart part) \{
-  if (activeEditorPart == part)   return;
-  activeEditorPart = part;
-  IActionBars actionBars = getActionBars();
-  if (activeEditorPart != null && activeEditorPart instanceof ITextEditor) \{
-   IActionBars siteActionBars = ((IEditorSite)activeEditorPart.getEditorSite()).getActionBars();
-   siteActionBars.setGlobalActionHandler(ITextEditorActionConstants.UNDO, getAction((ITextEditor)activeEditorPart, ITextEditorActionConstants.UNDO));
-   siteActionBars.setGlobalActionHandler(ITextEditorActionConstants.REDO, getAction((ITextEditor)activeEditorPart, ITextEditorActionConstants.REDO));
-   siteActionBars.updateActionBars();              
-  \} else \{
-   if (part instanceof AspectEditor) \{  aspectEditor = (AspectEditor) part; \}
-   IWorkbenchPartSite site = aspectEditor.getSite();
-   if (site instanceof IEditorSite) \{
-    ITextEditor textEditor = aspectEditor.getMultipageEditor().getTextEditor();
-    IActionBars siteActionBars = ((IEditorSite) site).getActionBars();
-    siteActionBars.setGlobalActionHandler(ITextEditorActionConstants.UNDO, getAction(textEditor, ITextEditorActionConstants.UNDO));
-    siteActionBars.setGlobalActionHandler(ITextEditorActionConstants.REDO, getAction(textEditor, ITextEditorActionConstants.REDO));
-    siteActionBars.updateActionBars();              
- \} \}\}
- protected IAction getAction(ITextEditor editor, String actionID) \{
-   return (editor == null ? null : editor.getAction(actionID));
- \} \}
-   \end{Verbatim}
-      \vspace{-4mm}
-     \\ \hline
-\end{tabular} 
-\caption{Result No 4.: add undo/redo to a TextEditor}
-\label{fig:undoEditor}
-\end{minipage}
-\end{figure*}
-
-
-
-\begin{figure*}[!htb]
- \begin{minipage}{1\textwidth}
-\scriptsize 
-\begin{tabular}{@{}p{1\textwidth}} 
- \hline 
-  \multicolumn{1}{c}{(A) User's context} \\ \hline
+  \multicolumn{1}{c}{Result 7: PaparusCDTEditor} \\ \hline
   \vspace{-4mm}
 \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
 public class PapyrusCDTEditor extends CEditor \{
@@ -144,15 +18,15 @@ public class PapyrusCDTEditor extends CEditor \{
  public void createPartControl(Composite parent) \{
   IActionBars actionBars = getEditorSite().getActionBars();
   if((actionBars != null) && (gmfUndo == null)) \{
-   gmfUndo = actionBars.getGlobalActionHandler(ITextEditorActionConstants.UNDO);
-    gmfRedo = actionBars.getGlobalActionHandler(ITextEditorActionConstants.REDO);
+   gmfUndo =  \uwave{actionBars.getGlobalActionHandler(ITextEditorActionConstants.UNDO)};
+    gmfRedo =  \uwave{actionBars.getGlobalActionHandler(ITextEditorActionConstants.REDO)};
   \}
   super.createPartControl(parent);
   if(actionBars != null) \{
    textUndo = actionBars.getGlobalActionHandler(ITextEditorActionConstants.UNDO);
    textRedo = actionBars.getGlobalActionHandler(ITextEditorActionConstants.REDO);
-   actionBars.setGlobalActionHandler(ITextEditorActionConstants.UNDO, gmfUndo);
-   actionBars.setGlobalActionHandler(ITextEditorActionConstants.REDO, gmfRedo);
+    \uwave{actionBars.setGlobalActionHandler(ITextEditorActionConstants.UNDO, gmfUndo)};
+    \uwave{actionBars.setGlobalActionHandler(ITextEditorActionConstants.REDO, gmfRedo)};
    actionBars.updateActionBars();
   \}
   @Override
@@ -186,27 +60,86 @@ public class PapyrusCDTEditor extends CEditor \{
  \end{Verbatim}
       \vspace{-4mm}
      \\ \hline
+       \multicolumn{1}{c}{Result No.9,10: AspectEditorContributor} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+public class AspectEditorContributor extends MultiPageEditorActionBarContributor \{
+ private IEditorPart activeEditorPart;
+ private AspectEditor aspectEditor;
+ @Override
+ public void setActivePage(IEditorPart part) \{
+  if (activeEditorPart == part)   return;
+  activeEditorPart = part;
+  IActionBars actionBars = getActionBars();
+  if (activeEditorPart != null && activeEditorPart instanceof ITextEditor) \{
+   IActionBars siteActionBars = ((IEditorSite)activeEditorPart.getEditorSite()).getActionBars();
+    \uwave{siteActionBars.setGlobalActionHandler(ITextEditorActionConstants.UNDO, getAction((ITextEditor)activeEditorPart, ITextEditorActionConstants.UNDO))};
+    \uwave{siteActionBars.setGlobalActionHandler(ITextEditorActionConstants.REDO, getAction((ITextEditor)activeEditorPart, ITextEditorActionConstants.REDO))};
+   siteActionBars.updateActionBars();              
+  \} else \{
+   if (part instanceof AspectEditor) \{  aspectEditor = (AspectEditor) part; \}
+   IWorkbenchPartSite site = aspectEditor.getSite();
+   if (site instanceof IEditorSite) \{
+    ITextEditor textEditor = aspectEditor.getMultipageEditor().getTextEditor();
+    IActionBars siteActionBars = ((IEditorSite) site).getActionBars();
+    siteActionBars.setGlobalActionHandler(ITextEditorActionConstants.UNDO, getAction(textEditor, ITextEditorActionConstants.UNDO));
+    siteActionBars.setGlobalActionHandler(ITextEditorActionConstants.REDO, getAction(textEditor, ITextEditorActionConstants.REDO));
+    siteActionBars.updateActionBars();              
+ \} \}\}
+ protected IAction getAction(ITextEditor editor, String actionID) \{
+   return (editor == null ? null : editor.getAction(actionID));
+ \} \}
+   \end{Verbatim}
+      \vspace{-4mm}
+     \\ \hline
+
 \end{tabular} 
-\caption{Result No 4.: add undo/redo to a TextEditor}
+\caption{Results from SearchCode CSE}
 \label{fig:undoEditor}
 \end{minipage}
 \end{figure*}
-
-
-
-
-
-
-
-
-
 
 \begin{figure*}[!htb]
  \begin{minipage}{1\textwidth}
 \scriptsize 
 \begin{tabular}{@{}p{1\textwidth}} 
  \hline 
-  \multicolumn{1}{c}{(A) User's context} \\ \hline
+    \multicolumn{1}{c}{Result No 2,3.: AndroidTextEditor} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+public abstract class AndroidTextEditor extends FormEditor implements IResourceChangeListener \{
+ protected void createAndroidPages() \{
+  mIsCreatingPage = true;
+  createFormPages();
+  createTextEditor();
+  createUndoRedoActions();
+  postCreatePages();
+  mIsCreatingPage = false;
+ \}
+ private void createUndoRedoActions() \{
+  IActionBars bars = getEditorSite().getActionBars();
+  if (bars != null) \{
+    IAction action = mTextEditor.getAction(ActionFactory.UNDO.getId());
+    bars.setGlobalActionHandler(ActionFactory.UNDO.getId(), action);
+    action = mTextEditor.getAction(ActionFactory.REDO.getId());
+    bars.setGlobalActionHandler(ActionFactory.REDO.getId(), action);
+    bars.updateActionBars();
+  \}\}
+ private void createTextEditor() \{
+   mTextEditor = new TextEditor();
+   int index = addPage(mTextEditor, getEditorInput());
+   mTextPageIndex = index;
+   setPageText(index, mTextEditor.getTitle());
+   IDocumentProvider provider = mTextEditor.getDocumentProvider();
+   mDocument = provider.getDocument(getEditorInput());
+   mDocument.addDocumentListener(new IDocumentListener() \{
+    public void documentChanged(DocumentEvent event) \{
+    onDocumentChanged(event);
+ \}); \} \}
+\end{Verbatim}
+\vspace{-4mm}
+ \\ \hline
+  \multicolumn{1}{c}{Result 4: DocumentUndoManagerImpl } \\ \hline
   \vspace{-4mm}
 \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
 public class DocumentUndoManagerImpl implements DocumentUndoManager \{
@@ -234,9 +167,6 @@ public class DocumentUndoManagerImpl implements DocumentUndoManager \{
   \}
   return false; 
 \}
-public boolean canExecute() \{
-  return fDocumentUndoManager.isConnected();
-  \}
 public IStatus undo() \{
   if (isValid()) \{
     fDocumentUndoManager.fireDocumentUndo(fStart, fPreservedText, fText, null, DocumentUndoEvent.ABOUT_TO_UNDO, false);
@@ -265,27 +195,12 @@ protected void updateTextChange() \{
    if (fDocumentUndoManager.fFoldingIntoCompoundChange)
      return new UndoableCompoundTextChange(fDocumentUndoManager);
   return new UndoableTextChange(fDocumentUndoManager);
- \}
-protected void commit() \{
-  if (fStart < 0) \{
-  if (fDocumentUndoManager.fFoldingIntoCompoundChange) \{
-   fDocumentUndoManager.fCurrent = createCurrent();
-  \} else \{
-   reinitialize();
-  \} \} else \{
-   updateTextChange();
-   fDocumentUndoManager.fCurrent = createCurrent();
-  \} \}
- protected void pretendCommit() \{
-    if (fStart > -1) \{
-       fText = fDocumentUndoManager.fTextBuffer.toString();
-       fPreservedText = fDocumentUndoManager.fPreservedTextBuffer.toString();
  \} \}
   \end{Verbatim}
       \vspace{-4mm}
      \\ \hline
 \end{tabular} 
-\caption{Result No 4.: add undo/redo to a TextEditor}
+\caption{Results from SearchCode CSE}
 \label{fig:undoEditor}
 \end{minipage}
 \end{figure*}

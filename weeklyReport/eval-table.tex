@@ -6,26 +6,26 @@
 \label{tab:total}
 \scriptsize{
 \begin{tabular*}{1\textwidth}{@{}l|l|l@{}} \hline
-Source&Query&\# methods\\\hline
+Tool&Input: query / context&Output: method / code snippet\\\hline
 FCA~\cite{Denys:FCA12}&jEdit: support for `thick' caret &6 (org.eclipse.swt.widgets.Table.createHandle(), createWidget(), etc)\\
 &jEdit: rename project source&5 (org.eclipse.core.internal.localstore.FileSystemStore.move, etc)\\ \hline
-FindConcept~\cite{Hill:FindConcept07}&Add Textfield&5\\
-&Compile Report&8\\ \hline
+%FindConcept~\cite{Hill:FindConcept07}&Add Textfield&5\\
+%&Compile Report&8\\ \hline
 %COMMIT~\cite{Hassan:concernHistory10}&Error logging&It focuses on improving crosscutting concerns using co-evolving history.\\
 %&Debugging&\\ \hline
 Portfolio~\cite{Portfolio:DenysICSE11}&mip map dithering texture image graphics&6 methods: ImageTexture:createTextureFromImage, TiledTexture:\\ 
-&&buildGaussianGlareTexture, LoadTextureFromFile:initReaderer, etc  \\
+Export~\cite{Export:DenysASE13}&&buildGaussianGlareTexture, LoadTextureFromFile:initReaderer, etc  \\
 &adjust parameters such as brightness for a picture*\\
 &read and play midi files*\\ \hline
 Rastkar, Murphy&jEdit: add autosave capabilities&They assume that there already exist multiple instances of this concern.\\
  et al.~\cite{Murphy:nlConcern11}&add undo functionality for a command&`All of the methods named `undo': \\ 
  &&override method `org.jhotdraw.util.UndoableAdapter.undo';\\
  &&are a member of the class `undoActivity';\\ \hline
- Strathcona~\cite{Holmes:structural05}&update status line&protected void updateStatusLine(IStructuredSelection selection) \{\\
+ Strathcona~\cite{Holmes:structural05}&update status line&protected void updateStatusLine(IStructuredSelection selection) \{//fill \\
 &&String msg = getStatusLineMessage(selection);\\
 &&getViewSite().getActionBars().getStatusLineManager().setMessage(msg); \}\\ 
 &&\\
-&generate method signature&public boolean visit(MethodDeclaration node) \{\\
+&generate method signature&public boolean visit(MethodDeclaration node) \{//fill\\
 && node.getModifiers();\\
 && node.getName.getIdentifiers();\\
 && return super.visit(node); \} \\ \hline
@@ -55,7 +55,7 @@ Rastkar, Murphy&jEdit: add autosave capabilities&They assume that there already 
 \vspace{1mm}
 \scriptsize{
 \begin{tabular*}{1\textwidth}{@{}l|l|l|l@{}} \hline
-Source&Task&LOC&Result / Description\\\hline
+Tool&Task&LOC&Result / Description\\\hline
 Gilligan~\cite{Holmes:reuse07}&reuse BMP image file parsing in SWT&497&They try to address the problem of source code integration \\
 &reuse  module that serializes objects to XML&900& in the context of medium or large-scale reuse tasks. They  \\
 &reuse virtual file system from a third-party app&3000& suggest program elements that are easy to reuse based on \\
@@ -83,7 +83,7 @@ LOC represents the lines of code that are reused.
 \vspace{1mm}
 \scriptsize{
 \begin{tabular*}{1\textwidth}{@{}l|l|l@{}} \hline
-Source&Query&Result\\\hline
+Tool&Input: query / keyword&Output: code snippet / code element\\\hline
 SNIFF~\cite{sniff:Sen09}&get active editor window from&IWorkbenchWindow window = PlatformUI.\\
 & eclipse workbench&getWorkbench().getActiveWorkbenchWindow();\\
 &parse a java source and create ast&ASTParser parser = ASTParser.newParser(AST.JLS3);\\
