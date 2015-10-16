@@ -1,0 +1,137 @@
+%\documentclass[natbib,preprint]{sigplanconf}
+% \documentclass[conference]{IEEEtran}
+\documentclass{sig-alternate}
+\usepackage{fancybox}
+\usepackage{cite}
+\usepackage{color,soul}
+\usepackage{hyperref}
+\usepackage{algorithmic}
+\usepackage{flushend}
+\usepackage{fancyvrb}
+\usepackage[normalem]{ulem}
+\usepackage{graphicx}
+\usepackage[lined, algonl, ruled, boxed]{algorithm2e} 
+\usepackage{amsmath}
+\usepackage{amssymb} 
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage{subfigure}
+\usepackage{latexsym}
+\usepackage{xspace}
+\usepackage[usenames,dvipsnames]{xcolor}
+
+% \usepackage{fancybox}
+% \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+% \captionsetup[table]{skip=10pt}
+
+\newcommand{\tool}{\textsc{Niche}\xspace}
+\newcommand{\fixme} [1] {\textcolor{red}{{\it FIXME}: #1}}
+\newcommand{\delete} [1] {\textcolor{red}{#1}}
+\newcommand{\add} [1] {\textcolor{blue}{#1}}
+% \newcommand{\javac}{javac\xspace} % This package lets you punctuate \javac normally and get good spacing, e.g., \javac.  gives you: javac.
+\newcommand{\codefont}[1]{\footnotesize{\texttt{#1}}\normalsize}
+\newcommand{\todo} [1]{\textcolor{blue}{{\sf TODO}: #1}}
+\newcommand{\hlc}[2][yellow]{ {\sethlcolor{#1} \hl{#2}} }
+
+
+% \lstset{frame=tb,
+%   language=Java,
+%   showstringspaces=false,
+%   columns=flexible,
+%   basicstyle={\ttfamily\footnotesize},
+%   numberstyle=\tiny\color{gray},
+%   keywordstyle=\color{blue},
+%   commentstyle=\color{dkgreen},
+%   stringstyle=\color{mauve},
+%   breaklines=true,
+%   breakatwhitespace=true,
+%   tabsize=3
+% }
+
+
+
+\begin{document}
+
+%\conferenceinfo{Mystery'09,} {January 1, 2009, Austin, TX.}
+%\CopyrightYear{2009}
+%\copyrightdata{2009}
+
+
+%\title{How Universal are Naming Rules?}
+
+\title{Are Inconsistent Names Correlated with Bugs in Java?} %
+
+% \numberofauthors{3} 
+% \author{
+% You can go ahead and credit any number of authors here,
+% e.g. one 'row of three' or two rows (consisting of one row of three
+% and a second row of one, two or three).
+%
+% The command \alignauthor (no curly braces needed) should
+% precede each author name, affiliation/snail-mail address and
+% e-mail address. Additionally, tag each line of
+% affiliation/address with \affaddr, and tag the
+% e-mail address with \email.
+%
+
+\numberofauthors{1} %  in this sample file, there are a *total*
+% of EIGHT authors. SIX appear on the 'first-page' (for formatting
+% reasons) and the remaining two appear in the \additionalauthors section.
+%
+\author{
+% You can go ahead and credit any number of authors here,
+% e.g. one 'row of three' or two rows (consisting of one row of three
+% and a second row of one, two or three).
+%
+% The command \alignauthor (no curly braces needed) should
+% precede each author name, affiliation/snail-mail address and
+% e-mail address. Additionally, tag each line of
+% affiliation/address with \affaddr, and tag the
+% e-mail address with \email.
+%
+% 1st. author
+\alignauthor
+Lisa Hua$^{\dag}$ \hspace*{2em} Miryung Kim$^{\ast}$ \hspace*{2em} \\[.2ex]
+\affaddr{$^{\dag}$The University of Texas atAustin~~$^{\ast}$University of California, Los Angeles}\\
+\email{\normalsize{lisahua@utexas.edu,  miryung@cs.ucla.edu}}
+}
+
+\maketitle
+
+\input{abstract}
+
+%{
+%\scriptsize
+%\category{D.3.4}{Programming Languages}{Processors}[Memory management (garbage collection); Optimization] 
+%\terms
+%Experimentation, Languages, Performance, Measurement
+%\keywords
+%Heap
+%}
+
+\input{intro}
+
+
+
+\input{empiricalStudy}
+
+\input{related} 
+
+\input{discussion}
+
+\input{conclusion}
+
+
+%\bibliographystyle{abbrvnat}
+% \renewcommand{\bibfont}{\footnotesize} % <--- change bib font size here
+% \setlength{\bibsep}{0.5ex}             % <--- change space between bib entries here
+\bibliographystyle{abbrv}
+\bibliography{branch} 
+%\bibliography{strings-short,paper}  % <--- use short strings in case of emergency
+
+%\input{appendix}
+
+\end{document}
