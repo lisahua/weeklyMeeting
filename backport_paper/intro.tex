@@ -1,1 +1,9 @@
 \section{Introduction}
+
+As software projects grow ever larger, it has become a challenge to meet different requirements from different users and dispatch these requirements to multiple development teams.   One common solution to this problem is to use branches within the source code management system. Branches  provides a workspace where changes can be made and tested in one branch without affecting any other branches.  This feature allows development teams to partition work and prevent interruptions from external sources. With the advert of version control systems that facilitate easy branching and merging such as Git andMercurial, many open source projects have begun using branching in their distributed development practices, including Linux kernel, Eclipse, and Apache Hadoop. 
+
+Recent studies show that branches do not come without a price~\cite{Muslu:dvcsICSE14, Bird:whatIfFSE12}. Since a change is initially only visible within the branch, it must be integrated into a single target branch with other changes from multiple feature branches, initiating a conflict resolution process if changes are incompatible. This process is known as upstream merge that pushes changes into higher  branch levels. Moreover,  to maintain multiple product variants for different users simultaneously, the bug-fixes and necessary features should be backported from the main branch to release branches or other feature branches.  
+
+However,the porting practices in large scale open source projects have not been systematically studied in a quantitative manner: 
+
+ In the effort to improve the current solution for backporting in the industry. 
