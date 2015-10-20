@@ -1,5 +1,104 @@
 
 
+
 \section{Approach}
 
-To identify methods that implement concerns, I build a prototype which invokes Code Search Engine (CSE) API and analyzes the results from CSE using partial program analysis~\cite{partialProgram:OOPSLA08}. I select SearchCode~\cite{SearchCode} because it is an open source code search engine with over 7000 projects from  Github, Bitbucket, Google Code, and Sourceforge, with complete API documentations. To identify queried features in the returned source code,  I use the mean of TF-IDF weight  for each query term as a weighting factor and select top k (k=5) methods that are related to the given query.  This approach is similar to prior works that use  IR~\cite{Denys:FCA12} and NL analysis~\cite{Hill:FindConcept07} for feature location. I choose IR approach because other approaches require history or structural analysis that might not be feasible for partial program. TF-IDF =  $avg( \log (1 + f_{t,d}) \times  \log \frac {N} {n_t}), f_{t,d}$ is the frequency of term $t$ in method $d$, $N$ is the total number of methods, $n_t$ is the number of methods that have the term $t$.
+Our approach helps identify and integrate reusable examples in two phases:
+
+\subsection{Example Collection Phase.}  
+We identify the main features from multiple partial programs derived from informal resources. Without confined to an established code corpus, we leverage web search engine to obtain a list of code examples in the form of partial programs and use partial program analysis~\cite{partialProgram:OOPSLA08} to infer partial type and resolve syntactic ambiguity. 
+
+\noindent{\textbf{Query Code Search Engine.}}  We use code search engine SearchCode~\cite{SearchCode} to extract code examples based on free-form queries from users.  We choose it because 1) it has good support for free-form queries,  2) it is an open source code search engine with over 7000 projects from  Github, Bitbucket, Google Code, and Sourceforge, 3) it has complete API documentations and returns. 
+
+\noindent{\textbf{Locate Queried Features.}}  Considering that source code examples always contain multiple features, we identify program elements that are related to the queried features. I use the mean of TF-IDF weight  for each query term as a weighting factor and select all methods whose weighting score is bigger than a threshold.  This approach is similar to prior works that use  IR~\cite{Denys:FCA12} and NL analysis~\cite{Hill:FindConcept07} for feature location. I choose IR approach because other approaches require history or structural analysis that might not be feasible for partial program. TF-IDF =  $avg( \log (1 + f_{t,d}) \times  \log \frac {N} {n_t}), f_{t,d}$ is the frequency of term $t$ in method $d$, $N$ is the total number of methods, $n_t$ is the number of methods that have the term $t$. 
+
+\noindent{\textbf{Extract Structural Facts.}}  Before we extract structural facts, we construct symbol table for partial program based on the partial program analysis~\cite{partialProgram:OOPSLA08}.  We extract structural facts in an ontology instance. The ontology schema we use is the SEON Java ontology, which has been used in several prior works~\cite{gall:seonICSE10, Murphy:nlConcern11}.  Every extracted fact is represented in the ontology instance by one or more  \codefont{(subject, predicate, object)} triples. For instance, the fact that class $c_1$ extends class $c_2$ is represented by triple \codefont{($c_2$, subType, $c_1$)}. To manipulate the relationship between different facts, we use Resource Description Framework (RDF)  to represent each \codefont{(subject, predicate, object)} triple as an edge from \textit{subject} to \textit{object} labeled with {\it predicate}. We use \codefont{Apache Jena}, which is a Java framework for  linked data applications,  to create and process ontology instances. We define \codefont{subType} as  transitive predicate as ($c_1$, subType, $c_2$) and ($c_2$, subType, $c_3$) $\rightarrow$  ($c_1$, subType, $c_3$). 
+
+
+\begin{table}[ht]
+\begin{center}
+\caption{Structural Fact Types}
+\label{tab:total}
+\vspace{1mm}
+\scriptsize{
+\begin{tabular*}{0.5\textwidth}{@{}c|r|l@{}} \hline
+Level&Type&Description\\\hline
+&($c_1$, subType, $c_2$)& class $c_1$ extends $c_2$ \\
+class&($c_1$, innerclass, $c_2$)& class $c_1$ has an inner class $c_2$ \\
+level&($c$, field, $v$)& class $c$ has field $v$ \\ 
+&($c$, method, $m$)& class $c$ contains method $m$ \\ \hline
+&($m$, parameter, $v$)& method  $m$ has parameter $v$ \\ 
+method&($m$, return, $t$)& method  $m$ returns an object of type $t$ \\ 
+level&($e_1$, accesses, $e_1$)& $e_1$ = $e_2$, $e_1$ and $e_2$ are expressions\\ 
+&($m_1$, call, $m_2$)& method  $m_1$ calls method $m_2$ \\ 
+&($m$, variable, $v$)& method  $m$ has variable $m_2$ \\  \hline
+&($o$, name, $s$)& The name of object  $o$ is  $s$ \\  \hline
+\end{tabular*}
+ \label{tab:dataset}
+}
+ \end{center}
+\end{table}
+
+\begin{figure}[!htb]
+    \begin{minipage}{0.5\textwidth}
+    \centering
+\includegraphics[width=1\textwidth]{fig/rdf.pdf}
+ \end{minipage}%
+   \caption{RDF graph}
+ \label{fig:rdf}
+   \end{figure}
+
+%The Resource Description Framework (RDF) [26] is the data-model for representing meta-data in the Semantic Web. The RDF data-model formalizes meta-data based on subject ? predicate ? object triples, so called RDF statements. 
+
+\subsection{Example Clustering Phase.} 
+
+We take three steps in this phase. Based on the type facts extracted from partial program analysis, we first cluster similar code examples based on the number of shared class-level facts and API calls (i.e.,  \codefont{call} facts) to reduce the duplicated code snippets. Next, for each example in each cluster, we identify main facts that are shared among all examples, and perform slicing to identify related elements. Finally, we group auxiliary features based on program slicing and lexical similarity.
+
+\noindent{\textbf{Cluster Examples.}}   We greedily select the most suitable structural correspondence~\cite{Cottrell:jigsaw08} and propagate the similarity of {\it object} nodes to the {\it subject} node. 
+
+ The comparison is done by investigating the lexical similarity and similar paths in RDF graphs. For example, when comparing UndoAction.actionPerformed() in Figure~\ref{fig:cluster1} (A), we first try to match the fact \codefont{(actionPerformed, calls, CompoundUndoManager. undo())}. We only look at the facts with the same type. We find  the fact  \codefont{(actionPerformed, calls, TextUndoManager.undo())} which is lexically similar though not identical to the target fact. We calculate the similarity score as follows: 1) We split the name for each element in the tuple by camel-case splitter and separators such as `.' and `('. Thus \codefont{TextUndoManager.undo()} is split as \codefont{[Text, Undo, Manager, undo]}.  2) We calculate the distance for each element as the $ editDistance(s_1,s_2)/ Min$ $(|s_1|, |s_2|)$, thus the similarity score between \codefont{TextUndoManager.undo()} and \codefont{CompoundUndoManager.undo()} is 0.25. 3) The distance between two tuples are the average distance for three elements. Thus the distance of two facts are 0.08.   We select  the most similar  fact by minimizing the similarity distance and we identify \codefont{(actionPerformed, calls, CompoundUndoManager.undo())} as the structural correspondence of the fact \codefont{(actionPerformed, calls, TextUndoManager.undo())}. 
+ 
+ Next, we try to match the fact   \codefont{(actionPerformed, calls, updateUndoState())}. Knowing that there is an edge from \codefont{updateUndoState()} to \codefont{setEnabled(undo.canUndo()} in RDF graph, we recursively match the fact \codefont{(updateUndoState, calls, setEnabled(undo.canUndo()))}  with  \codefont{(actionPerformed, calls, setEnabled(undo.canUndo()))}. The similarity score of {\it object} node \codefont{(updateUndoState, calls, setEnabled(undo.can Undo()))} is propagated to {\it subject} node \codefont{(actionPerformed, calls, updateUndoState())} as 0.4 compared to fact  \codefont{(actionPerformed, calls, setEnabled(undo. canUndo()))} in class \codefont{UndoAction}.  Our tool keeps on performing this matching until all facts in the target (Figure~\ref{fig:cluster1} (A)) is assigned a similarity score as 0 (i.e., fail to find correspondence) or a similarity score with other facts in the compared node. 
+
+Finally, the examples are clustered based on the number of  {\it object} nodes (without outer edge).  Our tool keeps on refining the large cluster to present a structured code examples to developers. 
+
+
+\noindent{\textbf{Extract Example Skeleton.}}  We extract all matched {\it object} nodes (without outer edge) and use them as  match seeds. We then perform dependency analysis to  extract example skeleton.  An example skeleton should start from an element without any inner edge and end at an element without any outer edge which covers all match seeds. 
+
+When selecting features, we use three rules to rank features in different examples: 1) the cost of reuse; 2) the number of resolved relationship; 3) the frequency of the feature in multiple examples; 4) the simplicity of code implementation. 
+
+The cost of reuse is measured as the number of outer edges in RDF graph, i.e., the more outer edges in RDF graph, the more expensive to reuse because it has more dependencies. We have rule 2) because  some of the relationships can not be resolved in partial program. When user tries to reuse the example, they have to manually resolve these external relationships. For instance, in Figure~\ref{fig:cluster2} (D), the feature group B.1 (\codefont{mUndoAction = new LintEditAction(undoAction, getEditorDelegate().getEditor())}) is not selected because the class \codefont{LintEditAction} cannot be resolved based on this partial program. The first two rules ease the reusability of our suggested code example. The third rule makes sure that the feature is representative and the last rule improves the understandability of our results. The simplicity is measured as the length of the code. For instance, we prefer \codefont{actionBars.setGlobalActionHandler (ITextEditorActionConstants.UNDO, undo)} in Figure~\ref{fig:cluster24} (D) than \codefont{actionBars.setGlobalActionHandler (ITextEditorActionConstants.UNDO, getAction((ITextEditor) part,  ITextEditorActionConstants.UNDO))} because the former one is easier to interpret. 
+
+\noindent{\textbf{Group Auxiliary Features.}}    The auxiliary features are different example  skeletons.  (TBD)
+
+\noindent{\textbf{Enable User Interaction.}}    The user could select the features and our tool is able to extract related elements based on their selection. (TBD)
+
+
+%\begin{table}[ht]
+%\begin{center}
+%\caption{Common Structural Facts Extracted from the Examples }
+%\label{tab:total}
+%\vspace{1mm}
+%\scriptsize{
+%\begin{tabular*}{0.5\textwidth}{@{}l|l@{}} \hline
+%Level&Structural Facts\\\hline
+%class&subType(Undo*Action, AbstractAction), \\ 
+%&subType(Redo*Action, AbstractAction), \\ \hline
+%method&override(actionPerformed(), Undo*Action, AbstractAction), \\
+%&override(actionPerformed(), Redo*Action, AbstractAction), \\ \hline
+%statement&init(*,javax.swing.undo.UndoManager), \\
+%&invoke(UndoManager.undo, actionPerformed(), Undo*Action),\\
+%& invoke(UndoManager.redo, actionPerformed(), Redo*Action)\\  \hline
+%\end{tabular*}
+% \label{tab:dataset}
+%
+%We simplify some full names due to space limitation: 
+%
+%AbstractAction: javax.swing.AbstractAction;
+%
+%UndoListener: javax.swing.event.UndoableEditListener
+%
+%actionPerformed():actionPerformed(ActionEvent)
+%}
+% \end{center}
+%\end{table}

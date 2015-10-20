@@ -1,113 +1,675 @@
 
 
 
-\begin{figure}[!htb]
+\begin{figure*}[!htb]
  \begin{minipage}{0.5\textwidth}
 \scriptsize 
 \begin{tabular}{@{}p{1\textwidth}} 
  \hline 
-%  \multicolumn{1}{c}{(A) TextEditor} \\ \hline
+  \multicolumn{1}{c}{(A) Cluster 1: textmash:TextEditor} \\ \hline
   \vspace{-4mm}
 \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
-public class TextEditor extends JTextPane \{
-\textcolor{purple}{ public UndoAction undoAction = new UndoAction();}
-\textcolor{purple}{ public RedoAction redoAction = new RedoAction();}
-\textcolor{purple}{ public CompoundUndoManager undo;}
- HashMap<Object, Action> actions = new HashMap<Object, Action>();
- public TextEditor(Workspace workspace) \{
-   this.workspace = workspace;
-\textcolor{purple}{   undo = new CompoundUndoManager(workspace);}
-   actions.put("undo", undoAction);
-   actions.put("redo", redoAction);
-   \}
- public void discardUndoRedo() \{
-    undo.discardAllEdits();
-    undoAction.updateUndoState();
-    redoAction.updateRedoState();
-   \}
-\textcolor{purple}{ public class UndoAction extends AbstractAction \{}
-\textcolor{purple}{  public void actionPerformed(ActionEvent e) \{}
-   try \{
-\textcolor{purple}{     undo.undo();}
-     updateUndoState();
-     redoAction.updateRedoState();
-    \} catch (CannotUndoException ex) \{
-    \}\}
-   public void updateUndoState() \{
-    \uwave{setEnabled(undo.canUndo());}
-   \}\}
-\textcolor{purple}{ public class RedoAction extends AbstractAction \{}
-\textcolor{purple}{   public void actionPerformed(ActionEvent e) \{}
-    try \{
-\textcolor{purple}{      undo.redo();}
-      updateRedoState();
-      undoAction.updateUndoState();
-     \} catch (CannotRedoException ex) \{
-     \}\}
-      public void updateRedoState() \{
-       \uwave{setEnabled(undo.canRedo());}
-     \}\}
+1. public class TextEditor extends JTextPane \{
+2. \textcolor{purple}{ public UndoAction undoAction = new UndoAction();}
+3. \textcolor{purple}{ public RedoAction redoAction = new RedoAction();}
+4. \textcolor{purple}{ public CompoundUndoManager undo;}
+5.  HashMap<Object, Action> actions = new HashMap<Object, Action>();
+6.  public TextEditor(Workspace workspace) \{
+7.    this.workspace = workspace;
+8. \textcolor{purple}{   undo = new CompoundUndoManager(workspace);}
+9.    actions.put("undo", undoAction);
+10.   actions.put("redo", redoAction);
+11.   \}
+12. public void discardUndoRedo() \{
+13.    undo.discardAllEdits();
+14.    undoAction.updateUndoState();
+15.    redoAction.updateRedoState();
+16.   \}
+17.\textcolor{purple}{ public class UndoAction extends AbstractAction \{}
+18.\textcolor{purple}{   public UndoAction() }
+19.\{     super("undo"); \}
+20.\textcolor{purple}{  public void actionPerformed(ActionEvent e) \{}
+21.   try \{
+22.\textcolor{purple}{     undo.undo();}
+23.     updateUndoState();
+24.\textcolor{purple}{     redoAction.updateRedoState();}
+25.    \} catch (CannotUndoException ex) \{
+26.    \}\}
+27. public void updateUndoState() \{
+28.\textcolor{purple}{     setEnabled(undo.canUndo());}
+29.   \}\}
+30.\textcolor{purple}{ public class RedoAction extends AbstractAction \{}
+31.\textcolor{purple}{   public RedoAction() }
+32.\{     super("redo"); \}
+33.\textcolor{purple}{   public void actionPerformed(ActionEvent e) \{}
+34.    try \{
+35.\textcolor{purple}{      undo.redo();}
+36.      updateRedoState();
+37.\textcolor{purple}{      undoAction.updateUndoState();}
+38.     \} catch (CannotRedoException ex) \{
+39.     \}\}
+40.  public void updateRedoState() \{
+41.\textcolor{purple}{      setEnabled(undo.canRedo());}
+42.     \}\}
   \end{Verbatim}
       \vspace{-4mm}
-     \\ \hline
+     \\ 
 \end{tabular} 
-\caption{Result No 1: textmash:TextEditor}
-\label{fig:textEditor}
 \end{minipage}
-\end{figure}
-
-
-
-
-
-\begin{figure}[!htb]
+%\caption{Cluster 1: textmash:TextEditor}
+%\label{fig:textEditor}
  \begin{minipage}{0.5\textwidth}
 \scriptsize 
 \begin{tabular}{@{}p{1\textwidth}} 
  \hline 
-%  \multicolumn{1}{c}{(B) No. 5.6,8, ConsoleTextEditor} \\ \hline
+  \multicolumn{1}{c}{(B) Cluster 1: groovy: ConsoleTextEditor} \\ \hline
   \vspace{-4mm}
 \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
-public class ConsoleTextEditor extends JScrollPane \{
-\textcolor{purple}{  private UndoAction undoAction = new UndoAction();}
-\textcolor{purple}{    private RedoAction redoAction = new RedoAction();}
-\textcolor{purple}{    private TextUndoManager undoManager;}
-    public ConsoleTextEditor () \{
-     this.undoManager = new TextUndoManager();
-\textcolor{purple}{     doc.addUndoableEditListener(undoManager);}
-     undoManager.addPropertyChangeListener(undoAction);
-     undoManager.addPropertyChangeListener(redoAction);
-\textcolor{purple}{     doc.addDocumentListener(undoAction);}
-\textcolor{purple}{     doc.addDocumentListener(redoAction);}
+1. public class ConsoleTextEditor extends JScrollPane \{
+2. \textcolor{purple}{    private UndoAction undoAction = new UndoAction();}
+3. \textcolor{purple}{    private RedoAction redoAction = new RedoAction();}
+4. \textcolor{purple}{    private TextUndoManager undoManager;}
+5.    private TextEditor textEditor = new TextEditor();
+6.    private Document doc = textEditor.getDocument();
+7.    public ConsoleTextEditor () \{
+8. \textcolor{purple}{     this.undoManager = new TextUndoManager();}
+9.      doc.addUndoableEditListener(undoManager);
+10.     undoManager.addPropertyChangeListener(undoAction);
+11.     undoManager.addPropertyChangeListener(redoAction);
+12.     doc.addDocumentListener(undoAction);
+13.     doc.addDocumentListener(redoAction);
+14.  \}
+15.\textcolor{purple}{ private class RedoAction extends UpdateCaretListener}
+16.  implements PropertyChangeListener \{
+17. \textcolor{purple}{   public RedoAction() }
+18.\{     setEnable(false); \}
+19.\textcolor{purple}{  public void actionPerformed(ActionEvent ae) \{}
+20.\textcolor{purple}{   undoManager.redo();}
+21.\textcolor{purple}{setEnabled(undoManager.canRedo());}
+22.\textcolor{purple}{undoAction.setEnabled(undoManager.canUndo());}
+23.  \}
+24.    public void propertyChange(PropertyChangeEvent pce) \{
+25.     setEnabled(undoManager.canRedo());
+26.   \} \}
+27.\textcolor{purple}{ private class UndoAction extends UpdateCaretListener }
+28. implements PropertyChangeListener \{
+29.\textcolor{purple}{   public RedoAction() }
+30.\{     setEnable(false); \}
+31.\textcolor{purple}{   public void actionPerformed(ActionEvent ae) \{}
+32.\textcolor{purple}{    undoManager.undo();}
+33.\textcolor{purple}{    setEnabled(undoManager.canUndo());}
+34.\textcolor{purple}{    redoAction.setEnabled(undoManager.canRedo());}
+35. \}
+36.  public void propertyChange(PropertyChangeEvent pce) \{
+37.    setEnabled(undoManager.canUndo());
+38.  \}
+39.    private abstract class UpdateCaretListener extends AbstractAction
+40.     implements DocumentListener \{
+41.       public void actionPerformed(ActionEvent ae) \{\}
+42.     \}\}
+  \end{Verbatim}
+      \vspace{-4mm}
+     \\ 
+\end{tabular} 
+%\caption{Cluster 1: groovy: ConsoleTextEditor}
+%\label{fig:textEditor}
+\end{minipage}
+%\end{figure*}
+
+%\begin{figure*}[!htb]
+ \begin{minipage}{0.5\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+  \multicolumn{1}{c}{(C) Cluster 1: suggested skeleton} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+public class TextEditor extends JComponent \{
+    private UndoAction undoAction = new UndoAction();
+    private RedoAction redoAction = new RedoAction();
+    private TextUndoManager undoManager;
+
+   public TextEditor () \{
+     undoManager = new TextUndoManager();
+     
+     
+     
+     
+     
   \}
-\textcolor{purple}{ private class RedoAction extends UpdateCaretListener}
-  implements PropertyChangeListener \{
-\textcolor{purple}{  public void actionPerformed(ActionEvent ae) \{}
-\textcolor{purple}{   undoManager.redo();}
-   \uwave{setEnabled(undoManager.canRedo());}
-   \uwave{undoAction.setEnabled(undoManager.canUndo());}
-  \}
-    public void propertyChange(PropertyChangeEvent pce) \{
-     setEnabled(undoManager.canRedo());
-   \} \}
-\textcolor{purple}{ private class UndoAction extends UpdateCaretListener }
- implements PropertyChangeListener \{
-\textcolor{purple}{   public void actionPerformed(ActionEvent ae) \{}
-\textcolor{purple}{    undoManager.undo();}
-    \uwave{setEnabled(undoManager.canUndo());}
-    \uwave{redoAction.setEnabled(undoManager.canRedo());}
- \}
-  public void propertyChange(PropertyChangeEvent pce) \{
+ private class UndoAction extends AbstractAction \{
+ 
+
+  public void actionPerformed(ActionEvent e) \{
+    undoManager.undo();
     setEnabled(undoManager.canUndo());
-  \}\}
+   redoAction.setEnabled(undoManager.canRedo());
+ \}
+ 
+ 
+  \}
+  private class RedoAction extends AbstractAction \{ 
+
+
+  public void actionPerformed(ActionEvent e) \{
+   undoManager.redo();
+   setEnabled(undoManager.canRedo());
+   undoAction.setEnabled(undoManager.canUndo());  
+ \}
+   
+   
+   \}  \}
+class TextUndoManager extends UndoManager() \{\}
   \end{Verbatim}
       \vspace{-4mm}
      \\ \hline
 \end{tabular} 
-\caption{Result No 5,6,8: groovy: DocumentUndoManagerImpl}
-\label{fig:textEditor}
 \end{minipage}
-\end{figure}
+\begin{minipage}{0.5\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+  \multicolumn{1}{c}{(D) Suggested skeleton with alternative features} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+public class TextEditor extends JComponent \{
+    private UndoAction undoAction = new UndoAction();
+    private RedoAction redoAction = new RedoAction();
+    private TextUndoManager undoManager;
+\textcolor{blue}{//@B.1,B2  private Document doc = textEditor.getDocument();}
+   public TextEditor () \{
+     undoManager = new TextUndoManager();
+\textcolor{blue}{     //@B.1 doc.addUndoableEditListener(undoManager);}
+\textcolor{blue}{     //@B.2 doc.addDocumentListener(undoAction);}
+\textcolor{blue}{     //@B.2 doc.addDocumentListener(redoAction);}
+\textcolor{blue}{     //@B.4 doc.addPropertyChangeListener(undoAction);}
+\textcolor{blue}{     //@B.4 doc.addPropertyChangeListener(redoAction);}
+  \}
+ private class UndoAction extends AbstractAction \{
+\textcolor{blue}{ //@B.2 implements DocumentListener}
+\textcolor{blue}{ //@B.4 implements PropertyChangeListener}
+  public void actionPerformed(ActionEvent ae) \{
+    undoManager.undo();
+    setEnabled(undoManager.canUndo());
+    redoAction.setEnabled(undoManager.canRedo());
+ \}
+\textcolor{blue}{//B.4  public void propertyChange(PropertyChangeEvent pce) \{}
+\textcolor{blue}{//B.4    setEnabled(undoManager.canUndo());  \} }
+\}
+  private class RedoAction extends AbstractAction \{ 
+\textcolor{blue}{ //@B.2 implements DocumentListener}
+\textcolor{blue}{ //@B.4 implements PropertyChangeListener}
+  public void actionPerformed(ActionEvent e) \{
+   undoManager.redo();
+   setEnabled(undoManager.canRedo());
+   undoAction.setEnabled(undoManager.canUndo());
+  \} 
+\textcolor{blue}{  //@B.4  public void propertyChange(PropertyChangeEvent pce) \{}
+\textcolor{blue}{  //@B.4    setEnabled(undoManager.canUndo());  \} }
+  \}  \}
+  class TextUndoManager extends UndoManager() \{\}
+  \end{Verbatim}
+      \vspace{-4mm}
+     \\ \hline
+\end{tabular} 
+\end{minipage}
+\caption{Cluster 1: source code and expected results}
+\label{fig:cluster1}
+\end{figure*}
+
+\begin{figure*}[!htb]
+    \begin{minipage}{0.5\textwidth}
+    \centering
+\includegraphics[width=1\textwidth]{fig/cluster1-1.png}
+ \end{minipage}%
+  \hfill
+     \begin{minipage}{0.5\textwidth}
+     \centering
+ \includegraphics[width=1\textwidth]{fig/cluster1-2.png}
+  \end{minipage}
+      \begin{minipage}{0.5\textwidth}
+     \centering
+ \includegraphics[width=1\textwidth]{fig/uml.png}
+  \end{minipage}
+   \caption{Screenshot for cluster 1}
+ \label{fig:nameFix}
+   \end{figure*}
+%%%%%Cluster 2 %%%%%
+
+
+\begin{figure*}[!htb]
+ \begin{minipage}{0.5\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+  \multicolumn{1}{c}{(A) Cluster 2: android: AndroidTextEditor} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+1. public abstract class AndroidTextEditor extends FormEditor
+2.    implements IResourceChangeListener \{
+3. \textcolor{blue}{   private TextEditor mTextEditor;}
+4.  public void createTextEditor() \{
+5. \textcolor{blue}{   mTextEditor = new TextEditor();}
+6.    IDocumentProvider provider = mTextEditor.getDocumentProvider();
+7.    mDocument = provider.getDocument(getEditorInput());
+8.    mDocument.addDocumentListener(new IDocumentListener() \{
+9.      public void documentChanged(DocumentEvent event) \{
+10.        onDocumentChanged(event);
+11.      \}  \});  \}
+12. private void createUndoRedoActions() \{
+13.\textcolor{blue}{ IActionBars bars = getEditorSite().getActionBars();}
+14.  if (bars != null) \{
+15.\textcolor{blue}{  IAction action = mTextEditor.getAction(ActionFactory.UNDO.getId());}
+16.\textcolor{blue}{  bars.setGlobalActionHandler(ActionFactory.UNDO.getId(), action);}
+17.\textcolor{blue}{  action = mTextEditor.getAction(ActionFactory.REDO.getId());}
+18.\textcolor{blue}{  bars.setGlobalActionHandler(ActionFactory.REDO.getId(), action);}
+19.\textcolor{blue}{  bars.updateActionBars();}
+20.        \}  \}    \} 
+  \end{Verbatim}
+      \vspace{-4mm}
+     \\     
+\end{tabular} 
+\end{minipage}
+ \begin{minipage}{0.5\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+  \multicolumn{1}{c}{(B) Cluster 2: android-sdk: LayoutCanvas} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+1. public class LayoutCanvas extends Canvas \{
+2.    private IAction mUndoAction, mRedoAction;
+3.    private LayoutEditorDelegate mEditorDelegate;;
+4.   @Override
+5.    public void updateGlobalActions(@NonNull IActionBars bars) \{   
+6. \textcolor{blue}{   ITextEditor editor = mEditorDelegate.getEditor().getStructuredTextEditor();}
+7.      if (mUndoAction == null) \{
+8. \textcolor{blue}{	         IAction undoAction = editor.getAction(ActionFactory.UNDO.getId());}
+9.          mUndoAction = new LintEditAction(undoAction, 
+10.           getEditorDelegate().getEditor());
+11.     \}
+12.\textcolor{blue}{	     bars.setGlobalActionHandler(ActionFactory.UNDO.getId(), mUndoAction);}
+13.     if (mRedoAction == null) \{
+14.\textcolor{blue}{	         IAction redoAction = editor.getAction(ActionFactory.REDO.getId());}
+15.         mRedoAction = new LintEditAction(redoAction, 
+16.         getEditorDelegate().getEditor());
+17.    \}
+18.\textcolor{blue}{	    bars.setGlobalActionHandler(ActionFactory.REDO.getId(), mRedoAction);}
+19.\textcolor{blue}{	    bars.updateActionBars();}
+20.    \}  \}
+   \end{Verbatim}
+      \vspace{-4mm}
+     \\   
+\end{tabular} 
+\end{minipage}
+% \begin{minipage}{0.5\textwidth}
+%\scriptsize 
+%\begin{tabular}{@{}p{1\textwidth}} 
+% \hline 
+%  \multicolumn{1}{c}{(B) Cluster 2: android-sdk: LayoutCanvas} \\ \hline
+%  \vspace{-4mm}
+%\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+%public class IUEditorContributor extends EditorActionBarContributor  \{
+%  private static final String[]  WORKBENCH_ACTION_IDS = {
+%     ActionFactory.UNDO.getId(),  ActionFactory.REDO.getId() \};
+%     
+%  private void hookGlobalActions(RichFormEditor editor, IActionBars actionBars) \{
+%     for(int i = 0; i < WORKBENCH_ACTION_IDS.length;i++)
+%	  actionBars.setGlobalActionHandler(WORKBENCH_ACTION_IDS[i],
+%	    editor.getAction(WORKBENCH_ACTION_IDS[i]));
+%	\} \}
+% \end{Verbatim}
+%      \vspace{-4mm}
+%  \\      \hline
+%\end{tabular} 
+%\end{minipage}
+\begin{minipage}{0.5\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+  \multicolumn{1}{c}{(C) Cluster 4: eclipse: PapyrusCDTEditor} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+1. public class PapyrusCDTEditor extends CEditor \{
+2.     protected IAction textUndo, textRedo;
+3.    
+4.   @Override
+5.   public void createPartControl(Composite parent) \{
+6. \textcolor{blue}{      IActionBars actionBars = getEditorSite().getActionBars();}
+7.      if (actionBars != null) \{
+8.          textUndo = actionBars.getGlobalActionHandler
+9.            (ITextEditorActionConstants.UNDO);
+10.        textRedo = actionBars.getGlobalActionHandler
+11.	   (ITextEditorActionConstants.REDO);
+12.\textcolor{blue}{	   actionBars.setGlobalActionHandler}
+13.\textcolor{blue}{	     (ITextEditorActionConstants.UNDO, textUndo);}
+14.\textcolor{blue}{   actionBars.setGlobalActionHandler}
+15.\textcolor{blue}{     (ITextEditorActionConstants.REDO, textRedo);}
+16.\textcolor{blue}{   actionBars.updateActionBars();}
+17.     \} 
+18.   \}
+ \end{Verbatim}
+      \vspace{-4mm}
+  \\   
+\end{tabular} 
+\end{minipage}
+ \begin{minipage}{0.5\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+  \multicolumn{1}{c}{(D) Cluster 4: eclipse: AspectEditorContributor} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+1. public class AspectEditorContributor extends MultiPageEditorActionBarContributor \{
+2.  private IEditorPart activeEditorPart;
+3.  @Override
+4.  public void setActivePage(IEditorPart part) \{
+5.   activeEditorPart = part;
+6.   IActionBars actionBars = getActionBars();
+7.   if (activeEditorPart != null && activeEditorPart instanceof ITextEditor) \{
+8. \textcolor{blue}{    IActionBars siteActionBars = ((IEditorSite)activeEditorPart.}
+9. \textcolor{blue}{        getEditorSite()).getActionBars();}
+10.\textcolor{blue}{  siteActionBars.setGlobalActionHandler(ITextEditorActionConstants.UNDO, }
+11.\textcolor{blue}{    getAction((ITextEditor)activeEditorPart, ITextEditorActionConstants.UNDO));}
+12.\textcolor{blue}{  siteActionBars.setGlobalActionHandler(ITextEditorActionConstants.REDO, }
+13.\textcolor{blue}{    getAction((ITextEditor)activeEditorPart, ITextEditorActionConstants.REDO));}
+14.\textcolor{blue}{  siteActionBars.updateActionBars();    }         
+15.  \} \}
+16. protected IAction getAction(ITextEditor editor, String actionID) \{
+17.   return (editor == null ? null : editor.getAction(actionID));
+18.  \}  \}
+ \end{Verbatim}
+      \vspace{-4mm}
+  \\      
+\end{tabular} 
+\end{minipage}
+ \begin{minipage}{0.5\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+  \multicolumn{1}{c}{(E) Suggested Skeleton for Cluster 2} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+1. public class TextEditor extends JComponent \{
+2.  public void createUndoRedoAction() \{
+3.   ITextEditor editor = new TextEditor();
+4.   IActionBars actionBars = getEditorSite().getActionBars();
+5.      if (actionBars != null) \{     
+6.        IAction undoAction = editor.getAction
+7.          (ActionFactory.UNDO.getId());         
+8.        actionBars.setGlobalActionHandler
+9.          (ActionFactory.UNDO.getId(), undoAction);
+10.       IAction redoAction = editor.getAction
+11.         (ActionFactory.REDO.getId());
+12.       actionBars.setGlobalActionHandler
+13.          (ActionFactory.REDO.getId(), redoAction);
+14.       actionBars.updateActionBars();
+15.\} \}
+ \end{Verbatim}
+      \vspace{-4mm}
+  \\     
+\end{tabular} 
+\end{minipage}
+ \begin{minipage}{0.5\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+  \multicolumn{1}{c}{(F) Suggested Skeleton for Cluster 4} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+1. public class TextEditor extends JComponent \{
+2.  public void createUndoRedoAction() \{
+ 
+3.   IActionBars actionBars = getEditorSite().getActionBars();
+4.    IAction undo = actionBars.getGlobalActionHandler
+5.      (ITextEditorActionConstants.UNDO);
+6.    if (actionBars != null) \{
+7.      IAction redo = actionBars.getGlobalActionHandler
+8.        (ITextEditorActionConstants.REDO);             
+9.     actionBars.setGlobalActionHandler
+10.      (ITextEditorActionConstants.UNDO, undo)
+11.    actionBars.setGlobalActionHandler
+12.      (ITextEditorActionConstants.REDO, redo)   
+13.    actionBars.updateActionBars();  
+14.  \} \}
+ \end{Verbatim}
+      \vspace{-4mm}
+  \\    
+\end{tabular} 
+\end{minipage}
+ \begin{minipage}{0.5\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+  \multicolumn{1}{c}{(G) Suggested Skeleton for Cluster 2, 4} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+1. public class TextEditor extends JComponent \{
+2.  public void createUndoRedoAction() \{
+3.    IActionBars actionBars = getEditorSite().getActionBars();
+4.
+5.    if (actionBars != null) \{
+6.      IAction undo = ...      
+
+7.      IAction redo = ...
+        
+8.     actionBars.setGlobalActionHandler(..., undo)
+     
+9.     actionBars.setGlobalActionHandler(..., redo)   
+10.   actionBars.updateActionBars();  
+11.  \} \}
+ \end{Verbatim}
+      \vspace{-4mm}
+  \\    \hline
+\end{tabular} 
+\end{minipage}
+ \begin{minipage}{0.5\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+  \multicolumn{1}{c}{(H) Alternative features for Suggested Skeleton} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+1.
+2.
+3.
+4. \textcolor{blue}{//@B.1 ITextEditor editor = new TextEditor();   }
+5.
+6. \textcolor{blue}{//@A.1 IAction undo = actionBars.getGlobalActionHandler.(ITextEditorActionConstants.UNDO);   }
+6. \textcolor{blue}{//@B.1 IAction undo = editor.getAction(ActionFactory.UNDO.getId());   }
+7. \textcolor{blue}{//@A.1 IAction redo = actionBars.getGlobalActionHandler.(ITextEditorActionConstants.REDO);   }
+7. \textcolor{blue}{//@B.1 IAction redo = editor.getAction(ActionFactory.REDO.getId());   }
+8. \textcolor{blue}{//@A.1 actionBars.setGlobalActionHandler(ITextEditorActionConstants.UNDO, undo)}
+8. \textcolor{blue}{//@A.1 actionBars.setGlobalActionHandler(ActionFactory.UNDO.getId(), undo);}
+9. \textcolor{blue}{//A.1   actionBars.setGlobalActionHandler(ITextEditorActionConstants.REDO, redo)}
+9. \textcolor{blue}{//A.1   actionBars.setGlobalActionHandler(ActionFactory.REDO.getId(), redo)}
+ \} \}
+ \end{Verbatim}
+      \vspace{-4mm}
+  \\      \hline
+\end{tabular} 
+\end{minipage}
+\caption{Cluster 2, 4: source code and suggested skeleton}
+\label{fig:cluster2}
+\end{figure*}
+
+
+\begin{figure*}[!htb]
+ \begin{minipage}{0.5\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+  \multicolumn{1}{c}{(C) Cluster 2: suggested skeleton} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+public class TextEditor extends JComponent \{
+
+
+
+
+
+
+
+
+
+
+
+   public void createUndoRedoActions() \{   
+   
+     ITextEditor editor = new TextEditor();
+     
+     
+     IActionBars actionBars = getEditorSite().getActionBars();
+     if (bars != null) \{
+     
+       IAction undoAction = editor.getAction
+         (ActionFactory.UNDO.getId());
+         
+         
+       actionBars.setGlobalActionHandler
+         (ActionFactory.UNDO.getId(), undoAction);
+         
+         
+         
+       IAction redoAction = editor.getAction
+         (ActionFactory.REDO.getId());
+         
+         
+         
+       bars.setGlobalActionHandler
+          (ActionFactory.REDO.getId(), redoAction);
+          
+          
+       bars.updateActionBars();
+    \}  \}
+   \end{Verbatim}
+      \vspace{-4mm}
+     \\   
+\end{tabular} 
+\end{minipage}
+ \begin{minipage}{0.5\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+  \multicolumn{1}{c}{(D) Cluster 2: suggested skeleton with alternative features} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+public class TextEditor extends JComponent \{
+\textcolor{blue}{//@A.1 ITextEditor editor;}
+\textcolor{blue}{//@A.1 public void createTextEditor() \{}\textcolor{blue}{//@A.1 editor = new TextEditor();}\textcolor{blue}{//@A.1 IDocumentProvider provider = mTextEditor.getDocumentProvider(); }
+\textcolor{blue}{//@A.1 mDocument = provider.getDocument(getEditorInput()); }
+\textcolor{blue}{//@A.1 mDocument.addDocumentListener(new IDocumentListener() \{}\textcolor{blue}{//@A.1 public void documentChanged(DocumentEvent event) \{onDocumentChanged(event);\}\});\}}
+\textcolor{blue}{//@B.1 IAction mUndoAction = new LintEditAction(redoAction, }
+\textcolor{blue}{//@B.1   getEditorDelegate().getEditor());}
+\textcolor{blue}{//@B.1 IAction mRedoAction = new LintEditAction(redoAction, }
+\textcolor{blue}{//@B.1   getEditorDelegate().getEditor());}
+   public void createUndoRedoActions() \{  
+\textcolor{blue}{//@B.2 (@NonNull IActionBars actionBars) }
+     ITextEditor editor = new TextEditor(); 
+\textcolor{blue}{//@A.1 editor = new TextEditor(); }
+\textcolor{blue}{//@B.3 ITextEditor editor = getStructuredTextEditor()}
+     IActionBars actionBars = getEditorSite().getActionBars(); \textcolor{blue}{//@deleteif B.2}
+     if (bars != null) \{
+\textcolor{blue}{//@B.1 if (mUndoAction == null) \{}
+       IAction undoAction = editor.getAction(ActionFactory.UNDO.getId());
+\textcolor{blue}{//@B.1 mUndoAction = new LintEditAction(undoAction, }
+\textcolor{blue}{//@B.1 getEditorDelegate().getEditor());  }
+\textcolor{blue}{//@B.1 \}          }
+       actionBars.setGlobalActionHandler
+          (ActionFactory.UNDO.getId(), undoAction);
+\textcolor{blue}{ //@B.1 actionBars.setGlobalActionHandler}
+\textcolor{blue}{//@B.1   (ActionFactory.UNDO.getId(), mUndoAction);}
+\textcolor{blue}{//@B.1 if (mRedoAction == null) \{    }      
+       IAction redoAction = editor.getAction
+          (ActionFactory.REDO.getId());
+\textcolor{blue}{//@B.1 mUndoAction = new LintEditAction(undoAction, }
+\textcolor{blue}{//@B.1  getEditorDelegate().getEditor());  }
+\textcolor{blue}{//@B.1 \}  }             
+       bars.setGlobalActionHandler
+          (ActionFactory.REDO.getId(), redoAction);
+\textcolor{blue}{ //@B.1 actionBars.setGlobalActionHandler}
+\textcolor{blue}{//@B.1   (ActionFactory.REDO.getId(), mRedoAction);}
+       bars.updateActionBars();
+    \}  \}
+   \end{Verbatim}
+      \vspace{-4mm}
+     \\  
+\end{tabular} 
+\end{minipage}
+%%%%%Cluster 4 %%%%%%%
+ \begin{minipage}{0.5\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+  \multicolumn{1}{c}{(C) Cluster 4: Suggested Skeleton} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+public class TextEditor extends JComponent \{
+
+ public void setActivePage(Composite parent) \{
+
+   IActionBars actionBars = getEditorSite().getActionBars();
+
+
+   IAction undo = actionBars.getGlobalActionHandler
+     (ITextEditorActionConstants.UNDO);
+
+     
+   IAction redo = actionBars.getGlobalActionHandler
+     (ITextEditorActionConstants.REDO);
+     
+     
+   actionBars.setGlobalActionHandler
+      (ITextEditorActionConstants.UNDO, undo)
+   actionBars.setGlobalActionHandler
+      (ITextEditorActionConstants.REDO, redo)     
+\} \}
+ \end{Verbatim}
+      \vspace{-4mm}
+  \\      \hline
+\end{tabular} 
+\end{minipage}
+ \begin{minipage}{0.5\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+  \multicolumn{1}{c}{(D) Cluster 4: Suggested Skeleton with alternative features} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+public class TextEditor extends JComponent \{
+
+ public void setActivePage(Composite parent) \{
+\textcolor{blue}{//@B.1 (IEditorPart part)}
+   IActionBars actionBars = getEditorSite().getActionBars();
+\textcolor{blue}{//@B.1 IActionBars actionBars = ((IEditorSite)activeEditorPart.}
+\textcolor{blue}{//@B.1  getEditorSite()).getActionBars();}
+   IAction undo = actionBars.getGlobalActionHandler
+     (ITextEditorActionConstants.UNDO);
+\textcolor{blue}{//@B.1 IAction undo = getAction((ITextEditor) part, }
+\textcolor{blue}{//@B.1   ITextEditorActionConstants.UNDO)     } 
+   IAction redo = actionBars.getGlobalActionHandler
+     (ITextEditorActionConstants.REDO);
+\textcolor{blue}{//@B.1 IAction undo = getAction((ITextEditor) part, }
+\textcolor{blue}{//@B.1    ITextEditorActionConstants.UNDO)  }       
+   actionBars.setGlobalActionHandler
+     (ITextEditorActionConstants.UNDO, undo)
+   actionBars.setGlobalActionHandler
+     (ITextEditorActionConstants.REDO, redo)     
+\} \}
+ \end{Verbatim}
+      \vspace{-4mm}
+  \\      \hline
+\end{tabular} 
+\end{minipage}
+\caption{Cluster 2, 4: more alternative features}
+\label{fig:cluster24}
+\end{figure*}
+
+
+
+%\input{eval-table}
+
+
 
 
 
