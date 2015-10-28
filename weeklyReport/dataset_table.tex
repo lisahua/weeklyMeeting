@@ -1,0 +1,49 @@
+
+
+\begin{table*}[ht]
+\begin{center}
+\caption{Preliminary Study for Example Clustering Phase}
+\label{tab:preStudy}
+\vspace{1mm}
+\scriptsize{
+\begin{tabular*}{1\textwidth}{@{}cl|rrr|rr|r@{}} \hline
+&&\multicolumn{3}{c|}{Querying}& \multicolumn{2}{c|}{Feature Location}&Clustering\\\hline
+&Reformulated Query&\# Examples&Time(sec)&Avg LOC&Avg Extr \#M&Avg Extr LOC&Clusters\\\hline
+1&undo redo TextEditor  & 68&2.7&477 & 7 &107 & 6 \\
+2&copy paste data clipboard   & 24&0.7&886 & 8 &178 & 5 \\
+3&open url  html browser  & 426&13.1&780 & 4 &68 & 7 \\
+4&track mouse hover  & 33&1.0&770 & 10 &177 & 4 \\
+5&open file external editor  & 341&13.4&927 & 11 &192 & 7 \\
+6&batch workspace change  single operation  & 11&0.6&928 & 11 &192 & 3 \\
+7&remove problem marker from resource  & 211&7.6&664 & 12 &206 & 8 \\
+8&highlight text range  editor  & 111&4.4&293 & 12 &219 & 6 \\
+9&update status line  & 445&24.6&921 & 4 &102 & 7 \\
+10&prompt user  select directory  & 114&4.2&893 & 6 &129 & 5 \\
+11&use share image workbench  & 17&0.7&841 & 4 &84 & 3 \\
+12&open dialog ask yes no question  & 30&1.0&382 & 6 &98 & 4 \\
+13&parse source string ast node  & 323&11.8&371 & 6 &97 & 8 \\
+14&extract return type method declaration   & 15&0.3&810 & 4 &101 & 3 \\
+15&fill table background  & 457&16.2&678 & 5 &97 & 8 \\
+16&platform debug trace  & 80&2.7&969 & 4 &96 & 5 \\
+17&get display create current thread  & 390&27.2&778 & 5&77 & 6 \\
+18&run job ui thread  & 548&17.3&748 & 6 &94 & 7 \\
+19&open external file  & 479&18.6&514 & 8 &161 & 5 \\
+20&BMP image file parse  & 23&0.8&824 & 11 &392 & 4 \\
+21&serialize objects XML  & 459&15.3&752 & 7 &205 & 8 \\
+22&NMEA parser  & 17&0.3&775 & 15 &277 & 3 \\
+23&line code counter  & 549&25.8&617 & 5 &61 & 8 \\
+24&update status line  & 445&21.0&921 & 6 &92 & 6 \\
+25&autosave  & 321&7.6&634 & 8 &163 & 6 \\
+26&picture brightness  & 34&0.7&943 & 9 &294 & 4 \\ \hline
+\end{tabular*}
+ \label{tab:dataset}
+{\bf Time}: represents the performance time from sending the first query to obtaining all identical results.
+
+{\bf Extr \#M}: Extracted methods from feature location
+}
+ \end{center}
+\end{table*}
+
+
+
+

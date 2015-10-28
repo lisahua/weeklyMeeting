@@ -217,23 +217,23 @@ public class TextEditor extends JComponent \{
 \label{fig:cluster1}
 \end{figure*}
 
-\begin{figure*}[!htb]
-    \begin{minipage}{0.5\textwidth}
-    \centering
-\includegraphics[width=1\textwidth]{fig/cluster1-1.png}
- \end{minipage}%
-  \hfill
-     \begin{minipage}{0.5\textwidth}
-     \centering
- \includegraphics[width=1\textwidth]{fig/cluster1-2.png}
-  \end{minipage}
-      \begin{minipage}{0.5\textwidth}
-     \centering
- \includegraphics[width=1\textwidth]{fig/uml.png}
-  \end{minipage}
-   \caption{Screenshot for cluster 1}
- \label{fig:nameFix}
-   \end{figure*}
+%\begin{figure*}[!htb]
+%    \begin{minipage}{0.5\textwidth}
+%    \centering
+%\includegraphics[width=1\textwidth]{fig/cluster1-1.png}
+% \end{minipage}%
+%  \hfill
+%     \begin{minipage}{0.5\textwidth}
+%     \centering
+% \includegraphics[width=1\textwidth]{fig/cluster1-2.png}
+%  \end{minipage}
+%      \begin{minipage}{0.5\textwidth}
+%     \centering
+% \includegraphics[width=1\textwidth]{fig/uml.png}
+%  \end{minipage}
+%   \caption{Screenshot for cluster 1}
+% \label{fig:nameFix}
+%   \end{figure*}
 %%%%%Cluster 2 %%%%%
 
 
@@ -556,9 +556,12 @@ public class TextEditor extends JComponent \{
 \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
 public class TextEditor extends JComponent \{
 \textcolor{blue}{//@A.1 ITextEditor editor;}
-\textcolor{blue}{//@A.1 public void createTextEditor() \{}\textcolor{blue}{//@A.1 editor = new TextEditor();}\textcolor{blue}{//@A.1 IDocumentProvider provider = mTextEditor.getDocumentProvider(); }
+\textcolor{blue}{//@A.1 public void createTextEditor() \{}
+\textcolor{blue}{//@A.1 editor = new TextEditor();}
+\textcolor{blue}{//@A.1 IDocumentProvider provider = mTextEditor.getDocumentProvider(); }
 \textcolor{blue}{//@A.1 mDocument = provider.getDocument(getEditorInput()); }
-\textcolor{blue}{//@A.1 mDocument.addDocumentListener(new IDocumentListener() \{}\textcolor{blue}{//@A.1 public void documentChanged(DocumentEvent event) \{onDocumentChanged(event);\}\});\}}
+\textcolor{blue}{//@A.1 mDocument.addDocumentListener(new IDocumentListener() \{}
+\textcolor{blue}{//@A.1 public void documentChanged(DocumentEvent event) \{onDocumentChanged(event);\}\});\}}
 \textcolor{blue}{//@B.1 IAction mUndoAction = new LintEditAction(redoAction, }
 \textcolor{blue}{//@B.1   getEditorDelegate().getEditor());}
 \textcolor{blue}{//@B.1 IAction mRedoAction = new LintEditAction(redoAction, }
