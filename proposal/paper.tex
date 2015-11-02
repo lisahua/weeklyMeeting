@@ -24,9 +24,7 @@
 \newcommand{\fixme} [1] {\textcolor{red}{{\it FIXME}: #1}}
 \newcommand{\factfont}[1]{\scriptsize{{{#1}}}\normalsize}
 \newcommand{\codefont}[1]{\footnotesize{\texttt{#1}}\normalsize}
-\newcommand{\sydit}{\small \sc Sydit}
-\newcommand{\lase}{\small \sc LASE}
-\newcommand{\lsdiff}{{\small{\sc{LSDiff}}}}
+\newcommand{\niche}{\textsc{Niche}\xspace}
 
 
 %\input{macros}
@@ -39,19 +37,28 @@
 
 \begin{document}
 
-\title{Exploring the Synergy between semantic naming and code structure}
+\title{Leveraging the Synergy Between Naming Semantics and Code Structure in Source Code}
 
 \author{Jinru Hua \\
-        Department of Electrical and Computer Engineering  \\
+        Electrical and Computer Engineering  \\
 The University of Texas at Austin}  
 \date{December 05, 2015}
 
 \maketitle
 
-%\input{abstract}
+\input{abstract}
 
+\input{intro}
 
-\bibliography{reuse}
+\input{preliminary}
+
+\input{proposed}
+
+\input{related}
+
+\input{conclusion}
+
+\bibliography{reuse,lexical,syntactic,cluster,bugLocation,coupling}
 \bibliographystyle{abbrv}
 
 \end{document}

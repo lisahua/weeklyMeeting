@@ -1,3 +1,13 @@
 \begin{abstract}
 
+Developers need to find bugs, search for code examples, and assess the compatibility of code examples before integrating them into the user context. There exist three problems: (1)  Misleading identifiers can lead to bugs that are hard to find; (2) Code examples returned from existing code search engine are unstructured; (3) It is hard to assess which code example can be correctly integrated into the user context.  Existing approaches that support bug location, code search, and code reuse use either code structure or naming semantics, but few approaches effectively combine both code structure and naming semantics together. This thesis investigates the synergy between naming semantics and code structure to help find more bugs based on naming inconsistency, group code examples in a structured manner, and proactively assess the compatibility between code examples and the user context to help developer integrate the example to the target context.
+
+To investigate this hypothesis, we design a bug finding technique that leverages naming dialects in conjunction with purity and type usage analysis. Our evaluation illustrates that inconsistent names found by our tool are strongly correlated with defects in the version history. Second, we propose a new clustering approach for code search results to assist developers comprehend related search results and investigate the commonality between these search results in a structured manner. We propose to use both user study and similar feature requests from version history to evaluate the usability and accuracy of our clustering approach. Third, we propose a speculative approach  to support code reuse tasks by proactively assessing the compatibility between code examples and the user context.  
+
+This proposal has the potential to improve software correctness and program comprehension by leveraging both code structure and naming semantics in several software engineering activities. 
+
+
+%We design a bug finding technique to identify naming dialects in conjunction with purity and type usage analysis. 
+%We hypothesize that we can improve existing code-structure analysis tools by leveraging semantic information, and vice versa. Based on this hypothesis, we propose to explore the synergy between code structure and program semantics using three case 
+
 \end{abstract}

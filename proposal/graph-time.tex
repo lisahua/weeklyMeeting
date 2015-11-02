@@ -1,0 +1,41 @@
+
+
+
+\begin{figure*}[!htb]
+    \begin{minipage}{0.49\textwidth}
+     \centering
+ \includegraphics[width=1\textwidth]{fig/fixRateIntroduce.jpeg}   
+     % \scriptsize{C-I represents the group of methods that add new inconsistent names; 
+%       
+%C-C represents the group of methods without inconsistent names that remain the same during the observation period.}
+  \end{minipage}
+  \hfill
+     \begin{minipage}{0.49\textwidth}
+     \centering
+ \includegraphics[width=1\textwidth]{fig/fixRateRemove.jpeg}  
+   %    \scriptsize{I-C represents the group of methods that remove inconsistent names; 
+%      
+%I-I represents the group of inconsistent name methods that remain as inconsistent name methods during the observation period; }
+    \end{minipage}
+      
+      \begin{minipage}{1\textwidth}
+           \centering
+           \scriptsize{
+ \begin{tabular}{l|rr|rr} 
+ {Fix rate change {\bf before} ($<0$) vs.~{\bf after} ($>0$)}&  \multicolumn{2}{c|}{Introduction of inconsistent names} & \multicolumn{2}{c}{Removal of inconsistent names}\\
+Inconsistent names are added/deleted at Revision 0& Mann-Whitney&Cliff Delta& Mann-Whitney&Cliff Delta\\ \midrule
+C-I: methods that inconsistent names are introduced&$p<0.01$&$-0.35$(m)&$p<0.01$&0.48(l)\\ 
+I-C: methods that inconsistent names are removed&$p<0.01$&$-0.39$(m)&$p<0.01$&0.35(m)\\ 
+I-I: methods with inconsistent names&$p=0.18$&N/A&$p=0.10$&N/A\\ 
+C-C: methods without inconsistent names&$p=0.21$&N/A&$p=0.24$&N/A\\ 
+ \end{tabular}
+ 
+ m:medium;  l:large
+ }
+    \end{minipage}
+       \vspace{-3mm}
+     \caption{Fix rate change before and after introducing/removing inconsistent names}
+   \label{fig:rateChange}
+      \vspace{-3mm}
+\end{figure*}
+

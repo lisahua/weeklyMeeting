@@ -1,0 +1,98 @@
+\section{Preliminary Work}
+
+We build a tool to automatically mines project-specific naming rules and analyze if the naming inconsistency indicates poor code quality. 
+
+Our Naming Inconsistency CHEcker called \niche infers naming rules based on two key insights: (1) {\it pure} and {\it impure} method names should reflect their purity property. (2) Objects with similar functionality should share similar names. 
+
+To detect inconsistent method names, \niche leverages purity analysis to identify pure methods and classifies the rest as impure ones. If a method does not mutate externally visible heap state, its parameters are read-only, and it does not create any new externally visible heap paths to objects transitively reachable from the parameters, we classify it as {\it pure} methods and mine its name for {\it pure} terms.  For example, in the project \codefont{Apache Accumulo}, \niche classifies the verb `{\it accept}' as a pure terms based on its relative occurrence in pure vs. impure methods. If an impure method in the same project uses `{\it accept}', \niche regards it as anomaly, because it volates the purity property associated with the term for the same project.
+To identify inconsistent object names, \niche implements type-use pattern analysis similar to Wasylkowski et al. \/ \cite{zellerfse07:usageAbnormal}. For each object within each method, \niche use a def-use analysis to extract a sequence of statements that read from or write to the objects or invoke methods on it. It then clusters similar type-use patterns and identifies object names that deviate from commonly used object names. For instance, if the variable of type \codefont{FlushRequester} is named \codefont{requester} with one exception of \codefont{listener}, \niche reports the anomaly as naming inconsistency. 
+
+To assess \niche's accuracy, we manually construct a ground truth of inconsistent names and compare it with the inconsistent names reported by \niche. We select the best setting based on F-measure with 81\% precision and 88\% recall for purity analysis as well as 89\% precision and 78\% recall using type-use pattern analysis.  
+
+To investigate if programs share a consistent naming dialect or have project-specific dialects and if inconsistent identifiers indicate poor code quality, we use \niche to identify inconsistent names in 39 Java projects from Apache Software Foundation, which are highly active projects with well-defined code convention and rigorous code review process using JIRA issuing tracking system. We collect actual defects from commit histories based on Fischer et al.'s method~\cite{Fischer:versionICSM03}  to search for commit messages with valid bug report references (e.g., ``HDFS \#4702'').  We answer four research questions:
+
+\paragraph{Is naming inconsistency project-specific?} Prior works report poor names based on hard-coded naming rules, These tools assume that different projects share the same naming conventions and use similar lexicons. However, each project may use the same naming dialects in different ways. We hypothesize that the naming rules may conflict among different projects and therefore naming inconsistency should be performed on per-project basis. 
+
+For purity analysis, we create a lexicon of pure terms and impure terms in each project, and compare the lexicons. If the same pure and impure term is shared among two or more projects, we regard it as a {\it corpus-wide} rule; otherwise it is classified as {\it project-specific rules}. If a pure term in one project is impure in another project, we classify it as a {\it conflicting} rule. For type-use pattern analysis, we create a set of object names for each type-use pattern. If the same type-use pattern is shared by two or more projects. we classify it as {\it corpus-wide} type-use pattern, otherwise it is {\it project-specific}.
+
+Our result shows that only 32\% of pure terms and 33\% of impure terms are corpus-wide terms that are commonly shared by two or more projects. The rest terms are project-specific, accounting for over 41\% of all inconsistent method headers. More than 790 terms are conflicting, which is 33\% of pure terms and 31\% of impure ones. For instance, one detected conflicting terms is \codefont{need}, which is only used by pure methods in project \codefont{Apache Jackrabbits}, but only used by impure methods in project \codefont{Apache Accumulo}. We observe similar results for type-use pattern analysis, in which project-specific rules account for all 100\% of identified inconsistent object names because similar type-usage patterns are rarely shared across different projects (0.1\%). 
+
+Our results indicate that naming is often project-specific. If projects use conflicting rules, existing hard-coded naming rules will miss them. Our results shows that corpus-wide rules miss over 41\% of inconsistent names. 
+
+\paragraph{Are inconsistent names correlated with bug fixes?}  
+
+Developers place a significant emphasis on good naming in software, because meaningful names can improve software readability and maintainability to facilitate programmer communication. However, no prior empirical study systematically evaluates whether inconsistent and confusing names are correlated with actual bug fixes in revision history. We therefore examine the correlation between actual defects and inconsistent names found by \niche. 
+
+To investigate if inconsistent names are correlated with bug fixes, we group methods into two sets: methods with inconsistent names either in header or body ($I$), and methods with bug fixes during the study period ($F$). We first check if inconsistent names are independent with Chi-Square test with p-value $<0.01$. We reject the null hypothesis and confirm that bug fixes and inconsistent names are correlated.  We then compute the conditional probability of bug fixes given inconsistent names $P(F|I)$ and compare it with the probability of bug fixes given no inconsistent name $P(F|\neg I)$. Similarly, we compute the conditional probability of inconsistent names given bug fixes $P(I|F)$ and compare that against the probability of inconsistent names given no bug fixes $P(I|\neg F)$. 
+
+The results indicate that inconsistent names are more likely to experience bug fixes than methods without: $P(F|I)=0.64$ vs.  $P(F|\neg I)=0.50$. Inconsistent names are more likely to appear in buggy methods than bug-free ones: $P(I|F)=0.11$ vs. $P(I|\neg F)=0.07$. We also perform this analysis at the file level and find a more significant difference:   $P(F|I)=0.75$ vs.  $P(F|\neg I)=0.45$ and $P(I|F)=0.24$ vs. $P(I|\neg F)=0.11$.
+
+
+\begin{table}[@{}ht]
+ \begin{minipage}{.5\linewidth}
+\begin{center}
+\vspace{-4mm}
+\caption{ Inconsistent name methods}
+\label{tab:avgIN}
+\scriptsize{
+\begin{tabular}{@{}l|rcrr@{}}  
+\multirow{2}{*}{Group} &\multirow{2}{*}{\#Total}&Average&Average&Average \# \\ 
+&&fix rate&\# fixes&other changes\\ \midrule
+$|I|=0$ &232,406&17\%&0.34&1.93\\
+$|I|=1$ &23,217&22\% &2.66&4.81\\
+$|I|>1$ &106& 25\% &5.23&8.48\\ 
+\end{tabular}
+}
+\vspace{-6mm}
+\end{center}
+\end{minipage}
+ \begin{minipage}{.5\linewidth}
+ \begin{center}
+\vspace{-4mm}
+\caption{Callers of inconsistent name methods}
+\label{tab:avgInvoke}
+\vspace{1mm}
+\scriptsize{
+\begin{tabular}{l|rcrr}  
+\multirow{2}{*}{Group} &\multirow{2}{*}{\#Total}&Average&Average&Average \# \\ 
+&&fix rate&\# fixes&other changes\\ \midrule
+$|C|=0$ &196,726& 19\% & 0.45&2.07\\
+$|C|=1$&57,796&25\% &0.88&2.58\\
+$|C|>1$&1,207& 27\% &1.35&4.89\\ 
+\end{tabular}
+}
+\vspace{-6mm}
+\end{center}
+ \end{minipage}
+\end{table}
+
+\input{graph-time}
+
+Table~\ref{tab:avgIN} represents average bug fix rate ($\frac{\#fix_revision}{\#revision}$) for methods with no inconsistent names ($|I|=0$), one inconsistent name $|I|=1$, and multiple inconsistent names ($|I|>1$). Methods without inconsistent names have a lower fix rate than methods with one inconsistent name (17\% vs. 22\%), and than those with multiple inconsistent names (17\% vs. 25\%). the Mann-Whitney test illustrates that  the three method groups are significant different from  each other (p-value$<0.01$).
+
+To support our hypothesis that inconsistent names are strongly correlated with defects, we investigate how the introduction and removal of inconsistent names affects a bug fix rate. Figure~\ref{fig:rateChange}  illustrates a bug fix before and after the addition or deletion of inconsistent names using a sliding time window.  We separate the methods into four groups: (1) C-I: methods that were consistent before and become inconsistent. (2)  I-C: methods that were inconsistent before and became consistent. (3) I-I: methods that stayed inconsistent.  (4) C-C: methods that stayed consistent. 
+For the method group C-I, the average fix rate 0.5\% within 10 revisions before the introduction of inconsistent names is 0.50\%, while this rate within 10 revisions after the introduction of inconsistent names is 0.71\%. This indicates that more defects occur after introducing inconsistent names. We use Mann-Whitney test to check if the difference is significant, and use Cliff's delta effect size to evaluate how big the difference is. We observe a significant fix rate increase after introducing inconsistent names (p-value$<0.01$). Using a similar approach, we find that the fix rate decreases significantly after deleting inconsistent names. 
+
+
+To investigate whether the confusion caused by inconsistent names propagates to their callers, we compare the average bug fix rate for methods calling no inconsistent methods ($|C|=0$), one inconsistent name method ($|C|=1$), and multiple inconsistent name methods ($|C|>1$), as shown in Table~\ref{tab:avgInvoke}. The bug fix rate for each method group is 19\%, 25\%, and 28\%, indicating that the more inconsistent name methods are called, the more confusion may occur, making the caller methods more defect prone. 
+
+ These results indicate that naming inconsistency may correlate with defects, yet it is unknown whether developers find inconsistent names particularly problematic and remove them faster than other names. To answer this question, we calculate the lifespan for each identifier by identifying the first revision in which it is introduced and the last revision in which it is removed. If a name is never removed, we treat the latest revision as the ending revision. We compare the lifespan of inconsistent names with other names and use Mann-Whitney test and Cliff's delta effect size to measure if there is any difference and how significant the difference is. 
+We separate methods, fields, parameters, and local variables since they are likely to have different lifespans. Our results indicates that inconsistent  names disappear significantly faster than other names. 
+
+
+\paragraph{Is naming inconsistency significant with respect to other factors?}  To understand whether and how much naming inconsistency plays a role in assessing defects among other software quality metrics such as code complexity, lines of code, and churn~\cite{nagappan:metricsICSE06, Menzies:metricsTSE07}, we conduct multivariate linear regression analysis and measure the impact of each metrics. Without loss of generality, we select 9 method-level code metrics from Nagappan et al.'s approach~\cite{nagappan:metricsICSE06}: code churn, LOC, the number of developers who edited each method, McCabe complexity~\cite{McCabe:complexity76}, fan out, fan in, the number of parameters, the number of field reads, and the number of field writes. 
+Using Spearman rank correlation between the number of defects and individual software metrics, we reject three variables \{LOC, \# FieldWrite, \#Developers\} with $p>0.01$. To investigate how much the remaining factors influence defects, we use a forward and backward stepwise regression to reduce the number of variables in the model. The result illustrates that the metrics \textit{inconsistent name} has a positive coefficient in the model, indicating that the more inconsistent names, the more defects a program may have, 
+
+Finally, we measure the deviance for each factor using ANOVA (analysis of variance) to measure the impact of variables. The result indicates that though naming inconsistency is not the most significant factor correlated with defects, it contributes to assess software quality even among other confounding factors.
+
+%The findings for the previous two questions illustrates correlation with defect not causation. We further investigate other software quality metrics that may affect defect rates, 
+% To identify if inconsistent and confusing names are correlated with actual defects found in commit histories. 
+
+In summary, our analysis yields several insights: 1) Naming dialects are largely project-specific. More than 67\% of naming rules are project-specific and these project-specific rules account for 41\% of inconsistent methods names from purity analysis and 100\% of inconsistent  object names from type-use pattern analysis. 2) Methods with inconsistent names and methods that invoke them both experience more bug fixes than other methods and the bug fix rate increases after the introduction of inconsistent names. 3) Inconsistent names have shorted lifespans than other names, which indicates that inconsistent names are more likely to be renamed compared to other names. 4) Compared with other software quality metrics, naming inconsistency is not the dominant factor, but it does influence software quality. 
+
+
+
+
+
+
+
