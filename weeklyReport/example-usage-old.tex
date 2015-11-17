@@ -1,0 +1,148 @@
+
+\begin{figure}[!htb]
+\begin{minipage}{0.47\textwidth}
+\scriptsize 
+\begin{tabular}{p{1\textwidth}}
+ \hline 
+ \multicolumn{1}{c}{(A) A type-use pattern with a commonly used name} \\ \hline
+%\midrule
+\vspace*{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+/* org.apache.jackrabbit.core.mem.InMemPersistenceManager */
+1. FileSystem blobFS;
+2. public void close() \{
+3.   if (blobFS != null) \{
+4.    try \{
+5.      blobFS.close();
+6.    \} catch (FileSystemException e) \{
+7.    \} 
+8.    finally \{
+9.     blobFS.releaseLock();
+10.   \} \} \}
+\end{Verbatim}
+\vspace{-4mm}
+\\  \hline
+%\midrule
+\multicolumn{1}{c}{(B) A method using a field with inconsistent name } \\ \hline
+\vspace{-3mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+/* org.apache.jackrabbit.core.IRepositoryImpl */
+1. FileSystem{\bf \hl{repStore}};
+2. public void doShutdown() \{
+3.  \uwave{if (repStore != null)} \{
+4.   try \{
+5.     \uwave{repStore.close()};
+6.   \} catch (FileSystemException e) \{
+7.        log.error("error while closing file system", e);
+8.   \} \} \}
+\end{Verbatim} 
+\vspace{-5mm}
+\\  \hline
+\multicolumn{1}{c}{(C) A refactoring on the field} \\ \hline
+Date: 2/16/2010
+
+Change Log: repStore is a FS rather than a DataStore, lock does not release when shutdown repFS, rename FS for consistency. 
+\vspace{-2mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+/* org.apache.jackrabbit.core.IRepositoryImpl */
+1. FileSystem\color{blue}{\underline{\underline{\bf repFS}}};
+2. public void doShutdown() \{
+3.  \color{blue}{\uwave{if (repFS != null)}} \{
+4.  try \{
+5.   \color{blue}{\uwave{repFS.close()}};
+6.  \} catch (FileSystemException e) \{
+7.    log.error("error while closing file system", e);
+8. \color{blue}{\bf \} finally \{ }
+9.      \color{blue}{\bf \uwave{repFS.releaseLock()};}
+10.  \} \} \}
+\end{Verbatim} 
+\vspace{-5mm}
+\\  \hline
+\end{tabular}
+\caption{Inconsistent field identified by type-use pattern analysis}
+\label{fig:usageExample}
+\end{minipage}
+\end{figure}
+
+
+
+
+%%%%%%%Usage pattern example %%%%%%%
+ \begin{figure}[!htb]
+ \begin{minipage}{0.47\textwidth}
+ \scriptsize 
+ \begin{tabular}{p{1\textwidth}}\hline
+   \multicolumn{1}{c}{(A) A type-use pattern with a commonly used name} \\ \hline
+ %\midrule
+ \vspace{-4mm}
+ \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+ /* org.apache.hadoop.hbase.regionserver.LogRoller */
+1. FlushRequester requester = null; ...
+2. private void scheduleFlush(final byte[] region) \{...
+3.   if (requester != null) \{
+4.      requester.request(this);...
+5.   \}
+6. \} 
+ \end{Verbatim}
+ \vspace{-4mm}
+\\ \hline
+  \multicolumn{1}{c}{(B) A method with an inconsistent parameter and its caller} \\ \hline
+ %\midrule
+ \vspace{-4mm}
+ \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+ /* org.apache.hadoop.hbase.regionserver.HRegion */
+1. Context c = getContext();
+2. public static HRegion newHRegion(...,
+3.     FlushRequester \hl{flushListener}) \{  
+4.   if (\uwave{flushListener} != null)  
+5.     \uwave{flushListener}.request(this);
+6.   return c.newInstance(..., \uwave{flushListener});  
+7.\}
+ /* org.apache.hadoop.hbase.util.HMerge */
+8. protected HRegion merge(...)  \{
+9.  HRegion r = HRegion.newHRegion(..., null);//\textcolor{red}{no FlushRequester}
+10.  return r.openHRegion();
+11.\} 
+ \end{Verbatim}
+ \vspace{-4mm}
+ \\  \hline
+ %\midrule
+ \multicolumn{1}{c}{(C) A refactoring on the method and its caller} \\ \hline
+ %\midrule
+ Date: 8/31/2010
+
+ Change Log: HBASE-2692 Unfinished renaming from CacheFlushListener to FlushRequester.
+  \vspace{-2mm}
+ \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+  /* org.apache.hadoop.hbase.regionserver.HRegion */
+1. Context c = getContext();
+2. public static HRegion newHRegion(..., 
+3.     FlushRequester\textcolor{blue}{\underline{\underline{\bf flushRequester}}}) \{  
+4.   if (\textcolor{blue}{\bf \uwave{flushRequester}} != null)  
+5.     \textcolor{blue}{\bf \uwave{flushRequester}}.request(this);
+6.   return c.newInstance(..., \textcolor{blue}{\bf \uwave{flushRequester}});  
+7. \}
+ \end{Verbatim} 
+ %\vspace{-3mm}
+ %\\  \hline
+%\multicolumn{1}{c}{(C) Bug fix that is related to the inconsistent name} \\ \hline
+%\midrule
+Date: 9/8/2010
+
+Change Log: FIX: Client can not send flush request.
+\vspace{-2mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+ /* org.apache.hadoop.hbase.util.HMerge */
+ 8. FlushRequester requester = new FlushRequester();
+ 9. protect HRegion merge(...)  \{
+10. \textcolor{blue}{\bf HRegion r = HRegion.newHRegion(..., requester);  }
+11.  return r.openHRegion();
+12. \} 
+ \end{Verbatim} 
+ \vspace{-4mm}
+ \\  \hline
+ \end{tabular}
+ \caption{Inconsistent parameter name detected with type-use pattern analysis}
+ \label{fig:usageExample}
+ \end{minipage}
+ \end{figure}

@@ -22,6 +22,7 @@
 \usepackage{latexsym}
 \usepackage{xspace}
 \usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{hyperref}
 
 % \usepackage{fancybox}
 % \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
@@ -35,8 +36,8 @@
 \newcommand{\codefont}[1]{\footnotesize{\texttt{#1}}\normalsize}
 \newcommand{\todo} [1]{\textcolor{blue}{{\sf TODO}: #1}}
 \newcommand{\hlc}[2][yellow]{ {\sethlcolor{#1} \hl{#2}} }
-
-
+\newcommand{\link}[2]{\hyperref[#1]{\color{blue}\setulcolor{blue}\ul{#2}}}
+%\hypersetup{colorlinks=true,linkbordercolor=blue,linkcolor=blue,pdfborderstyle={/S/U/W 1}}
 % \lstset{frame=tb,
 %   language=Java,
 %   showstringspaces=false,
@@ -59,11 +60,10 @@
 %\CopyrightYear{2009}
 %\copyrightdata{2009}
 
-
 %\title{How Universal are Naming Rules?}
 
-\title{Weekly Meeting 10/27/2015} %
-\subtitle{Approach: Example Clustering Phase}
+\title{Weekly Meeting 11/17/2015} %
+%\subtitle{Approach: Example Clustering Phase}
 % \numberofauthors{3} 
 % \author{
 % You can go ahead and credit any number of authors here,
@@ -104,9 +104,9 @@
 \input{problem}
 
 
-\input{approach}
+%\input{approach}
 %\input{related}
-\input{motivating}
+%\input{motivating}
 %\bibliographystyle{abbrvnat}
 % \renewcommand{\bibfont}{\footnotesize} % <--- change bib font size here
 % \setlength{\bibsep}{0.5ex}             % <--- change space between bib entries here
@@ -114,5 +114,5 @@
 \bibliography{coupling,reuse,cluster,ir} 
 %\bibliography{strings-short,paper}  % <--- use short strings in case of emergency
 
-\input{appendix}
+%\input{appendix}
 \end{document}

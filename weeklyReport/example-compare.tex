@@ -1,0 +1,116 @@
+\begin{figure}[!htb]
+ \begin{minipage}{0.47\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+%  \multicolumn{1}{c}{(A) An inconsistent object name found by both Lancelot and \tool } \\ \hline
+%  \vspace{-4mm}
+%\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+% /* org.elasticsearch.action.DeleteRepositoryRequestBuilder */
+%1.public String setName() \{
+%2.  return setName;
+%3.\}
+%\end{Verbatim}
+%\vspace{-4mm}
+% \\ \hline
+  \multicolumn{1}{c}{(A) A method naming bug from Lancelot only} \\ \hline
+    Lancelot: Methods with this name seldom return references.
+         \vspace{-3mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+/* org.apache.hama.action.PutRepositoryRequestBuilder */
+1. public PutRepositoryRequestBuilder{\bf \hl{setName}}(String name) \{
+2.  request.name(name);
+3.  return this;
+4. \}
+ \end{Verbatim}
+   \vspace{-4mm}
+  \\ \hline
+   \multicolumn{1}{c}{(B) An inconsistent method name from \tool only} \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+ /* org.apache.accumulo.core.sync.SortedMapIterator */
+1. boolean syncFlag = false;
+2. public void{\bf \hl{setSyncFlag}}(boolean sync) \{
+3.    boolean flag = false;
+4.    if (sync) \{...\}
+5.     flag = f;
+6. \}
+\end{Verbatim}
+\vspace{-4mm}
+ \\ \hline
+  \multicolumn{1}{c}{(C) A name suggestion example from Naturalize only} \\ \hline
+   \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+/* org.elasticsearch.test.integration.TestCluster.java */
+1. public void ensureAtLeastNumNodes(Settings settings,int{\bf \hl{num}})\{
+2.  int{\bf \hl{size}} = nodes.size();
+3.  \uwave{for (int i = size; i < num; i++)} \{
+4.    buildNode(settings).start();
+5.  \}
+6.\}
+Naturalize suggests:
+1.`num' (2.69\%) -> \{size(4.06\%), length(3.72\%), len(3.35\%),\} 
+2.`size' (16.46\%) -> \{delta(23.93\%), localNodeId(21.69\%), \}
+ \end{Verbatim}
+ \vspace{-4mm}
+  \\ \hline
+   \multicolumn{1}{c}{(D) An inconsistent object name found by both Naturalize and \tool } \\ \hline
+  \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+ /* junit.framework.TestSuite.java */
+1. private Test testCaseForClass(Class<?>{\bf \hl{each}})\{
+2.  if (\uwave{TestCase.class.isAssignableFrom(each)}) \{
+3.   return new TestSuite(\uwave{each.asSubclass(TestCase.class)});
+4.  \}
+5.  else \{
+6.   return warning(\uwave{each.getName()} + " does not extend TestCase");
+7.  \}
+8.\}
+\end{Verbatim}
+\vspace{-4mm}
+ \\ \hline
+\end{tabular} 
+\caption{Name Checker comparison}
+\label{fig:compare}
+\end{minipage}
+\end{figure}
+
+
+
+%%%%%%%Usage pattern example %%%%%%%
+
+%
+%\begin{figure}[!htb]
+% \begin{minipage}{0.47\textwidth}
+%\scriptsize 
+%\begin{tabular}{@{}p{1\textwidth}} 
+% \hline 
+% \multicolumn{1}{c}{(A) An inconsistent object name found by both Lancelot and \tool } \\ \hline
+%  \vspace{-4mm}
+%\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+% /* org.elasticsearch.action.delete.DeleteRepositoryRequestBuilder */
+%1.public String setName() \{
+%2.  return setName;
+%3.\}
+%\end{Verbatim}
+%\vspace{-4mm}
+% \\ \hline
+%  \multicolumn{1}{c}{(B) A naming bug from Lancelot} \\ \hline
+%   \vspace{-4mm}
+%\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+%/* org.elasticsearch.action.termvector.TermVectorFields */
+%1.public void size(int size) \{
+%2.  if (size <= 0) 
+%3.   throw new legalArgumentException("Size must be positive"); 
+%4.  this.size = size;
+%5.\}
+% \end{Verbatim}
+% Lancelot said: Methods with this name never return void.
+% \vspace{-4mm}
+%  \\ \hline
+%\end{tabular} 
+%\caption{Name Checker comparison}
+%\label{fig:compare}
+%\end{minipage}
+%\end{figure}
+ 

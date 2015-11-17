@@ -1,0 +1,166 @@
+
+\begin{figure*}[!htb]
+\begin{minipage}{0.47\textwidth}
+\scriptsize 
+\begin{tabular}{p{1\textwidth}}
+ \hline 
+ \multicolumn{1}{c}{(A) A type-use pattern with a commonly used name} \\ \hline
+%\midrule
+/*org.apache.jackrabbit.core.config.RepositoryConfig.java:\href{https://github.com/apache/jackrabbit/blob/a6b82ed15de77f5e883740da725b21cdad059970/jackrabbit-core/src/main/java/org/apache/jackrabbit/core/config/RepositoryConfig.java}{a6b82e}*/
+%\vspace*{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+1. FileSystem virtualFS;
+2. private WorkspaceConfig internalCreateWorkspaceConfig(...)\{
+3.   try \{
+4.     if (virtualFS != null) \{
+5.       virtualFS.close();
+6.      \}  \} catch (FileSystemException ignore) \{ \}
+\end{Verbatim}
+\vspace{-4mm}
+\\  \hline
+%\midrule
+% 
+\multicolumn{1}{c}{(B) A method using a field with inconsistent name} \\ \hline
+%\vspace{-3mm}
+/* org.apache.jackrabbit.core.RepositoryImpl:\href{https://github.com/apache/jackrabbit/blob/a6b82ed15de77f5e883740da725b21cdad059970/jackrabbit-core/src/main/java/org/apache/jackrabbit/core/RepositoryImpl.java}{a6b82e}*/
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+1. FileSystem{\bf \hl{repStore}};
+2. public void doShutdown() \{
+3.   try \{
+4.     \uwave{repStore.close()};
+5.   \} catch (FileSystemException e) \{
+6.        log.error("error while closing file system", e);
+7.   \} \} 
+\end{Verbatim} 
+\vspace{-5mm}
+\\  \hline
+\multicolumn{1}{c}{(C) A bug fix on the field} \\ \hline
+commit \href{https://github.com/apache/jackrabbit/commit/98ae1b3d1481d8713d0f4d8758ef9e19259a7270/?diff=split}{98ae1b}: JCR-1318: Repository Home locked not released despite RepositoryException being thrown.
+%
+%\vspace{-2mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+/* org.apache.jackrabbit.core.RepositoryImpl */
+1. FileSystem{\bf \hl{repStore}};
+2. public void doShutdown() \{
+3.\color{blue}{+  \uwave{if (repStore != null)}} \{
+4.  try \{
+5.   \uwave{repStore.close()};
+6.  \} catch (FileSystemException e) \{
+7.    log.error("error while closing file system", e);
+8.   \} \}
+\end{Verbatim} 
+\vspace{-5mm}
+\\  \hline
+\multicolumn{1}{c}{(D) The deletion of inconsistent name usage} \\ \hline
+commit  \href{https://github.com/apache/jackrabbit/commit/f51ed4#diff-9751fd2ad72989dbc11c7caca47e907c}{f51ed4}: JCR-2640: Add repository file system to RepositoryContext. No more need for the separate metaDataStore fs. 
+%https://github.com/apache/jackrabbit/commit/9cdb3cf89f11a1a201f758a1bd2f2c93e5718c59#diff-9751fd2ad72989dbc11c7caca47e907c
+ % https://github.com/apache/jackrabbit/commit/9cdb3cf89f11a1a201f758a1bd2f2c93e5718c59#diff-9751fd2ad72989dbc11c7caca47e907c
+%\vspace{-2mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+/* org.apache.jackrabbit.core.RepositoryImpl */
+1.\color{red}{- FileSystem{\bf \hl{repStore}}};
+2. public void doShutdown() \{
+3.\color{red}{-  \uwave{if (repStore != null)} \{}
+4.  try \{
+5.\color{blue}{+  context.getFileSystem().close();}
+6.  \} catch (FileSystemException e) \{
+7.    log.error("error while closing file system", e);
+8.   \} \}
+9. public Thread newThread(Runnable r) \{
+10.\color{blue}{+ FileSystem repStore = repConfig.getFileSystem();}
+11.\color{blue}{+ context.setFileSystem(repStore);}
+12. \}
+\end{Verbatim} 
+commit \href{https://github.com/apache/jackrabbit/commit/9cdb3c#diff-9751fd2ad72989dbc11c7caca47e907c}{9cdb3c}: (completely deletes this inconsistent name) 
+
+JCR-2640: Streamline namespace and node type registry creation
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+13. public Thread newThread(Runnable r) \{
+14.\color{red}{- FileSystem repStore = repConfig.getFileSystem();}
+15.\color{red}{- context.setFileSystem(repStore);}
+16.\color{blue}{+ context.setFileSystem(repConfig.getFileSystem());}
+17. \}
+\end{Verbatim} 
+\vspace{-5mm}
+\\  \hline
+A \codefont{FileSystem} object receives a method call \codefont{FileSystem.close()} in a \codefont{try-catch} block. The majority of such objects with similar type-use pattern contains a term \codefont{FS} in their name except for \codefont{repStore} in Part (B). A developer fixed a bug in this method with an inconsistent name at line 3 in Part (C), and removed this inconsistent name from the type-use pattern in commit \href{https://github.com/apache/jackrabbit/commit/f51ed4#diff-9751fd2ad72989dbc11c7caca47e907c}{f51ed4}. This inconsistent name was completely deleted in commit \href{https://github.com/apache/jackrabbit/commit/9cdb3c#diff-9751fd2ad72989dbc11c7caca47e907c}{9cdb3c}. 
+\end{tabular}
+\end{minipage}
+\hfill
+\begin{minipage}{0.47\textwidth}
+\scriptsize 
+\begin{tabular}{p{1\textwidth}}
+ \hline 
+ \multicolumn{1}{c}{(A) A type-use pattern with a commonly used name} \\ \hline
+/* org.apache.james.transport.mailets.Retry.java:\href{https://github.com/apache/james/blob/ed9bb43ec9f5b25f799e38c3a4b6e0d5053fc72f/mailets-function/src/main/java/org/apache/james/transport/mailets/Retry.java}{ed9bb4} */
+%\vspace*{-4mm}
+%snapshot link: https://github.com/apache/james/blob/ed9bb43ec9f5b25f799e38c3a4b6e0d5053fc72f/mailets-function/src/main/java/org/apache/james/transport/mailets/Retry.java
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+1. private SpoolRepository retryRepository;
+2. private MultipleDelayFilter delayFilter;
+3.  public void run() \{
+4.    Mail mail = retryRepository.accept(delayFilter);
+5.    String key = mail.getName();
+6.    if (retry(mail)) \{
+7.   	retryRepository.remove(key);
+8.     \} else \{
+9.      retryRepository.store(mail);
+10.    retryRepository.unlock(key);
+11.    \}\}
+\end{Verbatim}
+\vspace{-4mm}
+\\  \hline
+%\midrule
+\multicolumn{1}{c}{(B) A method using a field with inconsistent name } \\ \hline
+%\vspace{-3mm}
+/*org.apache.james.transport.mailets.RemoteDelivery.java:\href{https://github.com/apache/james/blob/ed9bb43ec9f5b25f799e38c3a4b6e0d5053fc72f/mailets-function/src/main/java/org/apache/james/transport/mailets/RemoteDelivery.java}{6aa468}*/
+%snapshot link: https://github.com/apache/james/blob/ed9bb43ec9f5b25f799e38c3a4b6e0d5053fc72f/mailets-function/src/main/java/org/apache/james/transport/mailets/RemoteDelivery.java
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+1. private SpoolRepository \hl{outgoing}; // The spool of outgoing mail
+2. private MultipleDelayFilter delayFilter;
+3. public void run() \{
+4.  Mail mail = (Mail) \uwave{outgoing.accept(delayFilter)};
+5.  String key = mail.getName();
+6.  if (deliver(mail, session)) \{
+7.   \uwave{outgoing.remove(key);}
+8.    \} else \{
+9.    \uwave{outgoing.store(mail);}
+10.   \uwave{outgoing.unlock(key);}
+11.  \}\}
+\end{Verbatim} 
+\vspace{-5mm}
+\\  \hline
+% refactoring: https://github.com/apache/james/commit/54cccd3a67dcd
+\multicolumn{1}{c}{(C) A refactoring on the field} \\ \hline
+commit \href{https://github.com/apache/james/commit/54cccd3a67dcd}{54cccd}: Minor changes to RemoteDelivery and Retry to make them more similar (I'd like to extract common code) (related to JAMES-874).
+%\vspace{-2mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+/* org.apache.james.transport.mailets.RemoteDelivery.java */
+// Repository used to store messages that will be delivered.
+1. private SpoolRepository\textcolor{blue}{\underline{\underline{\bf workRepository}}}; 
+2. private MultipleDelayFilter delayFilter;
+3. public void run() \{
+4.  Mail mail = (Mail)\textcolor{blue}{\bf \uwave{workRepository.accept(delayFilter)}};
+5.  String key = mail.getName();
+6.  if (deliver(mail, session)) \{
+7.   \textcolor{blue}{\bf \uwave{workRepository.remove(key);}}
+8.    \} else \{
+9.   \textcolor{blue}{\bf \uwave{workRepository.store(mail);}}
+10.  \textcolor{blue}{\bf \uwave{workRepository.unlock(key);}}
+11.  \}\}
+\end{Verbatim} 
+\vspace{-5mm}
+\\  \hline
+Part (A) represents a type-use pattern for \codefont{SpoolRepository} object from line 4 to line 10. The objects in similar type-use patterns are commonly named as \codefont{*Repository} except for \codefont{outgoing} in Part (B).  This inconsistent object name was renamed as \codefont{workRepository} in commit \href{https://github.com/apache/james/commit/54cccd3a67dcd}{54cccd} to enforce naming inconsistency. \todo{Lisa: I prefer the first example as there is no bug fix related to this example, although the inconsistent name was renamed.}
+\end{tabular}
+%\caption{Inconsistent field identified by type-use pattern analysis}
+%\label{fig:usageExample}
+\end{minipage}
+%\end{figure}
+%\begin{figure}[!htb]
+
+\caption{Inconsistent field identified by type-use pattern analysis}
+\label{fig:usageExample}
+\end{figure*}
+
+

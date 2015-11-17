@@ -1,0 +1,177 @@
+\begin{figure*}[!htb]
+ \begin{minipage}{0.47\textwidth}
+ \scriptsize 
+ \begin{tabular}{p{1\textwidth}}
+  \hline 
+  \multicolumn{1}{c}{(A) An inconsistent name method and its caller.} \\ \hline
+ %\midrule
+ %\vspace*{-3mm}
+ % performance improvement: https://github.com/apache/hbase/commit/ff2bcd476046c76d926639114efdb704fe287356#diff-53def65a3cf679a3f048ab71bcea9293
+  /*org.apache.hadoop.hbase.master.Mocking.java:\href{https://github.com/apache/hbase/blob/390f32d79fd0c0464fcab008150ad182f4c0abef/hbase-server/src/test/java/org/apache/hadoop/hbase/master/Mocking.java}{390f32} */
+ \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+1. static boolean{\bf \hl{verifyRegionState}}(ZooKeeperWatcher zkw, 
+    EventType expectedState)\{
+2.   zkw.sync(node);...
+3.   return getEventType().equals(expectedState);
+4. \}  
+5. static void fakeRegionServerRegionOpenInZK(ZooKeeperWatcher w,...)\{
+6.   while (! \uwave{verifyRegionState(w,...)}) \{
+7.     Threads.sleep(1);...
+8.  \} \}
+ \end{Verbatim}
+ \vspace*{-4mm}
+ \\  \hline
+ %\midrule
+ \multicolumn{1}{c}{(B) A performance issue on the caller of the inconsistent name method.} \\ \hline
+ %\midrule
+ %https://issues.apache.org/jira/browse/HBASE-6109
+ \vspace*{-1mm}
+commit \href{https://github.com/apache/hbase/commit/ff2bcd#diff-53def65a3cf679a3f048ab71bcea9293}{ff2bcd}: HBASE-6109 Improve RIT performances.
+
+HBASE-6109 issue description: lowering the number of synchronization
+ \vspace*{-2mm}
+ \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+ /*org.apache.hadoop.hbase.master.Mocking.java */
+1. \color{blue}{static void \underline{\underline{waitForRegionPendingOpenInRIT }}(AssignmentManager am,}
+  \color{blue}{String name) \{}
+  // We used to do a check like this: Mocking.verifyRegionState(..)
+2.  \color{blue}{ boolean wait = true;}
+3.  \color{blue}{ while (wait) \{}
+4.    \color{blue}{ RegionState state = am.getRegionsInTransition().get(name);}
+5.    \color{blue}{ if (state != null && state.isPendingOpen())\{}
+6.        \color{blue}{ wait = false;}
+7.      \} else \{
+8.       Thread.sleep(1);
+9.   \} \}
+10. static void fakeRegionServerRegionOpenInZK(ZooKeeperWatcher w,..) \{
+11.  \color{blue}{\uwave{waitForRegionPendingOpenInRIT}(getAssignmentManager(),}
+      \color{blue}{ getEncodedName());}
+12. \}
+ \end{Verbatim} 
+ commit \href{https://github.com/apache/hbase/commit/17dff6#diff-53def65a3cf679a3f048ab71bcea9293}{17dff6}: (delete Mocking.java)
+
+HBASE-11611 Clean up ZK-based region assignment.
+ \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+13.\color{red}{- static boolean{\bf \hl{verifyRegionState}}(ZooKeeperWatcher zkw, }
+  \color{red}{-   EventType expectedState)\{}
+14.\color{red}{-   zkw.sync(node);...}
+15.\color{red}{-   return getEventType().equals(expectedState);}
+16.\color{red}{- \}  }
+ \end{Verbatim} 
+ \vspace{-4mm}
+ \\  \hline
+In line 2 of Part (A), the impure method \codefont{verifyRegionState} with a pure term \codefont{verify} invokes an impure method \codefont{ZooKeeperWatcher.sync()}. The  \codefont{verifyRegionState} is invoked in a \codefont{while} loop at line 6. This leads to a performance issue that the \codefont{sync} method will be called for many times. A developer fixed this performance issue by creating a new method called \codefont{waitForRegionPendingOpenInRIT}. This new method uses a boolean flag to represent the waiting state and invokes three pure methods \codefont{AssignmentManager.getRegionsInTransition()}, \codefont{RegionsInTransition.get()}, and \codefont{RegionState.isPendingOpen()} to check the waiting state. The inconsistent method name \codefont{verifyRegionState} was deleted in commit \href{https://github.com/apache/hbase/commit/17dff6#diff-53def65a3cf679a3f048ab71bcea9293}{17dff6}. \todo{Lisa: the correlation between bug fix and inconsistent name exists, yet describing in a direct-causal-relationship manner is misleading. This applies to the description of qualitative examples as well.}
+ \end{tabular}
+ \end{minipage}
+ \hfill
+  \begin{minipage}{0.47\textwidth}
+\scriptsize 
+\begin{tabular}{@{}p{1\textwidth}} 
+ \hline 
+ \multicolumn{1}{c}{(A) An inconsistently-named method and its caller} \\ \hline
+ /* org.apache.accumulo.core.util.MetadataTable:\href{https://github.com/apache/accumulo/blob/69218e7e989b6f1d65afabce9c5b5ab0e3204141/core/src/main/java/org/apache/accumulo/core/util/MetadataTable.java}{69218e} */
+    %bug fix: https://github.com/apache/accumulo/commit/8e4e6d 
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+1. public static void{\bf \hl{getEntries}}(SortedSet<KeyExtent> tablets)
+   throws AccumuloException\{...
+2.  if (PREV_ROW_COLUMN.equals(...)) 			
+3.  \{ tablets.add(new KeyExtent()); \}	
+4.  validateEntries(tableId, tablets);		
+5.  \}
+6. public static void validateEntries(SortedSet<KeyExtent> tablets) 
+   throws AccumuloException \{
+7. if (tablets.size() == 0)		
+8.   throw new AccumuloException("Problem with metadata table.");
+9.  ...\}
+  /* org.apache.accumulo.core.client.admin.TableOperationsImpl */
+10. private void addSplits(String tableId)\{  
+11.  SortedSet<KeyExtent> tablets = new TreeSet<KeyExtent>();
+12.  while (true) \{
+13.    try \{
+14.      tablets.clear();
+15.     \uwave{MetadataTable.getEntries(tablets);}
+16. 	break;
+17.  \} catch (Throwable t) \{
+18.    UtilWaitThread.sleep(3000);...
+19.  \}\}\}
+\end{Verbatim}
+\vspace{-4mm}
+ \\ \hline
+\multicolumn{1}{c}{(B) A refactoring on the method and its caller during a bug fix} \\ \hline
+commit \href{https://github.com/apache/accumulo/commit/446a37a#diff-002fc1274cd98bf226ee8398551261a6}{446a37}: ACCUMULO-1481: refactor to consolidate metadata constants and structures in an organized way. 
+    %bug fix: https://github.com/apache/accumulo/commit/446a37a9795f2df7
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+ /* org.apache.accumulo.core.metadata.MetadataServicer */
+ 1.\color{blue}{ public static MetadataServicer \underline{\underline{forTableId}}(String tableId)  }
+2.\color{blue}{   if (RootTable.ID.equals(tableId)) }
+3.\color{blue}{     return new ServicerForRootTable(); ...}
+4.\color{blue}{ \} }
+/* org.apache.accumulo.core.metadata.ServicerForRootTable.java */
+5.\color{blue}{ public void \underline{\underline{getTabletLocations}}(SortedMap<KeyExtent,String> tablets) \{}
+6.\color{blue}{  tablets.put(RootTable.EXTENT, instance.getRootTabletLocation());}
+7.\color{blue}{  \}}
+/* org.apache.accumulo.core.client.admin.TableOperationsImpl */
+8.\color{blue}{TreeMap<KeyExtent,String> tabletLocations = new TreeMap<KeyExtent,String>();}
+9. public void addSplits(String tableId)\{  
+10.  while (true) \{
+11.   try \{ ...
+12.  \color{blue}{ \uwave{MetadataServicer.forTableId(tableId)}}
+       \color{blue}{ \uwave{ .getTabletLocations(tabletLocations);}}
+13.   \} catch (Throwable t) \{
+14.    UtilWaitThread.sleep(3000);...
+15.  \} \}
+\end{Verbatim}
+\vspace{-4mm}
+ \\ \hline
+ 
+ In line 1 of Part (A), the impure method \codefont{getEntries} modifies \codefont{tablets} by appending a newly created \codefont{KeyEvent} instance to the list if the condition in line 2 holds. However, if the condition in line 2 fails, the method \codefont{validateEntries} will throw an exception in line 8, and this exception will force the program to sleep for 3 seconds in line 18. As illustrated by a later commit log in Part (B), a developer fixed this bug by refactoring the method \codefont{getEntries} and invoke \codefont{forTableId.getTabletLocations()} instead. \todo{Lisa: This example introduces another inconsistent name \codefont{getTabletLocations()}, that's why I prefer the first example.}
+\end{tabular} 
+%\caption{Inconsistent method name detected with purity analysis}
+%\label{fig:purityExample}
+\end{minipage}
+%\end{figure}
+ \caption{Inconsistent method name detected with purity analysis}
+ \label{fig:purityExample}
+% \begin{figure}[!htb]
+ \end{figure*}
+
+
+
+
+
+
+
+
+% In this section, we describe an example of inconsistent name found by \tool. As shown in List~\ref{lst:iNameExample}. 
+
+
+%  based on the similar usages of the instances of \codefont{FlushRequester} in line $10-14$, $27-32$, and $37-40$, we identify the field name anomaly of the object \codefont{FlushListener} declared in line 3, and the parameter name anomaly of the object   \codefont{FlushListener}.  
+
+% /* org.apache.hadoop.hbase.regionserver */
+% public class HRegionServer {
+%  private FlushRequester requester = null;
+%  public void put(...) throws IOException {
+%     if (requester == null) {
+%       return;
+%     }
+%     if (!region.getRegionInfo().isMetaTable()) {
+%         requester.request(this);
+%       }...
+% }}
+% /* org.apache.hadoop.hbase.regionserver */
+% class LogRoller extends Thread implements WALObserver {
+%   private void scheduleFlush(final byte [] region) {...
+%     FlushRequester requester = null;
+%       if (requester != null) {
+%         requester.request(r);...
+%       }
+% } }
+% /* org.apache.hadoop.hbase.regionserver. SplitTransaction.java */
+% class SplitTransaction {
+%   HRegion createDaughterRegion(...,final FlushRequester flusher) {
+%    FileSystem fs = this.parent.getFilesystem();
+%    HRegion r = HRegion.newHRegion(..., flusher);
+%    return r;
+%   }}
+
+
