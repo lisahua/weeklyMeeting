@@ -1,7 +1,7 @@
 \section{Problem Statement}
 
 %\section{Problem 1}  
-\noindent{\bf{Proactively Recommending Code Examples to Reduce Integration Conflicts}}
+\noindent{\bf{Problem 1: Proactively Recommending Code Examples to Reduce Integration Conflicts}}
 
 
 
@@ -23,7 +23,21 @@
 
 
 
-Developers frequently use source code examples as the basis for interacting with an  application programming interface (API) to obtain the needed functionality~\cite{CodeSearch:FSE15}.  In this case, the source code example serves as the explicit origin for a reuse task which transforms a sequence of APIs with corresponding control structure to the target context~\cite{Frakes:reuseStatus05}.  
+Developers frequently use source code examples as the basis for interacting with an  application programming interface (API) to obtain the needed functionality~\cite{CodeSearch:FSE15}.  In this case, the source code example serves as the explicit origin for a reuse task which transforms a sequence of APIs with corresponding control structure to the target context~\cite{Frakes:reuseStatus05}.  Existing code search engines always return multiple examples that are found based on the relevance to the user query rather than the ability to fit for the target context. For any selected example  with a number of structural dependencies, developers have to rely on their intuition to determine which related elements should be transformed to the target context .
+
+we propose an approach to  recommend  code examples that implement a queried feature based on their integration cost to the target context. Instead of using the entire code example, we extract salient program elements that might provide the main queried functionality, integrate these salient elements to the user-defined location, and proactively add related elements into the context with user interaction to resolve integration conflicts.
+
+%We evaluate our approach with the 27 trackable features from feature location benchmark~\cite{denys:FLBenchmark13, Denys:BanchmarkQuery13}. This benchmark extracts queries from commit message based on information retrieval approach. We use the queries associated with features, and manually select 3 keywords from these queries.
+
+
+%identify common API calls that provide the main feature across different code examples from code search engine, and
+% integrate this reusable example to the target context with a set of related elements that are necessary to implement the main feature. We assume that the overlapping API calls are the main features that the user intends to reuse based on the user query, and the related elements should be transformed to the target together with main features if they are data dependent and control dependent on the common functionalities in a common way across different examples.  Figure~\ref{fig:system} illustrates the process of our system.  Given a free-form query from users, our tool invokes code search engine  to obtain a list of partial programs by recovering links between code elements and informal resources, clusters these examples and extracts common structural facts (e.g., jQuery logical facts) with corresponding control structures for each cluster, identifies a set of related elements that interact with main elements in a common way,  constructs reuse task with both main elements and related elements and ranks them based on user's context, and finally integrates the reuse task selected by users to the target context. 
+
+
+%However, there is no guarantee that a selected example will be appropriate until the integration results are examined~\cite{Holmes:reuseStudy09}.  First, there exist multiple examples that provide desired features for the task. Recent study [5] shows that it is unlikely to find a ?perfect? example that provides all desired features for the reuse task, and the desired features are always scattered in different example variants. Thus even with the help of code recommendation tools, developers still need to manually investigate multiple recommended code examples that are found based on the rel- evance to the user query rather than the ability to fit for the target context, in order to find the common API calls that provide expected features. Second, 
+
+
+
 
 %During the process of reuse task such as `add undo and redo actions in my Graphics Editor', developers often query for a set of examples considering the task, and integrate examples that match the task into their system~\cite{Parsons:cognitiveReuse04}. 
 
@@ -35,6 +49,11 @@ Developers frequently use source code examples as the basis for interacting with
 
 \noindent{\bf{Identify Duplicated Feature Requests}}
 
+There are a number of tracking system that helps the development process, such as Bugzilla, JIRA, and Pull Request mechanism in Github. Our preliminary study shows that only X\% of all issues of Z Apache projects reported in JIRA are unique, and Y\% of all pull requests are unique within 22 projects that actively use pull requests reported by~\cite{Devanbu:PullMSR15}. Our tool can also be used to recommend a potential fix based on reported bug report or description in natural language. 
+
+We first extract four types of information from these issue descriptions and corresponding comments: issue description in natural language, execution trace/bug report, code snippet, and diff patch. 
+
+We evaluate our approach using the dataset from JIRA issue tracking system, and pull request in Github. 
 %\item \textbf{Example Integration Phase.} Our approach investigates the user's contexts to recommend the best-fit reuse task  considering the number of matched structural facts in target context. After user's selection, our approach integrates the reuse task to the target context by transforming the unmatched structural facts based on matched facts in the context. 
 
 % \begin{figure*}[!htb]
