@@ -1,140 +1,77 @@
-\begin{comment}
 \begin{figure}[!htb]
  \begin{minipage}{0.5\textwidth}
 \scriptsize 
 \begin{tabular}{@{}p{1\textwidth}} 
  \hline 
-  \multicolumn{1}{c}{(A) Common facts} \\ \hline
+  \multicolumn{1}{c}{(A) Code snippet in parent project using akka 2.1.1 } \\ \hline
   \vspace{-4mm}
 \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
-import javax.swing.undo.UndoManager;
-import javax.swing.event.UndoableEditListener;
-import javax.swing.AbstractAction;
+/* AProject - pom.xml */
+<dependency>
+  <groupId>com.typesafe.akka</groupId>
+  <artifactId>\hl{akka-actor_2.10}</artifactId>
+  <version>2.1.1</version>
+<dependency>
 
-public class Foo \{
-  public void run() \{
-   UndoManager undoManager = new UndoManager();
-  \}\}
-  class UndoListener implements UndoableEditListener \{
-  public void undoableEditHappened(UndoableEditEvent e) \{
-    undoManager.addEdit(e.getEdit());
-  \}\}
-class UndoAction extends AbstractAction \{
-   public void actionPerformed(ActionEvent e) \{   
-     undoManager.undo();  
-  \}\}
-class RedoAction extends AbstractAction \{
-  public void actionPerformed(ActionEvent e) \{
-     undoManager.redo();
-  \}\}
+/* AkkaSystemExecutor.java */
+ActorSystem system = ActorSystem.create("MySystem");
+ActorRef myActor = system.actorOf(\underline{new Props(MyUntypedActor.class)},"myactor");
 \end{Verbatim}
 \vspace{-4mm}
  \\ \hline
-  \multicolumn{1}{c}{(B) Auxiliary facts: Menu} \\ \hline
+  \multicolumn{1}{c}{(B) Code snippet in a sub-module using akka 2.2.3 transitively } \\ \hline
     \vspace{-4mm}
 \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
-import com.sun.java.swing.*;
-
-public class Foo \{
-  public void run() \{
-   UndoManager undoManager = new UndoManager();
-   new TextComposite().getDocument().addUndoableEditListener(new UndoListener());
-   new JMenuItem(new UndoAction());
-   new JMenuItem(new RedoAction());
-  \}\}
+/* AProject.sparkPlugin - pom.xml */
+<parent>
+  <artifactId>AProject</artifactId>
+  <groupId>..</groupId>...
+</parent>
+	
+<dependency>
+  <groupId>org.apache.spark</groupId>
+  <artifactId>spark-core_2.10</artifactId>
+  <version>1.0.0</version>
+</dependency>
+/* SparkUtility.java */
+SparkConf sparkConf = new SparkConf();
+JavaSparkContext sc = new JavaSparkContext(sparkConf);...
  \end{Verbatim}
    \vspace{-4mm}
   \\ \hline
-   \multicolumn{1}{c}{(C) Auxiliary facts: Button} \\ \hline
+       \multicolumn{1}{c}{(C) Building error when integrating SparkPlugin with parent projects } \\ \hline
+    \vspace{-4mm}
+\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+java.lang.NoSuchMethodException: \hl{akka.remote.RemoteActorRefProvider.<init>}
+(java.lang.String, akka.actor.ActorSystem$Settings, akka.event.EventStream, 
+akka.actor.Scheduler, akka.actor.DynamicAccess)
+ at java.lang.Class.getConstructor0(Class.java:3082)...
+ \end{Verbatim}
+   \vspace{-4mm}
+  \\ \hline
+    \multicolumn{1}{c}{(D) code snippet in spark-core\_2.10} \\ \hline
   \vspace{-4mm}
 \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
-import javax.swing.undo.UndoableEditSupport;
-import com.sun.java.swing.Button;
-
-public class Foo \{
-  public void run() \{
-   UndoManager undoManager = new UndoManager();
-   new Button.addActionListener(new UndoAction());
-   new Button.addActionListener(new RedoAction());
-   new UndoableEditSupport().addUndoableEditListener(new UndoListener());
-  \}\}
+/* spark-core_2.10, version 1.0.0 pom.xml */
+ <properties> ...
+    <java.version>1.6</java.version>
+    <scala.version>2.10.4</scala.version>
+    <akka.group>org.spark-project.akka</akka.group>
+    <akka.version>\hl{2.2.3-shaded-protobuf}</akka.version>
+</properties>
+...
+<dependency>
+  <groupId>${akka.group}</groupId>
+  <artifactId>akka-remote_${scala.binary.version}</artifactId>
+</dependency>
+//some simplification by tranfering the raw scala code to Java code
+ActorRef myActor = system.actorOf(\underline{Props.create(MyUntypedActor.class)},"myactor");...
   \end{Verbatim}
         \vspace{-4mm}
      \\ \hline
-\end{tabular} 
-\caption{Common features and auxiliary features extracted from informal resources}
-\label{fig:fact}
-\end{minipage}
-\end{figure}
-\end{comment}
-
-
-\begin{figure}[!htb]
- \begin{minipage}{0.5\textwidth}
-\scriptsize 
-\begin{tabular}{@{}p{1\textwidth}} 
- \hline 
-  \multicolumn{1}{c}{(A) User's context} \\ \hline
-  \vspace{-4mm}
-\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
-import com.sun.java.swing.*;
-
-public class MyTextEditor \{
-  public void init() \{
-    JFrame frame = new JFrame("Undo Sample");
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    JTextArea textArea = new JTextArea();
-   JButton undoBtn_;
-   //add undo and redo action to text editor
-  \}\} 
-\end{Verbatim}
-    \vspace{-4mm}
-     \\ \hline
-  \multicolumn{1}{c}{(E) Expected reuse plan based on the query `undo redo TextEditor'} \\ \hline
-\begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
-import com.sun.java.swing.*;
-import javax.swing.undo.UndoManager;
-import javax.swing.event.UndoableEditListener;
-import javax.swing.AbstractAction;
-
-public class MyTextEditor \{
-    JFrame frame = new JFrame("Undo Sample");
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    JTextArea textArea = new JTextArea();
-    JButton undoBtn_;
-\textcolor{blue}{    JButton redoBtn_; }
   
-\textcolor{blue}{   public void init() \{}
-   //add undo and redo action to text editor
-\textcolor{blue}{   UndoManager undoManager = new UndoManager(); }
-\textcolor{blue}{   textArea.getDocument().addUndoableEditListener(new UndoListener());}
-\textcolor{blue}{   undoBtn_ = new Button();}
-\textcolor{blue}{   undoBtn_.addActionListener(new UndoAction());}
-\textcolor{blue}{   redoBtn_ = new Button().addActionListener(new RedoAction());}
-\textcolor{blue}{   redoBtn_.addActionListener(new RedoAction());}
-\textcolor{blue}{   \}}
-\textcolor{blue}{ private class UndoListener implements UndoableEditListener \{}
-\textcolor{blue}{  public void undoableEditHappened(UndoableEditEvent e) \{}
-\textcolor{blue}{    undoManager.addEdit(e.getEdit());}
-\textcolor{blue}{  \}\}}
-\textcolor{blue}{private class UndoAction extends AbstractAction \{}
-\textcolor{blue}{  public void actionPerformed(ActionEvent e) \{   }
-\textcolor{blue}{    undoManager.undo(); }
-\textcolor{blue}{  \}\}}
-\textcolor{blue}{private class RedoAction extends AbstractAction \{}
-\textcolor{blue}{  public void actionPerformed(ActionEvent e) \{}
-\textcolor{blue}{     undoManager.redo();}
-\textcolor{blue}{  \}\}\}}
-  \end{Verbatim}
-      \vspace{-4mm}
-     \\ \hline
 \end{tabular} 
-\caption{Scenario 1: add undo/redo to a TextEditor}
-\label{fig:undoEditor}
+\caption{Example from \underline{\href{https://travis-ci.org/lisahua/shifu/builds/29112815}{shifu.ml building error}}}
+\label{fig:shifu}
 \end{minipage}
 \end{figure}
-
-
-
-
-

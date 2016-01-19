@@ -1,66 +1,43 @@
-\section{Problem Statement}
 
-%\section{Problem 1}  
-\noindent{\bf{Problem 1: Proactively Recommending Code Examples to Reduce Integration Conflicts}}
+\section{Problem}  
+To obtain necessary functionality, developers often use third-party libraries. Due to the complexity of current software systems, the dependency issue arises when the system depend on different and incompatible versions of the same library. This issue, called  `dependency hell'~\cite{wiki:hell} may break other dependencies or push the problem to another set of libraries.  We use an example to illustrate how the `dependency hell' causes a build error, how it is localized, how it is fixed in the next session.
 
+%\noindent{\bf{Problem }}
 
-
-%Problem: The code examples returned from code search engine or other code search tools are not structured. 
-
-%Reuse tasks involve multiple related classes and methods, yet code search engines do not help developers recognize the latent structure among related classes/methods.
-
-%Hypothesis: We can find and rank related elements by following the structural dependencies of seed API elements in code. 
-
-%Input: a set of code examples returned from code search engine.
-
-%Output: a list of code example clusters based on their structural similarity. 
-
-%Sub questions: Do reuse tasks involve multiple related classes and methods? Can existing tools find reusable examples that involve multiple related classes and methods?
+\section{Example}
 
 
+ \begin{figure}[!htb]
+ \includegraphics{akka.jpeg}
+ \end{figure}
+\noindent{\bf{What is the `dependency hell'?}}
 
-%To answer these two subquestions, I search for the evaluation dataset for existing feature location/concern mining tools~\cite{Denys:FCA12, Hill:FindConcept07, Hassan:concernHistory10, Breu:DynamicAspect04} shown in Table~\ref{tab:concern},    reuse tools~\cite{Holmes:reuse07, Holmes:ASE09} shown in Table~\ref{tab:reuse}, and code search tools using free-form query ~\cite{sniff:Sen09, Portfolio:DenysICSE11, Sourcerer:SC14, Gvero:ICSE15, spotWork:ICSE14} shown in Table~\ref{tab:freeform}. We find that most medium-scale or large-scale reuse tasks involve multiple methods and classes,  and the developer should implement multiple methods and classes to finish the reuse task. Existing  code completion tools can complete a single method which involves in multiple API calls, yet they assume that all related APIs or  objects used in their suggested code snippet already exist. We argue that this assumption might not hold for a non-trivial reuse task, because developers need to implement the salient API calls that provide the main functionality as well as other related elements based on the latent structure.  
+\input{example}
+
+We illustrate the building error caused by `dependency hell' in a Maven project shown in Figure~\ref{fig:shifu}. As shown in part A, the parent project uses akka 2.1.1 to initialize \codefont{ActorRef} (underline) by creating a new \codefont{Props} object. The developer Alice is asked to implement a new sub-module named as SparkPlugin using Spark framework. Without knowing that Spark is dependent on akka-2.2.3, she implements the entire sub-module with Spark-1.0.0, writes the tests, and fully tests the single submodule before integrating with the parent project. However, she encounters the building error shown as part (C) (The complete building error is shown at~\cite{shifu}). 
+
+\noindent{\bf{How to localize `dependency hell'?}} 
+
+Starting from the \codefont{NoSuchMethodException}, she investigates the \codefont{akka.remote.RemoteActorRefProvider.<init>}  in akka-2.2.3 as declared in Spark's pom.xml and finds the static \codefont{Props.create} method shown in part (D). Alice get confused on the \codefont{NoSuchMethodException} and she has to use step-by-step debugging. She finally notices that the maven build system mistakenly uses akka-2.1.1 inherited from parent project, rather than the akka-2.2.3 that is required for Spark library. 
+
+\noindent{\bf{How to fix `dependency hell'?}}
+
+  Alice has several options to fix this bug as below:
+\begin{enumerate}
+\item change akka version in parent class to 2.2+, which is not feasible as the parent project heavily uses akka and it requires tremendous effort for upgrading.
+\item  exclude all transitive dependencies inherited from parent project with the feature provided by Maven 3.2.2+~\cite{maven:note}, aiming to resolve dependency hell~\cite{maven:hell}. This approach is not feasible as well because SparkPlugin itself relies on the parent projects and Alice has to re-import all dependencies that the submodule uses.
+\item include both akka versions and enforce Spark to use akka-2.2.3. This approach is similar to the well-known side-by-side  mechanism used in NIX package manager for Linux-based system~\cite{nix}. This might fix the build error, but Alice is concerned that compiling both versions might increase the building time of the entire system. 
+\item exclude akka-2.1.1 from the dependency declaration of Spark-1.0.0. Alice decides to use this solution as it won't have ripple effect on the rest of the system.
+\end{enumerate}
 
 
+%To ensure that there does not exist any other transitive dependency that causes dependency hell, she tries maven-enforcer plugin which have the rule to ban all transitive dependencies~\cite{maven:enforcer}, yet the plugin outputs more than 100 conflicts. Alice gives up to kill all conflicts as (1) It is costly to exclude all conflicts, (2) it makes the maven hard to maintain, and (3) most of them might not be harmful for the system. 
 
-Developers frequently use source code examples as the basis for interacting with an  application programming interface (API) to obtain the needed functionality~\cite{CodeSearch:FSE15}.  In this case, the source code example serves as the explicit origin for a reuse task which transforms a sequence of APIs with corresponding control structure to the target context~\cite{Frakes:reuseStatus05}.  Existing code search engines always return multiple examples that are found based on the relevance to the user query rather than the ability to fit for the target context. For any selected example  with a number of structural dependencies, developers have to rely on their intuition to determine which related elements should be transformed to the target context .
+Using this example, we illustrate that  it is not easy to  localize dependency hell without knowing the entire dependency graph and it can be error-prone when trying to fix the error.
 
-we propose an approach to  recommend  code examples that implement a queried feature based on their integration cost to the target context. Instead of using the entire code example, we extract salient program elements that might provide the main queried functionality, integrate these salient elements to the user-defined location, and proactively add related elements into the context with user interaction to resolve integration conflicts.
+\section{Approach}
 
-%We evaluate our approach with the 27 trackable features from feature location benchmark~\cite{denys:FLBenchmark13, Denys:BanchmarkQuery13}. This benchmark extracts queries from commit message based on information retrieval approach. We use the queries associated with features, and manually select 3 keywords from these queries.
+%There are some well-known solutions to this problem, they either ask developers to manually exclude all the transitive dependencies for a dependency (Solution 2) or include multiple versions in a side-by-side manner (Solution 3). Neither of them are perfect as described in the previous session. 
 
-
-%identify common API calls that provide the main feature across different code examples from code search engine, and
-% integrate this reusable example to the target context with a set of related elements that are necessary to implement the main feature. We assume that the overlapping API calls are the main features that the user intends to reuse based on the user query, and the related elements should be transformed to the target together with main features if they are data dependent and control dependent on the common functionalities in a common way across different examples.  Figure~\ref{fig:system} illustrates the process of our system.  Given a free-form query from users, our tool invokes code search engine  to obtain a list of partial programs by recovering links between code elements and informal resources, clusters these examples and extracts common structural facts (e.g., jQuery logical facts) with corresponding control structures for each cluster, identifies a set of related elements that interact with main elements in a common way,  constructs reuse task with both main elements and related elements and ranks them based on user's context, and finally integrates the reuse task selected by users to the target context. 
-
-
-%However, there is no guarantee that a selected example will be appropriate until the integration results are examined~\cite{Holmes:reuseStudy09}.  First, there exist multiple examples that provide desired features for the task. Recent study [5] shows that it is unlikely to find a ?perfect? example that provides all desired features for the reuse task, and the desired features are always scattered in different example variants. Thus even with the help of code recommendation tools, developers still need to manually investigate multiple recommended code examples that are found based on the rel- evance to the user query rather than the ability to fit for the target context, in order to find the common API calls that provide expected features. Second, 
-
-
-
-
-%During the process of reuse task such as `add undo and redo actions in my Graphics Editor', developers often query for a set of examples considering the task, and integrate examples that match the task into their system~\cite{Parsons:cognitiveReuse04}. 
-
-%Both location and integration of reusable examples are not trivial. For the phase of location, existing tools that search for specific API usage examples~\cite{MAPO:ECOOP09, Buse:apiICSE12, Export:DenysASE13, Sourcerer:SC14} might not be able to support such reuse tasks that always involve in multiple classes and related methods.  As a result, developers always query general search engines like Google or expert sites like StackOverflow to investigate potential tutorials for desired features. These search engines will return a list of informal documentations and users have to search for source code elements in these resources. Although some linking recovery  tools~\cite{PeterACE:ICSE13, RecoDoc:ICSE12} can help identify a partial program in the form of code snippet, they are not  sufficient to create a pragmatic reuse plan as the main functionality is always interleaving with auxiliary ones and  it is unlikely to find a `perfect' example that provides all desired features for the reuse task~\cite{Holmes:reuseStudy09}. Considering that a single example is not enough for a given task, developers need to investigate multiple example variants manually for the desired features (i.e., common API calls). For the phase of integration, developers should not only  measure structural and semantic similarity between the example and target context for the main API calls that provide desired features~\cite{Cottrell:jigsaw08}, but also determine which unnecessary code should be eliminated to save maintenance cost~\cite{Holmes:ASE09, Holmes:reuse07} and which related elements should be transformed with structural correspondence~\cite{Cottrell:generalize07} to the target context. Unfortunately, for any selected example in non-trivial system, the number of structural dependencies to follow is much too large to be completely covered by developers. The partial programs~\cite{partialProgram:OOPSLA08} extracted from the location phase make it even harder to  tease out irrelevant elements  without knowing a full scenario of precise type information and method implementation details.  Moreover,  the location and integration phase can be iterative as there is no guarantee that a selected example will be appropriate until the integration results are examined~\cite{Holmes:reuseStudy09}. 
-
-%To overcome these challenges, we propose to automatically identify common API calls that provide the main feature across different partial program examples from informal documentation, and integrate this reusable example to the target context with a set of related elements that are necessary to implement the main feature. We assume that the overlapping API calls are the main features that the user intends to reuse based on the user query, and the related elements should be transformed to the target together with main features if they are data dependent and control dependent on the common functionalities in a common way across different examples.  Figure~\ref{fig:system} illustrates the process of our system.  Given a free-form query from users, our tool invokes code search engine  to obtain a list of partial programs by recovering links between code elements and informal resources, clusters these examples and extracts common structural facts (e.g., jQuery logical facts) with corresponding control structures for each cluster, identifies a set of related elements that interact with main elements in a common way,  constructs reuse task with both main elements and related elements and ranks them based on user's context, and finally integrates the reuse task selected by users to the target context. 
-
-%Our tool also lists a set of variants from multiple source code examples so that users can select features they prefer to reuse, and transforms chosen features to the target context. 
-
-\noindent{\bf{Identify Duplicated Feature Requests}}
-
-There are a number of tracking system that helps the development process, such as Bugzilla, JIRA, and Pull Request mechanism in Github. Our preliminary study shows that only X\% of all issues of Z Apache projects reported in JIRA are unique, and Y\% of all pull requests are unique within 22 projects that actively use pull requests reported by~\cite{Devanbu:PullMSR15}. Our tool can also be used to recommend a potential fix based on reported bug report or description in natural language. 
-
-We first extract four types of information from these issue descriptions and corresponding comments: issue description in natural language, execution trace/bug report, code snippet, and diff patch. 
-
-We evaluate our approach using the dataset from JIRA issue tracking system, and pull request in Github. 
-%\item \textbf{Example Integration Phase.} Our approach investigates the user's contexts to recommend the best-fit reuse task  considering the number of matched structural facts in target context. After user's selection, our approach integrates the reuse task to the target context by transforming the unmatched structural facts based on matched facts in the context. 
-
-% \begin{figure*}[!htb]
-%    \centering
-%\includegraphics[width=1\textwidth]{fig/system.pdf}
-%       \caption{System process overview}
-%        \label{fig:system}
-%   \end{figure*}
-
+We propose an approach to check compatibility on the interfaces that use different versions for the same libraries, which has the possibility to introduce `dependency hell'. Instead of strict backward compatibility checker for the entire class~\cite{Welsch:backward12}, we regard it as safe if the used API is compatible for the other version in the current usage context. We make this trade-off because developers often embrace changes, making multiple versions incompatible to each other~\cite{bogart:backward}. To save build time and space,  we include multiple versions of the files from the same library only if they are incompatible with each other, instead of maintaining multiple versions for the same library at the same time. To save time for analysis, we only consider the API calls when it has the possibility to generate `dependency hell', since there is no need to check the dependency issue if the libraries are consistent used in the system with a single version.
 
