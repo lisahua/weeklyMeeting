@@ -1,54 +1,56 @@
-
-\section{Problem}  
-To obtain necessary functionality, developers often use third-party libraries. Due to the complexity of current software systems, the dependency issue arises when the system depend on different and incompatible versions of the same library. This issue, called  `dependency hell'~\cite{wiki:hell} may break other dependencies or push the problem to another set of libraries. When developers try to introduce a new library or upgrade existing ones, then other applications on their system might suddenly break as the newly-introduced libraries are not backward-compatible to the existing libraries. We use an example to illustrate how the `dependency hell' causes a build error, how it is localized, how it is fixed in the next session. 
-
-%\noindent{\bf{Problem }}
-
-\section{Example}
+\section{Program Repair}
 
 
- \begin{figure}[!htb]
- \includegraphics{akka.jpeg}
- \end{figure}
-\noindent{\bf{What is the `dependency hell'?}}
-
-\input{example}
-
-We illustrate the building error caused by `dependency hell' in a Maven project shown in Figure~\ref{fig:shifu}. As shown in part A, the parent project uses akka 2.1.1 to initialize \codefont{ActorRef} (underline) by creating a new \codefont{Props} object. The developer Alice is asked to implement a new sub-module named as SparkPlugin using Spark framework. Without knowing that Spark is dependent on akka-2.2.3, she implements the entire sub-module with Spark-1.0.0, writes the tests, and fully tests the single submodule before integrating with the parent project. However, she encounters the building error shown as part (C) (The complete building error is shown at~\cite{shifu}). 
-
-\noindent{\bf{How to localize `dependency hell'?}} 
-
-Starting from the \codefont{NoSuchMethodException}, she investigates the \codefont{akka.remote.RemoteActorRefProvider.<init>}  in akka-2.2.3 as declared in Spark's pom.xml and finds the static \codefont{Props.create} method shown in part (D). Alice get confused on the \codefont{NoSuchMethodException} and she has to use step-by-step debugging. She finally notices that the maven build system mistakenly uses akka-2.1.1 inherited from parent project, rather than the akka-2.2.3 that is required for Spark library. 
-
-\noindent{\bf{How to fix `dependency hell'?}}
-
-  Alice has several options to fix this bug as below:
-\begin{enumerate}
-\item change akka version in parent class to 2.2+, which is not feasible as the parent project heavily uses akka and it requires tremendous effort for upgrading.
-\item  exclude all transitive dependencies inherited from parent project with the feature provided by Maven 3.2.2+~\cite{maven:note}, aiming to resolve dependency hell~\cite{maven:hell}. This approach is not feasible as well because SparkPlugin itself relies on the parent projects and Alice has to re-import all dependencies that the submodule uses.
-\item include both akka versions and enforce Spark to use akka-2.2.3. This approach is similar to the well-known side-by-side  mechanism used in NIX package manager for Linux-based system~\cite{nix}. This might fix the build error, but Alice is concerned that compiling both versions might increase the building time of the entire system. 
-\item exclude akka-2.1.1 from the dependency declaration of Spark-1.0.0. Alice decides to use this solution as it won't have ripple effect on the rest of the system.
-\end{enumerate}
 
 
-%To ensure that there does not exist any other transitive dependency that causes dependency hell, she tries maven-enforcer plugin which have the rule to ban all transitive dependencies~\cite{maven:enforcer}, yet the plugin outputs more than 100 conflicts. Alice gives up to kill all conflicts as (1) It is costly to exclude all conflicts, (2) it makes the maven hard to maintain, and (3) most of them might not be harmful for the system. 
+\section{Improvement Idea} 
 
-Using this example, we illustrate that  it is not easy to  localize dependency hell without knowing the entire dependency graph and it can be error-prone when trying to fix the error.
+\noindent{\bf{Use NL to guide the search for program repair. }}  I manually check 105 defects/changes and their generated patches, I find that a) some plausible but not correct patches for defects are unrelated to bug descriptions in issue tracking system, b) there are a number of defects (30/69) that current auto-repair tools cannot generate any patches (neither plausible nor correct), but have the potential to be (partially) repaired with more 'specification' given by bug description. I argue that apart from passed and failed test cases, user is able to provide bug description in natural language that is also a special kind of specification to guide the search for the program repair.
 
-\section{Related Work}
+For example, php-309453-309456 (commit 8deb11c, bug #54291), none of auto-repair tools generate any fix for this bug in the benchmark, these tools include SPR [1](see its generated patches), Prophet [2], GenProg [4], AE [5], Kali [3], RSRepair [6] based on the evaluation, (PAR is unknown) .
 
-When two versions of the same library occur, Maven selects the closest library  in the tree of dependencies by default~\cite{maven:depend} (e.g., if dependencies for A, B, and C are defined as A -> B -> C -> D 2.0 and A -> E -> D 1.0, then D 1.0 will be used when building A because the path from A to D through E is shorter). User is able to manually exclude or force Maven to use a specific version, but the correctness is not guaranteed~\cite{maven:note}. Maven Enforcer Plugin checks a set of build rules including a Ban-Transitive-Dependency rule that detects all transitive dependencies conflicts and force users to resolve all conflicts. The Enforcer Plugin only checks the \codefont{groupid}, \codefont{artifactid}, and \codefont{version} declared in the configuration file (\todo{Lisa: though I don't know if we need to check semantics or compatibility of different versions, I leave this limitation for future reference}), and it does not help developers fix the conflicts without breaking any other parts of the system.
-The majority of existing build systems model dependencies identical to Maven. Examples include Gradle, MSBuild, Make, and CloudMake. The features that make them different are unrelated to dependency management, but on syntax of build scripts and parallelization. 
+This bug is caused by a null pointer exception and developer fixes it with correct exception handling. The reason why none of these tools handle this defect is because, 1) SPR fails to use control-flow transformation schema to this two-statement fix due to large search space, 2) Prophet does not learn this fix based on other fix patches,  3) There is no similar fix statement around thus GenProg, AE, and RSRepair fail to find the repair, 4) it adds code thus Kali that relies on statement deletion cannot fix it. In summary, all of these tools rely sole on test suite or cross-application history, but fail to understand what kind of defect user finds and what kind of repair user prefer.
 
-Bazel is a new build system developed by Google that advertises parallelization and correctness~\cite{bazel:depend}. Bazel does not allow transitive dependency and only reads dependencies listed in from the root dependency declaration file. This means that if your project (A) depends on another project (B) which list a dependency on project C in its WORKSPACE file, both transitive dependencies from B and C should be added to the WORKSPACE file. This can balloon the file size, but hopefully limits the chances of having one library include C at version 1.0 and another include C at 2.0. But they also assume that users can provide correct configuration and select correct versions of libraries. 
+Bug #54291 Crash in spl_filesystem_object_get_path
+Description:
+------------
+The attached code crashes on PHP5.3 SVN. Since this is pretty sure only a null-pointer deref, reporting this as public (non-security related)...
+Actual result:
+--------------
+==2043== Invalid read of size 8
+==2043==    at 0x6586DB: spl_filesystem_object_get_path (spl_directory.c:168)
+...
+The underlined line causes an null-pointer exception: intern->u.dir.dirp is null. Developer added exception handling in their fix. 
+PHPAPI char* spl_filesystem_object_get_path(spl_filesystem_object *intern, int *len TSRMLS_DC) /* {{{ */
+{
+#ifdef HAVE_GLOB
+     if (intern->type == SPL_FS_DIR) {
+           if (php_stream_is(intern->u.dir.dirp ,&php_glob_stream_ops)) {
+                  return php_glob_stream_get_path(intern->u.dir.dirp, 0, len);
+                    }
+                     }
+#endif
+                      if (len) {
+                            *len = intern->_path_len;
+                             }
+                              return intern->_path;
+} /* }}} */
+static void spl_filesystem_dir_open(spl_filesystem_object* intern, char *path TSRMLS_DC){
+    if (EG(exception) || intern->u.dir.dirp == NULL) {  
+            intern->u.dir.entry.d_name[0] = '\0';      intern->u.dir.entry.d_name[0] = '\0';
+             +  if (!EG(exception)) {
+                  +   /* open failed w/out notice (turned to exception due to EH_THROW) */
+                   +   zend_throw_exception_ex(spl_ce_UnexpectedValueException, 0
+                    +    TSRMLS_CC, "Failed to open directory \"%s\"", path);
+                    +  } 
+                    I hypothesize that bug reports such as "Crash in spl_filesystem_object_get_path " should give us hint based on NL semantic parsing: <type>crash</type> in <place>spl_filesystem_object_get_path</place>
 
-Package managers in operating system also encounter similar dependency management problem. To deal with destructive upgrade and multi-distribution support in Linux products, Nix ~\cite{nix} provides a co-existing package management mechanism to store a source package in its own directory, instead of a global location that share across the entire system. However, this might not work in build system like Maven, as with transitive dependencies, the graph of included libraries can quickly grow quite large~\cite{maven:depend}. 
+                    And this information should guide us to search for a better program repair.
 
-\section{Approach}
-
-%There are some well-known solutions to this problem, they either ask developers to manually exclude all the transitive dependencies for a dependency (Solution 2) or include multiple versions in a side-by-side manner (Solution 3). Neither of them are perfect as described in the previous session. 
-
-%We propose an approach to verify the safety of upgrading and 
-
-%We propose an approach to check compatibility on the interfaces that use different versions for the same libraries, which has the possibility to introduce `dependency hell'. Instead of strict backward compatibility checker for the entire class~\cite{Welsch:backward12}, we regard it as safe if the used API is compatible for the other version in the current usage context. We make this trade-off because developers often embrace changes, making multiple versions incompatible to each other~\cite{bogart:backward}. To save build time and space,  we include multiple versions of the files from the same library only if they are incompatible with each other, instead of maintaining multiple versions for the same library at the same time. To save time for analysis, we only consider the API calls when it has the possibility to generate `dependency hell', since there is no need to check the dependency issue if the libraries are consistent used in the system with a single version.
-
+                    Q: Any prior works that use NL in program repair?
+                    A: From the best of my knowledge (and based on a latest Program Repair Bibliography [13]), we don't have any tools that try to understand the natural language meaning in bug report and use it in program repair.
+                    Q: Why NL -semantic parsing can provide more information that test cases?
+                    A: NL in API document has been used to generate specification [17], indicating that NL has the potential to generate specification. Bug report is different from API document, but the idea is similar.
+                    Q: Why choosing semantic praising ?
+                    A: NL-based Software Analysis has been applied to many applications [18], yet most of them are confined to understanding the POS tagging properties (such as verb, noun) [17], and forget to understand the semantic relationship between each entity, e.g., <type>crash</type> in <place>spl_filesystem_object_get_path</place>
+                    means that there is an error type--'crash' happened in the method spl_filesystem_object_get_path

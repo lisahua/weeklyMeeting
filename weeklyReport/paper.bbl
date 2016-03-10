@@ -1,0 +1,44 @@
+\begin{thebibliography}{1}
+
+\bibitem{shifu}
+Build error.
+\newblock In {\em https://travis-ci.org/lisahua/shifu/builds/29112815}, last
+  visited 1/15/2016.
+
+\bibitem{maven:note}
+Maven release note.
+\newblock In {\em https://maven.apache.org/docs/3.2.1/release-notes.html}, last
+  visited 1/15/2016.
+
+\bibitem{maven:hell}
+T.~O. Brien.
+\newblock Maven-3.2.1 provides a new cure for dependency hell.
+\newblock In {\em
+  http://discursive.com/2014/03/17/maven-3-2-1-provides-a-new-cure-for-dependency-hell/},
+  last visited 1/15/2016.
+
+\bibitem{bazel:depend}
+B.~Documentation.
+\newblock Transitive dependencies.
+\newblock In {\em http://bazel.io/docs/external.html}, last visited 1/15/2016.
+
+\bibitem{maven:depend}
+Maven.
+\newblock Transitive dependencies.
+\newblock In {\em
+  https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html},
+  last visited 1/15/2016.
+
+\bibitem{nix}
+P.~Prins, J.~Suresh, and E.~Dolstra.
+\newblock Nix fixes dependency hell on all linux distributions.
+\newblock In {\em http://archive09.linux.com/feature/155922}, last visited
+  1/15/2016.
+
+\bibitem{wiki:hell}
+Wikipedia.
+\newblock Dependency hell.
+\newblock In {\em https://en.wikipedia.org/wiki/Dependency\_hell}, last visited
+  1/15/2016.
+
+\end{thebibliography}

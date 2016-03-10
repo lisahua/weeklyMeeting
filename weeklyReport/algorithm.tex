@@ -1,0 +1,176 @@
+
+
+\begin{algorithm*}[!htb]
+
+\SetKwInOut{Input}{Input}
+\SetKwInOut{Output}{Output} 
+\SetKwProg{Prog}{Title}{ is}{end}
+
+\Input {Assertion set $a\_set$, Function Set $f\_set$, A set of transformation functions $s\_set$ }
+\Output{Updated $\langle a\_set, f\_set \rangle$ with maximum number of assertions pass}
+
+$e\_set = \phi$; //expression set\\ 
+$l\_set = \phi$;  //location set\\
+$f\_set' = \phi$; //newly generated functions \\
+$a\_set' = \phi$; //selected assertions \\
+$r\_set = \phi$; //repair set \\
+$a\_fail = null$; //assertion failure \\
+\SetKwProg{Fn}{Function}{ is}{end}
+\Fn{ recurRepair ($\langle a\_set, f\_set \rangle$) :  $\langle a\_set, f\_set \rangle$}{
+
+	$failure$ = runSketch($\langle a\_set, f\_set \rangle$)\; 
+	 \If{$failure == a\_fail$} {
+	 \Return $\langle a\_set, f\_set \rangle$; //stop recursion 
+	 }
+	 $a\_fail$ = $failure$\;
+	$field$ = findSuspicious($a\_fail$)\;
+	$type$ = typeOf($field$)\;
+	$a\_set'$ = locateInHarness($type$); 
+
+$f\_set' = \phi$\;
+	\ForEach{schema $s \in s\_set$}{
+\ForEach{function $f \in f\_set$}{ 
+  $l\_set$ = locateInFunction($f, field$)\;
+    \eIf{$l\_set ==  null$} {
+    $f\_set' = f\_set' \cup f$\;
+    }{
+    $e\_set$ = findExpInFunction($f, type$)\; 
+    $r\_set = \phi$\;
+  \ForEach{location $l \in l\_set$}{ 
+
+	  $\langle l, f\_add \rangle$ = $createUpdate$($s, l, e\_set$)\;
+ $r\_set = r\_set     \cup  \langle l, f\_add \rangle$\;
+  }
+  	 $ f'$ = replaceFunc($f, r\_set$)\;
+	  $f\_set' = f\_set' \cup f'$\;
+	  }
+	  }
+
+\Return  recurRepair($\langle a\_set', f\_set' \rangle$)\;
+}
+}
+\caption{Recursive repair generation algorithm with Program Sketch}
+\label{alm:repair}
+\end{algorithm*}
+
+
+
+\begin{algorithm*}[!htb]
+
+\SetKwInOut{Input}{Input}
+\SetKwInOut{Output}{Output} 
+\SetKwProg{Prog}{Title}{ is}{end}
+\SetKwProg{Fn}{Function}{ is}{end}
+\SetKwProg{Def}{def}{:}{end}
+
+\SetKwProg{Fn}{Function}{ is}{end}
+\Fn{ createUpdate ($s, l, e\_set$) :  $\langle l, f\_add \rangle$}{
+//define four schema here.
+	}
+	
+\Def{s1($l, e\_set$) //rhs only}{
+$rhs$ = concat($e\_set$) \;
+\eIf {typeOf($e\_set$ is primitive type)}{
+$rhs = rhs + ?? $\;}
+{$rhs = rhs + null $\;}
+return $lhs(l) = rhs$\;
+}
+\BlankLine
+
+	
+	
+\Def{s1($l, e\_set$) //both lhs and rhs}{
+$lhs$ = concat($e\_set$) \;
+\eIf {typeOf($e\_set$ is primitive type)}{
+$rhs = lhs + ?? $\;}
+{$rhs = lhs + null $\;}
+return $lhs = rhs$\;
+}
+\BlankLine
+
+	
+	
+\Def{s1($l, e\_set$) // add one condition}{
+$a$ = concat($e\_set$) \;
+\eIf {typeOf($e\_set$ is primitive type)}{
+$b = a + ?? $\;}
+{$b = a + null $\;}
+$cond = concat('a==b', 'a != b', 'true')$\;
+return concat ($cond, a=b$);
+}
+
+
+
+\caption{Repair template generation algorithm}
+\label{alm:template}
+\end{algorithm*}
+
+
+\begin{algorithm*}[!htb]
+
+\SetKwInOut{Input}{Input}
+\SetKwInOut{Output}{Output} 
+\SetKwProg{Prog}{Title}{ is}{end}
+\SetKwProg{Fn}{Function}{ is}{end}
+
+\SetKwProg{Fn}{Function}{ is}{end}
+\Fn{ findExpInFunction ($f, type$) :  $e\_set$}{
+$e\_set = \phi$; //expression set\\ 
+$other\_queue = \phi$; //other type structs;\\
+  \ForEach{location $l \in l\_set$}{ 
+\eIf{defineTypeAt($l,type$)}{
+$e\_set = e\_set \cup $ record($l$)\;
+}{
+$other\_queue = other\_queue \cup$ record($l$)\;
+}
+}
+ \While{$other\_queue$ not Empty }{
+r = $poll(other\_queue)$\;
+  \ForEach{field $fd \in r$}{
+ \If{typeOf($fd$) == type}{
+$e\_set = e\_set \cup field$\;
+}
+	}
+	}
+	}
+\caption{Repair expression generation algorithm}
+\label{alm:repair}
+\end{algorithm*}
+
+
+\begin{algorithm*}[!htb]
+
+\SetKwInOut{Input}{Input}
+\SetKwInOut{Output}{Output} 
+\SetKwProg{Prog}{Title}{ is}{end}
+\SetKwProg{Fn}{Function}{ is}{end}
+
+\Input {Sketch file $file$, A set of transformation functions $s\_set$ }
+\Output{Repaired SketchFile $file'$}
+
+\SetKwProg{Fn}{Function}{ is}{end}
+\Fn{ recurRepair ($\langle a\_set, f\_set \rangle$) :  $\langle a\_set, f\_set \rangle$}{
+
+
+$a\_set = \phi$; //assertion set\\
+$e\_set = \phi$; //expression set\\ 
+$f\_set = \phi$; //function set\\
+$l\_set = \phi$;  //location set\\
+\BlankLine
+
+	$a\_set$ = allHarness($file$)\;
+	$f\_set$ = allFunctions($file$)\;
+	$\langle a\_set', f\_set' \rangle$ =  $ recurRepair$($\langle a\_set, f\_set \rangle$)\;
+	$file'$ = createFile($\langle a\_set', f\_set' \rangle$)\;
+	\BlankLine
+	}
+\caption{Repair driver algorithm }
+\label{alm:repair}
+\end{algorithm*}
+
+
+
+
+
+
+
