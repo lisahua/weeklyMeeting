@@ -1,146 +1,63 @@
 
 
-\input{dataset_table}
+%\input{dataset_table}
 \section{Approach}
-Without confined to an established code corpus, we use code search engine to extract code examples based on free-form queries from users.  We build our tool in a plugin mechanism so that any code search engine can be easily planted into our system.  
-We choose SearchCode~\cite{SearchCode} in our prototype because 1) it has good support for free-form queries,  2) it is an open source code search engine with over 7000 projects from  Github, Bitbucket, Google Code, and Sourceforge, 3) it has complete API documentation. 
 
-\subsection{Example Clustering Phase}  
 
-\noindent{\textbf{Reformulate User Query.}}  Most code search engines rely on text matching to extract code examples, thus vocabulary mismatching can affect their performance~\cite{Hill:NLQueryRefine14}. We therefore refine the given query using NL approaches before querying the code search engine. 
-For each queried term, we perform stemming to remove derivational affixes using Porter stemmer\cite{porter:stemmer} (e.g., parsing$\rightarrow$parse).  \textit{and identify salient terms (verbs, nouns, and adjectives) using a POS tagger~\cite{postagger04:stanford}. We choose these terms because prior work shows that they are salient elements in the query and other terms such as proposition, conjunction, and pronoun always impact query performance~\cite{Hill:NLQueryRefine14}. For example, the proposition \codefont{in} always matches the term \codefont{plugin}, leading to a false positive result). }
-To achieve better search result, we leverage  WordNet to generate English synonyms (e.g., \codefont{inquire} and \codefont{query}) and software-specific word thesaurus~\cite{yangMSR12:semWord, SEWordSim:ICSE14} to identify semantically-related terms (e.g., \codefont{source} and \codefont{target}). Our  approach is similar to other \textit{automatic query refinement} approaches, which have shown up to 41\% improvement in precision and 30\% increase in recall~\cite{lopes:queryExpand14, Marcus:queryReform13}. 
-Our preliminary study also shows that our query refinement approach works well to extract more related code examples. For instance, code search engine returns nothing for the query \codefont{inspect hard-drive for music files}, yet when we refine the query using  the synonym of the term \codefont{inspect}---\codefont{check}, we successfully obtain 10 related code examples. 
-
-\noindent{\textbf{Locate Queried Features.}}  Considering that source code examples are always entangled with multiple features, we separate program elements that are related to the queried features from big code examples. We do not cluster code examples based on the entire code example because it leads to too much noise in our preliminary study shown in Table~\ref{tab:preStudy}. For instance, one of the code examples for the query `\codefont{undo redo TextEditor}' contains 10 inner classes with 1447 lines of code: \codefont{CopyAction, PasteAction, MoveAction,..., UndoAction, RedoAction}, and only the last two inner classes (147 lines) are related to the queried feature. 
-
-There exist a variety of feature location approaches based on IR approach, dynamic execution trace, and historical information. We adopt a plugin mechanism and select an IR approach similar to~\cite{Marcus:LSI04}.
- We extract type names, method calls, and  identifier names, split them  into tokens using Samurai identifier splitting approach~\cite{samurai:msr09}, and convert each method into a document of Latent Semantic Index (LSI) space using an off-the-shelf tool call Semantic Vector~\cite{semanticVector:10}. \textit{Existing corpus-based feature location tools always leverage comments or even informal documents for feature location, but we only use reliable information from code elements because web-based code search engine provides us a fruitful of code examples.}
-The user query is also converted to a document of LSI space.  We measure the  LSI similarity between user query and each method to identify query-related methods.  We set  a threshold for LSI similarity score to include all related methods for the given query and filter out unrelated elements. 
-%I use the mean of TF-IDF weight  for each query term as a weighting factor and select all methods whose weighting score is bigger than a threshold.  This approach is similar to prior works that use  IR~\cite{Denys:FCA12} and NL analysis~\cite{Hill:FindConcept07} for feature location. I choose IR approach because other approaches require history or structural analysis that might not be feasible for partial program. TF-IDF =  $avg( \log (1 + f_{t,d}) \times  \log \frac {N} {n_t}), f_{t,d}$ is the frequency of term $t$ in method $d$, $N$ is the total number of methods, $n_t$ is the number of methods that have the term $t$. 
-
-\noindent{\textbf{Cluster Extracted Features. }}  After extracting queried features from each code examples, we automatically cluster search results using Latent Dirichlet allocation (LDA). LDA is a generative  model to express each document as a probability distribution of topics, and each topic is a probability distribution of words. Words can belong to multiple topics and documents can contain multiple topics.  We use a popular topic modeling toolkit called MALLET~\cite{McCallumMALLET} to train topic model. 
-To find a near-optimal LDA configuration (the number of topic, Dirichlet prior on the per-topic word distribution, etc), we reimplement a simple Genetic-Algorithm according to~\cite{Denys:LDAGA13} for each query task. We set the maximum number of topics $k$ as 9 following Miller's law in cognitive psychology~\cite{Miller:72}. We present the generated topics to users, so that user can select the example clusters they prefer. Hindle et al. \/conducted a case study in Microsoft to investigate if the topics extracted from requirements were relevant to development feature~\cite{Hindle:topicModel12}, and their result shows that experienced developers who are familiar with features are comfortable to identify behaviors based on topic words. We hypothesize that our users can also identify expected behavior based on topic words. User can choose to view more words in a topic to help them identify which topic they prefer. As shown in Table~\ref{tab:LDA}, if user prefers to implement a  \codefont{java.swing.TextEditor} that supports undo/redo action, she may choose Topic 1 because it contains keyword \codefont{viewer, action, listener} which seems related; yet if she wants to implement a TextEditor for a Eclipse Plugin, Topic 7 is the most promising one because of the keyword \codefont{workbench, plugin}.
-
-\begin{table}
-\begin{center}
-\caption{Clustering Result }
-\label{tab:LDA}
-\vspace{1mm}
-\scriptsize{
-\begin{tabular*}{0.5\textwidth}{@{}l|l|rrr@{}} \hline
- \multicolumn{3}{c}{Query: `\codefont{undo redo TextEditor}' } \\ \hline
- Topic&Topic Words &\# E\\\hline
- 1&viewer undo manager redo action listener provider& 17\\
-2&selection event undo change redo builder target& 14\\
-3&action factory editor undo redo constants text bars & 23\\
-4&editor text menu action site group page & 18\\
-5&document string outline file command set java &8\\
-6&undo manager context operation element tab history &8\\
-7&undo redo workbench listener shared plugin tool&6\\ \hline
- \multicolumn{3}{c}{Query: `\codefont{track mouse hover}' } \\ \hline
-Topic&Topic Words &\# E\\\hline
-1&mouse hover property handler  event drag data&13\\ 
-2&mouse component object key select item component &11\\
-3&track mouse scene parent node local client &4\\
-4&mouse bound height width series listener native &11\\ \hline
-\end{tabular*}
- \label{tab:dataset}
- {\# E}: the number of Examples
-}
- \end{center}
-\end{table}
 
 %The Resource Description Framework (RDF) [26] is the data-model for representing meta-data in the Semantic Web. The RDF data-model formalizes meta-data based on subject ? predicate ? object triples, so called RDF statements. 
 
-\subsection{Example Skeleton Generation Phase} 
+\subsection{Evaluation Dataset} 
 
-We take three steps in this phase. For the selected code example cluster, we  first extract type facts for the located methods that belong to the queried feature.  For each example in each cluster, we identify main facts that are shared among all examples, and perform slicing to identify related methods as auxiliary feature. Finally, we rank the related elements and select the best-fit one to generate a reusable code example skeleton with common facts. Our tool also enables users to drag and drop other auxiliary features to generate desired code example.
-
-\noindent{\textbf{Extract Structural Facts.}}  Before we extract structural facts, we construct symbol table for partial program based on the partial program analysis~\cite{partialProgram:OOPSLA08}.  We extract structural facts in an ontology instance. The ontology schema we use is the SEON Java ontology, which has been used in several prior works~\cite{gall:seonICSE10, Murphy:nlConcern11}.  Every extracted fact is represented in the ontology instance by one or more  \codefont{(subject, predicate, object)} triples. For instance, the fact that class $c_1$ extends class $c_2$ is represented by triple \codefont{($c_2$, subType, $c_1$)}. To manipulate the relationship between different facts, we use Resource Description Framework (RDF)  to represent each \codefont{(subject, predicate, object)} triple as an edge from \textit{subject} to \textit{object} labeled with {\it predicate}. We use \codefont{Apache Jena}, which is a Java framework for  linked data applications,  to create and process ontology instances. We define \codefont{subType} as  transitive predicate as ($c_1$, subType, $c_2$) and ($c_2$, subType, $c_3$) $\rightarrow$  ($c_1$, subType, $c_3$). 
+We collect K defects from student-written versions of Java Program with intricate faults in nested loops and recursive data structure. This section discusses how we construct the dataset, the subjects used in the experiment, and how we categorize the defects. 
 
 
-\begin{table}[ht]
+\noindent{\textbf{Methodology.  }}We collect K defects from high-level Data Structure course with an enrollment of 99 students (EE 422C, at UT Austin). For each of the 19 pop quizzes, students are given a specification and two JUnit test cases that their program should pass and they need to write a Java program that satisfies the specification and passes test cases in half an hour.  The pop quizzes covers the topic described last week and students have one week to review the concept before the pop quizzes. During the quiz, students  are not allowed to use the Internet or any Integrated Development Environment. They need to write down code in paper based on the given material. The defects are collected and manually classified based on program equivalence. We manually isolate the defects such that each defect is different from correct program only with a range of input for a specific field. 
+ We discard the defects that occur only once to eliminate random error. We then input these defects and test them against corresponding test suite generated by Korat, a symbolic execution tool that automatically generates all test cases within a given bound. Korat generates M test cases in total for 18 problems. 
+
+\noindent{\textbf{Subjects.  }} The dataset consists of  four basic data structures and three sorting algorithms.  
+\begin{enumerate}
+\item BST: Binary Search Tree  is a special binary tree that the key in each node must be greater than all keys stored in the left sub-tree, and smaller than all keys in right sub-tree. We check insert operation and three traversal approaches: in-order, pre-order, and post-order. Our test suite covers all test cases up to seven nodes, which leads to all cases in binary search tree up to three layers.  
+\item LL: Sorted Linked List  is a linear collection of data elements in ascendent order in which  nodes can point to the next node by means of a pointer. 
+%Our specification defines a sentinel header for the linked list whose next field points to itself for an empty linked list. If the linked list is not empty, the next field for the last element will point to the header.  
+Students are asked to finish insert and reverse operations as well as a method that validates whether the list has loop or not.  Our test suite covers all test cases up to three nodes.  
+\item DLL: Doubly Linked List  is a linked data structure which consists of a set of sequentially linked nodes. Each node has next and previous field, pointing to its next node and previous node correspondingly. We adapt the implementation of \codefont{java.util.PriorityQueue} in \codefont{openjdk version 6-27}. 
+%The list consists of a sentinel header. If the list is empty, both the header's next field and previous field point to header itself. Otherwise, the header's previous field points to the last elements in the list, and this last elements' next field points to the header.  
+Our test suite covers all test cases up to three nodes.  
+
+\item Heap: MinHeap is a specialized tree-based data structure whose parent node is always smaller than its children. Students are required to finish insert and remove operations. They are also required to implement sorting algorithm to convert an unsorted array to a MinHeap. Our test suite covers all test cases up to seven nodes.
+
+\item Sorting: We check three sorting algorithms: Bubble Sort, Quick Sort, and Merge Sort. Bubble Sort requires two loops while Quick Sort and Merge Sort requires recursive structure. We verify the program with up to five numbers.  
+
+\end{enumerate}
+
+\noindent{\textbf{Categorization.  }}  We categorize the defects into omission error (should assign a value but miss the assignment) and commission error (assign a value but assign another value). We further classify these errors into method-level and path-level  with respect to \todo{.... If a field value should be changed but is not changed by applying a method, we regard it as a method-level omission error. Similarly, if a field value should be changed but is not changed within a given block, but it is correctly set for all the inputs that do not execute that block, we regard it as block-level omission error. }
+
+
+
+\subsection{Comparison with other Program Repair Tools}  
+
+We manually convert defects to C and compare our efficacy with three existing program repair tools: GenProg, SPR, and Angelix. 
+
+\begin{table*}[ht]
 \begin{center}
-\caption{Structural Fact Types}
-\label{tab:total}
+\caption{Evaluation Dataset }
+\label{tab:evalSubject}
 \vspace{1mm}
 \scriptsize{
-\begin{tabular*}{0.5\textwidth}{@{}c|r|l@{}} \hline
-Level&Type&Description\\\hline
-&($c_1$, subType, $c_2$)& class $c_1$ extends $c_2$ \\
-class&($c_1$, innerclass, $c_2$)& class $c_1$ has an inner class $c_2$ \\
-level&($c$, field, $v$)& class $c$ has field $v$ \\ 
-&($c$, method, $m$)& class $c$ contains method $m$ \\ \hline
-&($m$, parameter, $v$)& method  $m$ has parameter $v$ \\ 
-method&($m$, return, $t$)& method  $m$ returns an object of type $t$ \\ 
-level&($e_1$, accesses, $e_1$)& $e_1$ = $e_2$, $e_1$ and $e_2$ are expressions\\ 
-&($m_1$, call, $m_2$)& method  $m_1$ calls method $m_2$ \\ 
-&($m$, variable, $v$)& method  $m$ has variable $m_2$ \\  \hline
-&($o$, name, $s$)& The name of object  $o$ is  $s$ \\  \hline
+\begin{tabular*}{1\textwidth}{@{}c|r|cc|cccc|cccc|cccc@{}} 
+&Subject		&LOC	&\# tests 	&\#bug	& ratio	&\tool&G/S/A	&\#Omission & ratio	&\tool&G/S/A	&\#Omission & ratio	&\tool&G/S/A		 \\\midrule
+%1&BST.insert	&31		&		& 		&		&		&2		&BST.post		&37		&		&		&\\ 
+%3&BST.in		&20		&  		&		&		&		&4		&BST.pre		&21		&		&		&\\
+% 5&LL.insert	&		&		&		&		&		&6		&LL.remove 	&		&		&		& \\ 
+%7&LL.reverse	&		&		& 		&		&		&8		&LL.hasLoop	&		&		&		& \\ 
+%9&DLL.hasLoop&		&		&		&		&		&10		& DLL.remove	&		&		&		& \\ 
+%11&DLL.addFirst&		&		&		&		&		&12		& DLL.addLast	&		&		&		& \\ 
+%13&Heap.insert	&		&		&		&		&		&14		&Heap.remove	&		&		&		& \\ 
+%15&Heap.sort	&		&		&		&		&		&16		&Sort.bubble	&		&		&		& \\ 
+%17&Sort.merge&		&		&		&		&		& 18		&Sort.quick	&		&		&		& \\ 
 \end{tabular*}
  \label{tab:dataset}
 }
  \end{center}
-\end{table}
-
-\begin{figure}[!htb]
-    \begin{minipage}{0.5\textwidth}
-    \centering
-\includegraphics[width=1\textwidth]{fig/rdf.pdf}
- \end{minipage}%
-   \caption{RDF graph}
- \label{fig:rdf}
-   \end{figure}
-
- \noindent{\textbf{Extract Example Skeleton.}} 
-
- We greedily select the most suitable structural correspondence~\cite{Cottrell:jigsaw08} and propagate the similarity of {\it object} nodes to the {\it subject} node. 
-
- The comparison is done by investigating the lexical similarity and similar paths in RDF graphs. For example, when comparing UndoAction.actionPerformed() in Figure~\ref{fig:cluster1} (A), we first try to match the fact \codefont{(actionPerformed, calls, CompoundUndoManager. undo())}. We only look at the facts with the same type. We find  the fact  \codefont{(actionPerformed, calls, TextUndoManager.undo())} which is lexically similar though not identical to the target fact. We calculate the similarity score as follows: 1) We split the name for each element in the tuple by camel-case splitter and separators such as `.' and `('. Thus \codefont{TextUndoManager.undo()} is split as \codefont{[Text, Undo, Manager, undo]}.  2) We calculate the distance for each element as the $ editDistance(s_1,s_2)/ Min$ $(|s_1|, |s_2|)$, thus the similarity score between \codefont{TextUndoManager.undo()} and \codefont{CompoundUndoManager.undo()} is 0.25. 3) The distance between two tuples are the average distance for three elements. Thus the distance of two facts are 0.08.   We select  the most similar  fact by minimizing the similarity distance and we identify \codefont{(actionPerformed, calls, CompoundUndoManager.undo())} as the structural correspondence of the fact \codefont{(actionPerformed, calls, TextUndoManager.undo())}. 
- 
-We try to match the fact   \codefont{(actionPerformed, calls, updateUndoState())}. Knowing that there is an edge from \codefont{updateUndoState()} to \codefont{setEnabled(undo.canUndo()} in RDF graph, we recursively match the fact \codefont{(updateUndoState, calls, setEnabled(undo.canUndo()))}  with  \codefont{(actionPerformed, calls, setEnabled(undo.canUndo()))}. The similarity score of {\it object} node \codefont{(updateUndoState, calls, setEnabled(undo.can Undo()))} is propagated to {\it subject} node \codefont{(actionPerformed, calls, updateUndoState())} as 0.4 compared to fact  \codefont{(actionPerformed, calls, setEnabled(undo. canUndo()))} in class \codefont{UndoAction}.  Our tool keeps on performing this matching until all facts in the target (Figure~\ref{fig:cluster1} (A)) is assigned a similarity score as 0 (i.e., fail to find correspondence) or a similarity score with other facts in the compared node. 
-
-%Finally, the examples are clustered based on the number of  {\it object} nodes (without outer edge).  Our tool keeps on refining the large cluster to present a structured code examples to developers. 
-
-We extract all matched {\it object} nodes (without outer edge) and use them as  match seeds. 
-
-\noindent{\textbf{Rank Related Elements.}}   
- We perform dependency analysis to  extract example skeleton.  An example skeleton should start from an element without any inner edge and end at an element without any outer edge which covers all match seeds. 
-When selecting features, we use three rules to rank features in different examples: 1) the cost of reuse; 2) the number of resolved relationship; 3) the frequency of the feature in multiple examples; 4) the simplicity of code implementation. 
-The cost of reuse is measured as the number of outer edges in RDF graph, i.e., the more outer edges in RDF graph, the more expensive to reuse because it has more dependencies. We have rule 2) because  some of the relationships can not be resolved in partial program. When user tries to reuse the example, they have to manually resolve these external relationships. 
-
-For instance, in Figure~\ref{fig:cluster2} (D), the feature group B.1 (\codefont{mUndo Action = new LintEditAction(undoAction, getEditorDelegate().getEditor())}) is not selected because the class \codefont{LintEditAction} cannot be resolved based on this partial program. The first two rules ease the reusability of our suggested code example. The third rule makes sure that the feature is representative and the last rule improves the understandability of our results. The simplicity is measured as the length of the code. For instance, we prefer \codefont{actionBars.setGlobalActionHandler (ITextEditorActionConstants .UNDO, undo)} in Figure~\ref{fig:cluster24} (D) than \codefont{actionBars.setGlobal ActionHandler (ITextEditorActionConstants.UNDO, getAction((ITextEditor) part,  ITextEditorActionConstants.UNDO))} because the former one is easier to interpret. 
-
-
-\noindent{\textbf{Enable User Interaction.}}  Apart from the selected best-fit related program elements, our tool also lists a fuzzy set of suggested program elements that can be added into the example skeleton. Users can drag-and-drop their preferred features to the code skeleton and our tool is able to select related program elements associated with this feature to fill in the skeleton. For instance, in Figure~\ref{fig:cluster2} (D), if user wants to add \codefont{propertyChange()} methods into the code skeleton, our tool will add super interface \codefont{PropertyChangeListener} to both \codefont{UndoAction} and \codefont{RedoAction} based on RDF graph, which are tagged as \codefont{B.4} in Figure~\ref{fig:cluster2} (D).
-
-
-%\begin{table}[ht]
-%\begin{center}
-%\caption{Common Structural Facts Extracted from the Examples }
-%\label{tab:total}
-%\vspace{1mm}
-%\scriptsize{
-%\begin{tabular*}{0.5\textwidth}{@{}l|l@{}} \hline
-%Level&Structural Facts\\\hline
-%class&subType(Undo*Action, AbstractAction), \\ 
-%&subType(Redo*Action, AbstractAction), \\ \hline
-%method&override(actionPerformed(), Undo*Action, AbstractAction), \\
-%&override(actionPerformed(), Redo*Action, AbstractAction), \\ \hline
-%statement&init(*,javax.swing.undo.UndoManager), \\
-%&invoke(UndoManager.undo, actionPerformed(), Undo*Action),\\
-%& invoke(UndoManager.redo, actionPerformed(), Redo*Action)\\  \hline
-%\end{tabular*}
-% \label{tab:dataset}
-%
-%We simplify some full names due to space limitation: 
-%
-%AbstractAction: javax.swing.AbstractAction;
-%
-%UndoListener: javax.swing.event.UndoableEditListener
-%
-%actionPerformed():actionPerformed(ActionEvent)
-%}
-% \end{center}
-%\end{table}
+\end{table*}
