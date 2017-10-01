@@ -1,0 +1,176 @@
+\section{Evaluation}\label{sec:eval} 
+\input{table_line}
+
+We evaluate \tool with two benchmarks that consist of straight-line and non-straight-line subjects. We address the following research questions in the evaluation: 
+
+\begin{itemize}
+\item How well does \tool perform on synthesizing straight-line code snippets involving Java APIs compared to the state-of-the-art API synthesizer?
+\item How do the  prioritization strategies affect the search space and performance of the synthesis?
+\item How effective is \tool to synthesize program fragments from open source projects with if-conditions and while-loops?
+\end{itemize}
+
+All performance experiments are conducted on a MacBook Pro with 2.7 GHz Inter core i5 processor and 8GB memory running OS X version 10.12.4. %The maximum heap memory is set as 2 Gigabytes. 
+
+
+\subsection{Synthesizing Straight-Line API sequences}
+To evaluate \tool, we first curate a benchmark of 47 synthesis tasks for straight-line API sequences, and compare \tool's synthesis efficacy with \spt~\cite{isil:sypet17}, a SAT-based API synthesizer with reachability analysis,  using the same benchmark.  Within these 47 subjects, 30 of them are used in the original evaluation of \spt, 8 are derived from open source projects used in \spt evaluation, and the rest involves small synthesis tasks like array sorting. The 30 synthesis tasks used in \spt evaluation are collected from 4 open source projects based on {\it StackOverflow} online forum and Github repositories, and the corresponding test cases are manually created in an incremental manner until \spt can find a correct solution with respect to the original implementation. For the 17 newly-added subjects, we follow a similar approach to create test cases. As we cannot replicate the experiments using the same machine, we execute \spt under our experiment setting (with smaller memory compared to their machine) and report the comparison result. Therefore, the result might be different from that reported in their original paper. To ease the comparison, we set up a time limit as 30 minutes for our experiments, the same as the default setting of \spt. 
+
+
+
+
+
+
+
+\noindent{\textbf{Evaluation Results. }}  Table~\ref{table:line} reports the 47 subjects with brief descriptions, the numbers of provided test cases for the synthesis (\textit{\#Tests}), and the number of synthesized  APIs in the first solution (\textit{\#API}).   Column {\it Space} shows the search space of API sequence candidates with respect to the identified solution.  If \tool collects a total of $m$ methods from input types using reflection, the average number of parameters for these methods is $ap$, and the number of given arguments is $v$,  we calculate the search space of API sequence candidates as $\sum_{1}^{N} (m \times v^{ap})^i$ while $N$ is the number of synthesized APIs  in the correct solution. We define the search space as is because each argument in a method candidate can have a maximum of $v$ options, and we incrementally insert more APIs into the sequence, searching for a desired solution.   Note that it is just an estimated search space because API candidates are dynamically generated based on previous APIs and constraints, and not all candidates in the search space will be executed.  Column   \textit{\#Run} shows the number of executed program candidates when \tool finds the first solution that passes all test cases.  Column \textit{Time} represents the total performance time including program compilation and test execution when \tool finds the first solution. 
+
+\tool successfully synthesizes 39 subjects with an average of 52 seconds. We manually investigate the tasks that \tool could not generate a solution within one hour, and find that these outliers usually have a relatively large distance for the intermediate value consumption, thus \tool de-prioritizes these candidates and times out after the preset time limit. For instance, shown as Figure~\ref{fig:outlier}  (A), the input argument \codefont{arg1} is not consumed until the $6^{th}$ statements, indicating that the maximum distance of the value consumption is 6. Therefore, \tool fails to prioritize the correct solution and identify it within the time limit.  Regarding the performance of the API synthesis,   out of 34 subjects that both tools could generate desired code, \tool outperforms \spt in 25 subjects. %indicating that \tool performs generally faster than the start-of-the-art. 
+
+
+
+\input{example_outlier}
+
+
+On the other hand,  \spt finds desired API sequences for 42 subjects with an average of 49 seconds. Figure~\ref{fig:outlier}  (B)  presents a subject that \spt fails to identify a correct solution within the time limit whereas \tool detects the solution in 7 seconds. We are not aware of the root cause of this failure as the source code of \spt is not publicly available.  In addition,  \spt throws out of memory exception in 3 synthesis tasks, indicating that constructing a large reachability graph using SAT solver can consume a large memory.   \tool does not require reachability analysis and the memory \tool uses for API synthesis is linear with respect to the number of method invocations under sketching. 
+
+
+In summary, \tool compares generally well with the state-of-the-art API synthesizer to sketch straight-line API sequences. 
+
+
+\subsection{Efficacy of Prioritization Strategies}\label{sec:strategyEval}
+
+To evaluate if our prioritization strategies can expedite the search of the desired API sequence, we report the number performance time and the number of executed programs with and without prioritization strategies when \tool finds the first solution that satisfies all test cases.  The last 4 columns of Table~\ref{table:line} lists these 4 numbers for all 47 synthesis tasks in our benchmark. 
+
+Within the 38 synthesis tasks that \tool can find desired solutions both with and without prioritization strategies, \tool with prioritization outperforms 23 tasks.    
+  We further use the Spearman test to measure if the number of executed program candidates is significant different with and without prioritization strategies and the $p<0.01$ indicates that our prioritization strategies significantly reduce the number of executed candidates. We manually inspect the subjects in which prioritization strategies perform poorly and highlight one example in Figure~\ref{fig:outlier} (B).   In this example, the return object comes from the first statement and the desired sequence contains two repetitive APIs, which contradicts with two heuristics applied in the prioritization strategies. 
+
+The experiment results also indicate that even without pruning strategies, our test-execution-driven sketching could identify a desired API sequence by executing only a very small portion of the total search space (less than $0.001\%$). 
+
+\input{table_sub}
+
+\subsection{Sketching Non-Straight-Line Code Fragments}~\label{sec:branch}
+
+We further illustrate \tool's ability to synthesize APIs in if-conditions and while-loops that could hardly be  handled by existing API synthesizers.  
+We select 10 non-straight-line code fragments from the implementation of 3 widely-used open source Java projects: \codefont{JFreeChart}~\cite{chart}, \codefont{Apache-Math}~\cite{math}, and \codefont{Closure} compiler~\cite{closure} for Javascript.  To distinguish from straight-line API synthesis, we select these subjects based on the criteria that  1) they should contain method invocations in both conditions and bodies of the conditions/loops; 2) at least one test case in the test suite should covered both the conditions and the bodies of the conditions/loops. The first rule ensure that \tool will synthesize APIs in the conditions,  and the second rule makes sure that there exist at least two holes in a single test execution and at least two holes will be sketched. 
+Different from the straight-line benchmark whose test cases are hand-made by the authors of \spt or by us with the purpose of using libraries, the test suites for non-straight-line benchmark are directly from the open source projects with the purpose of validating these tools, which are usually written in JUnit test framework. %In particular, the test cases in the \codefont{Closure} project are organized in a non-conventional way using scripts rather than standard JUnit test cases. Our test-execution-driven synthesis approach does not have any requirement on the format of test cases and can be applied to any projects that can be executed. 
+
+
+We manually create program sketches  and introduce ``holes'' for API sequences based on the original implementation. We execute all test cases that reach the ``holes'' to synthesize program sketches using API calls and   validate generated solutions against the entire test suite. %Finally, we manually inspect if the solutions are semantically equivalent to  the original programs. 
+%Given that the subjects we select contain ``holes'' in both conditions and bodies of the conditions/loops, \tool will encounter at least two ``holes'' in  a single test execution, which is different from existing API completion tools.  We have tries to extend existing API synthesizers with test partition for synthesizing non-straight-line programs, and more details will be described in the Section~\ref{sec:discuss}. 
+
+
+\noindent{\textbf{Evaluation Results. }}   Table~\ref{table:branch}  lists these 10 non-straight-line subjects, including basic information of the open source projects (lines of code {\emph Loc} and the number of test cases {\emph \#Tests}), a brief summary of each synthesis task (Column {\it Description}),  and the number of test cases that reaches the ``holes'' (Column  {\it \#Test}). Column {\it \#Cond} represents the number of invocations in conditions, while {\it 2if} indicates that \tool synthesizes a total of 2 method invocations in all if-condition expressions. It can be an API chain of two methods in an if-condition, 2 chained if-conditions, or nested if-conditions. Similarly, we use {\it 1wh} to represent  a while-condition with one API call. The column {\it \#Stmt} represents the total number of invocations synthesized in the body of the conditions/loops, yet these invocations may scattered in different branches.  %We have shown two  non-straight-line subjects in  Figure~\ref{fig:motivate} (No.3) and Figure~\ref{fig:generic}  (No.6). % {\it 2if, 1wh} represents that \tool synthesizes 2 method invocations in if-conditions and  one API call in while-condition. 
+
+
+
+On average, \tool explores 67.2k program candidates before it finds a sequence of method calls that satisfies all test assertions  in a reasonable amount of time that 70\% of synthesis tasks can be done in 1 minute. We also see that \tool does not require many test cases to synthesize an API sequence. Particularly, some tasks with multiple holes in both while-condition and while-body can be synthesized using a single JUnit test case such as the subject No.3 shown in Figure~\ref{fig:motivate}. %Note that  we directly use the JUnit test cases from open source projects to synthesize the ``holes'' in open source projects, and we only report the number of API invocations that have been reached and synthesized by \tool.  \tool generates an implementation that performs the desired functionality in a reasonable amount of time as Y seconds on average to complete a synthesis task with an average search space of M million program candidates. 
+
+
+
+
+In summary, \tool could successfully synthesize multiple API calls with branches and loops based on several test cases, while existing API synthesizers could only handle straight-line code. %We further investigate the efficacy of \tool to synthesize straight-line code in the next section.
+
+
+\noindent{\bf Threats to Validity.}  We use  test cases as the
+correctness criteria, which can generate plausible solutions that pass
+all test cases but are not equivalent to some hypothetical correct
+ones.  It can be incomplete to use test cases as correctness
+specification.  When we evaluate non-straight-line subjects, we reuse
+the original test cases provided by the open source projects, which
+are not created with the purpose of code synthesis\Comment{. Although
+  benefiting from the reuse of existing JUnit test cases, \tool may
+  inadvertently generate plausible sketching results, i.e., passing
+  all test cases but is incorrect from the perspective of users}. In
+our experiments, we manually inspect the first generated solution for
+each subject to validate its correctness. %We also list our evaluation dataset at~\cite{hua:eval} for  cross validation.
+
+%\noindent{\textbf{External Validity.}}  
+We only compare \tool with one state-of-the-art API synthesizer; thus,
+our comparison result might not extend to other such tools, e.g.,
+\textsc{CodeHint}~\cite{codehint:icse14} and
+\textsc{InSynth}~\cite{insynth:cav11}.  We note that \spt has been
+shown to be a state-of-the-art tool in comparison with both
+\textsc{CodeHint} and \textsc{InSynth} using the same 30 subjects.  We
+also include these 30 subjects in our comparison and \tool could
+successfully synthesize most of them. 
+
+ % \tool only uses given arguments as parameters and does not support features such as field dereferences. We envision that we could extend \tool to support field dereferences and enum types with reflection. % and insert them into the candidate vector for parameters. 
+
+
+  \vspace{-2mm}
+\section{Discussion}~\label{sec:discuss}
+  \vspace{-2mm}
+% Test Partion SyPet extension
+%May not be correct solution
+%\noindent{\bf Extending SyPet to handle non-straight-line code synthesis.} 
+  
+   The use of Petri nets in SyPet is effective, although
+limited to synthesis of straight-line code.  It is possible in
+principle to enhance SyPet to handle a broader class of synthesis
+problems, e.g., those that \tool handles.  To illustrate, consider
+using SyPet to synthesize parts of an ``if-else'' statement.  \Comment{
+
+With the notion that the problem of API synthesis with if-else branches can be divided into some subproblem of straight-line API synthesis, we extend \spt, trying to support  non-straight-line API synthesis with test partition. 
+}
+Intuitively, the synthesis problem can be divided into three
+subproblems of sketching the if-condition, the if-body, and the
+else-body. Given that a test case can only exclusively execute either
+the if-block or the else-block, we try to partition the given test suite
+and synthesize these two blocks and the if-condition based on two
+subsets of test cases. We enumerate all combinations of given test
+cases, searching for an adequate test partition such that \spt could
+generate API sequences for both the if-body and the else-body based on
+these two subsets correspondingly. If the test partition can
+successfully generate two method sequences for the if-body and the
+else-body, we further collect test oracles for the if-condition with
+respect to the tests, and let \spt synthesize an API sequence that
+could generate this test partition using the if-condition. Based on
+this idea of dividing the non-straight-line synthesis task to multiple
+straight-line synthesis problems, we consider an extension of \spt to
+synthesize chained if-conditions by splitting the test suite into a
+few subsets.
+
+To illustrate this extension based on test partitioning, consider the
+method in Figure~\ref{fig:partition} that tries to classify the
+triangle based on its three edges. The method \codefont{classify}
+takes the lengths of three edges as input and returns the triangle's
+classification as either acute, right angled, or obtuse.
+Figure~\ref{fig:partition} (A) presents a method skeleton of
+non-straight-line program with chained if-conditions. This method
+skeleton is regarded as the test driver for the extension of \spt.  We
+also manually provide more than 20 test cases for this synthesis task
+to sketch 3 bodies and 2 if-conditions. Figure~\ref{fig:partition} (C)
+shows a solution from the extension of \spt based on the test
+partition.
+
+We learn several lessons from extending an existing straight-line API synthesizer to support non-straight-line code. First,  it can be rather expensive to find an adequate test partition  that satisfies constraints from both condition bodies and if-conditions. Given 20 test cases, the possible partitions can be as large as $3^{20}$. Even though \spt successfully finds a desired API sequence for a subset of test cases, it might fail to sketch a condition with method invocations that could separate the test suite to these subsets. Second, this idea assumes that the synthesized APIs for the if-condition cannot change the current program state, i.e, they must be pure methods. Otherwise the idea of test-partition may fail due to the side effect of the if-condition. Lastly, the test-partition-based non-straight-line code synthesis can fail in synthesizing while-loops. 
+
+While the simple idea of dividing the non-straight-line API synthesis
+problem to several straight-line API synthesis sub-problems based on
+test partitioning may not allow SyPet to effectively handle
+non-straight-line synthesis problems, Petri nets could still provide
+valuable guidance during search.  We believe future work on
+integrating Petri nets with \tool holds promise in further optimizing
+\tool.
+
+\Comment{On the other hand, however, \tool does not require any test partition and can easily support  API synthesis with if-conditions and while-loops based on test-execution-driven sketching. }
+
+\input{example_partition}
+
+  
+  
+
+
+%\noindent{\textbf{Internal Validity.}} 
+
+
+
+%We believe that the reachability analysis used in \spt is complementary to ours and has the potential to further prune the search space of API sequences.  
+%\noindent{\textbf{Construct Validity.}} 
+%For our benchmark of straight-line subjects, the API completion tasks  are  defined 
+%
+% test cases are  not provided 
+%
+% \tool may generate a different solution that also satisfies all test cases compared to the synthesized API sequence generated by \spt. We regard solutions that pass all test cases are regarded as correct solution, we regard 
+%In our performance comparison experiment, we manually transform the Java program to Sketch language, which may have inadvertently introduced behavioral differences. We list all subjects and tests at~\cite{hua:eval} for cross-validation.
+
+

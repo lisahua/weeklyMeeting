@@ -1,0 +1,34 @@
+
+
+
+\begin{algorithm}[t!]
+\small
+\SetKwInOut{Input}{Input}
+\SetKwInOut{Output}{Output} 
+\SetKwProg{Prog}{Title}{ is}{end}
+\SetKwProg{Fn}{Function}{ is}{end}
+\SetKw{New}{new}
+\SetKw{Throw}{throw}
+\SetKw{Break}{break}
+\SetKwIF{Trying}{Catch}{Catching}{try}{}{catch}{}{catch}{}%
+%\SetKwIF{Try}{Catch}{try}{catch}{}%
+\SetKwRepeat{Do}{do}{while}{}{}%
+\Input {Partial program with Hole $hole$,  test suite $T$}
+\Output{Complete Program $P'$ that pass all test cases }
+\SetKwProg{Fn}{Function}{ is}{end}
+\Fn{ sketch ()  }{
+\Do{ incrementCounter() }{
+\Trying{}{
+	 exploreCurrentChoice()\;} 
+		\Catch{BacktrackException}{ createNextChoice()~\label{line:nextChoice} \;}}
+}
+\Fn{ exploreCurrentChoice()  }{
+\Trying{}{
+	 \ForEach{ $test \in T$}{ test.run() \;}}
+		\Catch{TestFailureException~\label{line:backtrack}}{\Throw BacktrackException \;}
+printSolution() \;	searchExit()  ; \tcp{first solution found}	 
+}
+\caption{Execution-Driven Sketching }
+\label{alm:sketch}
+\end{algorithm}
+ 

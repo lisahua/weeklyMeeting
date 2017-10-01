@@ -1,0 +1,68 @@
+\section{Approach}\label{sec:approach}
+\input{algorithm}
+
+We describe our test-execution-driven sketching for API calls in this section. We first show how we generate API candidates for each hole based on our prioritization strategies, and then describe how we leverage execution-driven sketching to synthesize a desired API sequence.  
+
+
+\subsection{API Candidates Generation} 
+
+This section describes how we dynamically generate candidates for API sequences when the test execution first reaches the ``hole''. 
+
+\noindent{\textbf{Generating Candidates During the Test Execution. }}  Shown as Algorithm~\ref{alm:genCandidate},  given a maximum length of the method invocation and a set of input arguments provided by users, \tool first generates a list of prioritized constraints to divide the API generation search space into multiple smaller spaces which only generates API sequences satisfying specific constraints.  The procedure of constraint generation will be described in the Section~\ref{sec:prioritize}.  Based on these prioritized constraints, \tool assigns each constraint a unique identifier, which is its index in the constraint vector.  When \tool performs sketching, it dynamically selects a constraint identifier with non-deterministic \codefont{choose()} operator (line~\ref{line:chooseRule}) and generates API candidates based on the chosen constraint. \tool further incrementally selects  methods based on the number of API calls defined in the constraint ($rule.stmt$).  Once \tool selects a single method in the sequence, it tries to execute this  selected method using reflection. If this method can be executed without throwing runtime exceptions,  \tool records the return value (if the invoked method has any),  updates the argument list with the generated intermediate value, and inserts this method into the API sequence. If the execution encounters any runtime exception, \tool backtracks immediately, and selects the next candidate in the candidate vector (line~\ref{line:genBacktrack}). The detailed backtracking procedure will be described in the Section~\ref{sec:backtrack}. If an API sequence candidate is successfully generated, \tool updates the ``hole'' with the generated sequence, and provide the return value for the initial execution. 
+
+
+\noindent{\textbf{Single Method Generation. }}    To choose a single method invocation, \tool generates method candidates based on the given constraint and selects receiver objects and parameters for the method candidate with given arguments or intermediate values from previous method invocations. \tool first collects all  source types declared by users and fetches all methods of these types using reflection (line~\ref{line:fetchMethod}). Note that the method collection process can be rather expensive if given a large amount of source types, thus we only collect these methods once and reuse them for each re-execution.   These methods are further filtered by the given constraint. In addition, if there does not exist a given argument or intermediate value with the type of a parameter in the method \codefont{m}, this method will not be considered because one of its parameters cannot be completed by the given arguments or intermediate values generated from previous method invocations.  
+
+After \tool generates a vector of method candidates, it assigns each candidate a unique identifier as its index in the candidate vector and dynamically selects a  candidate identifier with non-deterministic \codefont{choose()} operator. \tool further recursively generates candidates (given arguments and intermediate values) for  receiver objects and parameters of this selected method, and non-deterministically selects candidates to complete the chosen method call (line~\ref{line:fillExpr}). \tool then returns this generated method call, validates its correctness by invoking it using reflection,  and incrementally inserts more invocations into the API sequence. 
+
+Following the same standard with other API synthesis tools~\cite{isil:sypet17,  codehint:icse14}, we only consider one method invocation for each statement, e.g., \tool only considers a method call \codefont{iterator.next()} for one statement, but will not consider method chains like  \codefont{iterator.next().toString()} when it synthesizes a single method invocation. The method chain will be represented as multiple API calls: \codefont{Object obj = iterator.next()} and \codefont{String str = obj.toString()}.  Similar to \spt,   \tool currently only supports variables as receiver objects and parameters, without considering  field dereferences derived from these variables (e.g., field dereferences like \codefont{node.val} while \codefont{node} is an element in a linked list and \codefont{val} is the integer value that the node contains). Note that the execution-driven sketching engine~\cite{sketch4j:spin17} we use as our backend supports the generation of field dereferences using a breath-first iteration and the reflection. We envision that the extension to support field dereferences can be straightforward by inserting these fields into candidate vectors of expressions used in the method. 
+
+
+
+\noindent{\textbf{Executing with Selected Candidates. }}  Once the ``hole'' has been initialized, the generated API sequence will be used consistently across all test cases. For instance, if there exists an API sequence ``hole'' inside a while-loop, \tool only generates candidates for the API sequence when the test execution first reaches the ``hole'' in the while-loop body, and the selected  sequences will be used across all executions of the while-loop. Yet if the while-condition is evaluated to \codefont{false}, the test execution will not reach the ``hole'' inside the while-loop body, thus no new search space will be generated.  Users may specify the maximum number of method invocations (line~\ref{line:holeLen}). By default, we set a pre-defined bound for the maximum number of statements as 4, and make this bound configurable for end users. 
+
+
+
+ \input{algorithm_sketch}
+\subsection{Prioritization Strategies}\label{sec:prioritize}
+
+This section describes how we generate prioritized constraints to divide the API generation problem to multiple subproblems that satisfy different constraints. Shown as 
+the method \codefont{genConstraints()} starting from line~\ref{line:genrule} in Algorithm~\ref{alm:genCandidate}, \tool generates 4 elements that will be used to prioritize the API sequence candidates: the number of API invocations in the method sequence ($rule.stmt$),  the statement that generates the return object ($rule.rtn$), the maximum distance that intermediate values must be consumed ($rule.vc$), and the maximum number of repetitive APIs invoked in the method sequence ($rule.rep$).  We describe the effect of each constraint element as below. 
+
+ \noindent{\textbf{1) The number of API calls. }}  Intuitively, the search space of the API sequence increases if \tool wants to synthesize more methods for the ``hole''.  Therefore, we prioritize the candidates with the fewer API invocations and increase the bound of API calls  until we reach the given bound from users or the preset bound for the number of API calls.  %Given that we incrementally insert one method into the sequence at a time, the synthesized sequences from \tool are guaranteed to have the minimum number of APIs that satisfy all test assertions.
+
+ \noindent{\textbf{2) The statement that generates the return object. }} % \tool assumes that the return value should come from the output value of a statement inside the API sequence. That is, \tool will not return the 
+ Based on the insight that method invocations appears  later in the execution could use parameters generated before and these methods are more likely to generate the return value for the API sequence, we prioritize the statements that are called later during the test execution and add a constraint that the selected statement must generate a value with the return type. Particularly, Figure~\ref{fig:background} illustrates this idea that  the return value \codefont{res3} of the API sequence  is the output of the last API calls in the sequence. 
+ 
+ \noindent{\textbf{3) Maximum distance that values must be consumed. }}  Similar to other API completion tools~\cite{isil:sypet17, jungloid:pldi05}, \tool assumes that all arguments and intermediate values generated from previous method invocations must be consumed in later API calls. With the insight that arguments and intermediate values should be consumed as quickly as possible, we set up a constraint that all values must be used within a given bound of statements. For instance, shown as Figure~\ref{fig:background}, based a constraint that all values must be consumed in the next two statements, the statement that initialize a new \codefont{Vector2D} object \codefont{res3} must consume the intermediate values  (\codefont{res1} and \codefont{res2}) generated from the previous two statements. To eliminate duplication, we ensure that there exists at least one value that is used at the maximum value-consumption distance. That is, if the maximum value-consumption distance is set as 2, at least one  value is used at the second next statement, otherwise all objects will be consumed at the next statement and these candidates has been explored with $rule.vc = 1$.  
+ 
+ \noindent{\textbf{4) Maximum number of repetitive APIs. }} With the notion that developers hardly use the same API for multiple times in a method sequence, we restrict the number of repetitive APIs in a method sequence, and relax this bound by allowing multiple repetitive APIs. 
+
+Our prioritization strategies is based on several heuristics for API completion, which might not always expedite the exploration for correct solutions. We conduct a comprehensive  evaluation for our pruning strategies in Section~\ref{sec:strategyEval}. 
+%In addition to the previous prioritization strategies, we prune the APIs if any of their parameters' type are not available in the set of arguments and intermediate values.  \tool backtracks immediately  because some of their parameters cannot be initialized, therefore, these methods cannot generate a correct solution for the API sequence. 
+ 
+
+ 
+\subsection{Execution-Driven Sketching}\label{sec:backtrack}
+
+\tool leverages a recent developed execution-driven sketching engine called \sj~\cite{sketch4j:spin17}  to handle the backtrack search based on the re-execution. 
+Algorithm~\ref{alm:sketch} illustrates the execution-driven synthesis procedure.  \tool performs the synthesis by executing given test cases. When the test execution reaches a ``hole'' at the first time, \tool initializes this ``hole'' by generating API sequence candidates based on the runtime information and continues executing the program based on the selected candidate. If this candidate throws a runtime exception or fails in a test assertion (line~\ref{line:backtrack}), \tool throws a \codefont{BacktrackException} and breaks from the current execution. This \codefont{BacktrackException} is caught at line~\ref{line:nextChoice}. \tool then increments candidate identifiers, and fetches the next candidate in the candidate vector. 
+
+\input{example_generic}
+\subsection{Advanced Java Feature Support}
+
+  Many Java libraries use parametric polymorphism.  Instead of  modeling generic types based on static analysis like \spt, \tool handles generic types using reflection based on the runtime information. Figure~\ref{fig:generic} illustrates our ability to synthesize APIs using variables with generic types. Using APIs from the \codefont{Closure} library~\cite{closure}, this program sketch under synthesis contains an if-else condition, and specifies that the if-condition expression, the if-body, and the else-body are all incomplete method invocations. There exists a  local variable named \codefont{type}  with the generic type \codefont{T}, and the variable is given as an argument for the ``hole''. Without knowing the specific type of \codefont{T}, users can specify the argument type of the given generic variable as \codefont{Object.class} shown as line 3. 
+  Note that we ask users to provide the argument type because if the given argument is evaluated to be \codefont{null} at runtime, \tool will not be able to generate any methods using reflection on a \codefont{null} object. We ask users to provide argument type as \codefont{Object.class} rather than \codefont{type.getClass()} as the variable \codefont{type} can be \codefont{null} and this invocation will lead to a \codefont{NullPointerException} at runtime.  
+  
+   Moreover, if users are not clear about the return type of the API sequence, they can set the return type as \codefont{null}, and \tool will consider all types  as well as the \codefont{void} type as the API sequence's return type. 
+   
+    We reuse the test suite from the \codefont{Closure} open source project to synthesize this program sketch and highlight one test case at   Figure~\ref{fig:generic} (B).  Figure~\ref{fig:generic} (C) shows a solution found by \tool that passes all test cases. We manually check this solution and find that it is identical to the original implementation in the open source project.
+
+In summary, \tool synthesizes API sequences based on the test execution and applies a set of prioritization strategies to expedite the exploration of correct solutions. 
+
+
+
+
+
+
+

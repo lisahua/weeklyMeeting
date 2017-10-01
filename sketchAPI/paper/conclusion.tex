@@ -1,0 +1,5 @@
+\section{Conclusion}\label{sec:conclude}
+
+
+We present \tool, a novel test-execution-driven approach to synthesize API sequences. Our approach dynamically generates candidates for API sequences during the test execution and backtracks whenever the candidate encounters any test failures or runtime exceptions. Our key novelty is to introduce effective prioritization strategies to divide the search space of APIs to multiple sub-places with prioritized constraints. %\tool explores the actual program behavior with an execution-driven synthesis engine. 
+We evaluate \tool on a collection of straight-line programming tasks and a benchmark of non-straight-line subjects derived from open source projects. Our evaluation results indicates that \tool compares generally well with a state-of-the-art API synthesizer and \tool can synthesize the desired program in a practical manner using a few test cases in a reasonable amount of time. We also illustrate that \tool can synthesize APIs in if-conditions and while-loops, which can hardly be handled by existing API synthesis tools.  

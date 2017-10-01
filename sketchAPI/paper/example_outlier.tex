@@ -1,0 +1,38 @@
+
+
+
+\begin{figure}[t!]
+\footnotesize
+      \begin{minipage}{0.5\textwidth}
+      \begin{tabular}{@{}p{0.9\textwidth}}
+        \\ \hline
+  \multicolumn{1}{c}{(B) A subject that \tool times out (No.6) } \\ \hline
+  \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+1.public static double[] solveLinear
+   (double[][] arg0, double[] arg1) \{
+2. RealMatrix v1 = MatrixUtils.createMatrix(arg0);
+3. RealMatrix v2 = v1.transpose();
+4. LUDecomposition v3 = new LUDecomposition(v2);
+5. DecompositionSolver v4 = v3.getSolver();
+6. RealMatrix v5 = v4.getInverse();
+7. double[] v6 = v5.preMultiply(arg1);
+8. return v6;
+9. \} 
+\end{Verbatim}
+   \\ \hline
+  \multicolumn{1}{c}{(B) A subject that \spt times out (No.41)} \\ \hline
+  \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+1.public int getAndAddTwo(IntegerWrapper arg0)\{
+2. int res0 = arg0.get();
+3. arg0.increment();
+4. arg0.increment();
+5. return res0;
+6.\}
+\end{Verbatim}  
+ \\  \hline
+ \end{tabular}
+  \end{minipage}
+   \caption{Two ``timeout'' subjects for \tool and \spt }
+ \label{fig:outlier}
+
+ \end{figure}

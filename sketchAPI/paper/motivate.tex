@@ -1,0 +1,41 @@
+\section{Motivating Examples}\label{sec:motivate}
+\input{example_background}
+\input{example_motivate}
+In this section, we define the problem of API synthesis and illustrate our approach using two examples of straight-line and non-straight-line code. Both examples use APIs from the \codefont{Apache-Math} library~\cite{math}. 
+
+\subsection{Problem Definition}
+
+API synthesis is an approach that generates a sequence of method invocations to perform a desired functionality based on the given input types, arguments, and the output type of the API sequence. For \tool, the desired behavior is defined as the satisfaction of all test cases. That is,  the correctness of the sketched solution from \tool is with respect to the given test suite. We present a usage scenario of API synthesis in Figure~\ref{fig:background} (A) that tries to create an API sequence to compute the $i^{th}$  eigenvalue of a matrix. Several test cases are provided as correctness criteria and we highlight one of them in Figure~\ref{fig:background} (B).  
+
+To use \tool for API synthesis, users provide input arguments used in the method sequence, source types or libraries that specify the scope of the API exploration, and the output type of the API sequence, shown as Figure~\ref{fig:background} (C). 
+To further illustrate the input arguments of existing API synthesis techniques, we show an input configuration file  for a state-of-the-art API synthesizer called \spt. Shown as Figure~\ref{fig:background} (D), \spt asks for similar information to identify correct sequences of method calls. Note that \spt is known as the state-of-the-art method synthesizer that compares favorably with other synthesis tools~\cite{codehint:icse14, insynth:cav11}. 
+
+API synthesis tools return a desired method sequence with respect to the test suite.  Figure~\ref{fig:background} (D) presents a synthesized method sequence from \tool that pass all test cases. This solution is semantically identical to the result from \spt using the same test suite. 
+
+\subsection{Non-Straight-Line Synthesis Example }
+
+We further illustrate \tool's ability to  sketch API calls in non-straight-line code such as conditions and loops.  
+
+%Figure~\ref{fig:motivate} (A) presents a code 
+%\codefont{ebeDivide} method derived from the \codefont{OpenMapRealVector} class in the Apache-Math project. This \codefont{ebeDivide} method performs an element-by-element division for each element in the vector. Assume that users want to implement this method, and they want to implement this method using  three local variables \codefont{v}, \codefont{res}, and \codefont{iter}, and a \codefont{while} loop to traverse the vector. The users leave the condition of the \codefont{while} loop and its body to be synthesized by \tool. 
+
+Figure~\ref{fig:motivate} (A)  shows a code skeleton (sketch) written by users. In this sketch, users specify the \codefont{while} condition (line 5) and the body of the \codefont{while} loop (line 6)  as ``holes'' that need to be synthesized. %Similar to other API completion tools~\cite{codehint:icse14, isil:sypet17}, users provide the input parameters and output type of the expected API sequence, and let API synthesis tool complete the method calls. 
+Different from other API synthesis tools  that could only synthesize a single straight-line method sequence, \tool enables users to specify multiple holes in non-straight-line programs with if-conditions and while-loops. Using a suite of JUnit test cases, \tool tries to complete these holes via test execution. A JUnit test case is highlighted in Figure~\ref{fig:motivate} (B).  
+
+%Using 3 visible variables in this example, there are 59 visible methods that can be chosen for the a single API invocation.  Even if we only consider candidates with up to 4 statements for the \codefont{while} loop body and 1 statement for the \codefont{while} loop condition, the space of possible complete programs can be as large as 12.1 millions. 
+
+%We use the existing test suite from the \codefont{Apache-Math} project as the correctness criteria for the partial program, and set up a time out as 30 seconds to eliminate infinite loop. \codefont{Apache-Math} project  contains 3.6k JUnit test cases yet only one test case reaches the holes of this sketch.  For more efficient synthesis, we pick this test case to synthesize the partial program and validate the solution against the entire test suite. 
+
+\tool dynamically selects method candidates for the sketch when it executes given test cases.  When \tool first reaches the \codefont{while} condition hole (line 5), it generates all API candidates based on the given input types using reflection and non-deterministically selects a candidate  with respect to the given output type \codefont{boolean}. If the selected candidate returns \codefont{false} for the \codefont{while} loop condition, the ``hole'' inside the while loop will not be executed thus no new search space will be initialized. When \tool first reaches the ``hole'' inside the while-loop at line 6, it  selects a method invocation in a non-deterministically manner and incrementally adds more APIs to the sequence until it finds the first solution that satisfies all test cases. Users may specify the number of statements in the synthesized sequence; by default, we set the bound of the API calls as 4 and make it configurable.  \tool backtracks its search if the current method sequence encounters a runtime error or a test failure, and selects the next candidate for a new execution.  
+
+A naive search may explore a huge amount of program candidates. Considering hundreds of methods and multiple options for receiver objects and parameters of these methods, the search space for this problem can be as large as 9.4 billion.  \tool introduces effective prioritization strategies to divide the search space of API generation to multiple smaller spaces based on some heuristics such as the values generated later in the sequence are more likely to be used as the return object. 
+
+%prunes a number of such candidates based on the output type and a similar assumption with other API completion tools that all intermediate values should be consumed. \tool also prioritizes candidates based on a set of heuristics such as variable locality, etc.
+
+Figure~\ref{fig:motivate} (C) presents a solution generated by \tool with one method invocation for the \codefont{while} condition and 4 statements for the  body of the while-loop. This  solution is semantically identical to the original implementation in the library based on manual inspection, In this example, \tool finds the corrrect solution in 50 seconds (including compilation and test execution time) after exploring 7.8k candidates. 
+
+
+  
+
+
+

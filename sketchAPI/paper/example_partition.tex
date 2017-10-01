@@ -1,0 +1,49 @@
+
+
+
+\begin{figure}[t!]
+\footnotesize
+      \begin{minipage}{0.5\textwidth}
+      \begin{tabular}{@{}p{0.9\textwidth}}
+   
+   \\ \hline
+  \multicolumn{1}{c}{(A) A code skeleton under synthesis as the input of \spt} \\ \hline
+  \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+1.String classify(int a, int b, int c) \{ 
+2. if(condition1(a, b, c)) \{
+3.  return body1();
+4. \} else if(condition2(a, b, c)) \{ 
+5.  return body2();
+6. \} else \{
+7.  return body3();
+8. \} \}
+ \end{Verbatim}
+   \\ \hline
+  \multicolumn{1}{c}{(B) Sample test cases that define correct behavior} \\ \hline
+  \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+public static boolean test1() throws Throwable \{
+ return classify(78, 79, 80).equals("acute");
+\}
+public static boolean test2() throws Throwable \{
+ return classify(12, 13, 5).equals("right");
+\}
+public static boolean test3() throws Throwable \{
+ return classify(10, 15, 10).equals("obtuse");    
+\}
+ \end{Verbatim}  
+      \\ \hline
+  \multicolumn{1}{c}{(B) A solution from extended \spt  } \\ \hline
+  \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+1. body3(a,b,c): Library.obtuse(a,b,c);
+2. body2(a,b,c): Library.right(a,b,c);
+3. body1(a,b,c): Library.acute(a,b,c);
+4. condition2(a,b,c): Library.isRight(a,b,c);
+5. condition1(a,b,c): Library.isAcute(a,b,c);
+ \end{Verbatim}
+ \\  \hline
+ \end{tabular}
+  \end{minipage}
+   \caption{Example of \spt extension to synthesize non-straight-line APIs   }
+ \label{fig:partition}
+
+ \end{figure}

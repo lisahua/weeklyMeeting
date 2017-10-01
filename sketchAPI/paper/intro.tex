@@ -1,0 +1,67 @@
+\section{Introduction}
+
+
+Reuse of existing code from class libraries is often difficult because it involves using unfamiliar APIs, and the  numerous combination of APIs makes the synthesis of API sequences even harder. There has been much research on helping developers explore APIs by mining existing code~\cite{strathcona:icse05, portfolio:icse13, jungloid:pldi05} based on probabilistic models~\cite{slang:pldi14, codehint:icse14}.  Some of them take  natural-language queries~\cite{sniff:fase09, freeQuery:oopsla15}   and synthesize a suitable code fragment that satisfies the query.   A recent work~\cite{isil:sypet17} uses SAT solver for graph-reachability analysis and synthesizes APIs based on the given test suite. Although the effectiveness of these techniques have been impressed, these techniques follow a similar generate-and-validate approach that generates all program candidates and validate them based on the correctness property, such as  partial specification~\cite{codehint:icse14} or test cases~\cite{isil:sypet17, testDriven:pldi14}. The key limitation for these two-phase synthesis techniques is that, without runtime information, the generation phase may construct a number of candidates  that are not feasible for a specific test execution. For instance, they may generate multiple APIs whose receiver objects are evaluated to be \codefont{null} or unreachable code fragments within an if-condition while the condition expression is evaluated to be \codefont{false}. 
+
+
+%%More limitation for G&V and more benefit needed here
+With the insight that an integration of generation and validation could help develop an effective approach for API synthesis, we present \tool, a new synthesis approach for complex APIs based on test-execution-driven sketching. 
+As input, \tool takes a sketch (partial program) with holes for an API sequence, and a test suite that characterizes the expected behavior of this partial program. \tool supports API holes in  Java syntax for both conditions and statements. It executes the test suite against the sketch and backtracks  when it encounters a runtime exception or a test failure. \tool terminates when all API combinations have been explored or a solution has been found that satisfies the given test suite.  
+
+ When the test execution reaches a ``hole'', \tool dynamically constructs candidates based on the runtime information, selects a candidate, continues executing this candidate, and validate this candidate using test execution. Yet if the test execution does not reach a ``hole'', e.g., the ``hole'' inside a while-loop while the while-condition is evaluated to be \codefont{false}, \tool will not create any new search space. \tool leverages a recent developed execution-driven sketching engine  called \sj~\cite{sketch4j:spin17}  as backend to handle backtracking search via re-execution~\cite{verisoft:97}.  
+
+To initialize the search for API synthesis, \tool generates API candidates for the ``holes'' based on input types using reflection. These candidates are put in a candidate vector and \tool assigns a unique identifier for each candidate using its index in the candidate vector.  When \tool performs synthesis, it dynamically selects a candidate identifier for each ``hole'' using non-deterministic \codefont{choose()}  operator and executes the program based on the candidate it selects. 
+
+
+The key novelty of our work is to introduce effective prioritization strategies to divide the search space into multiple sub-spaces with more constraints. The constraints are defined based on Java semantics and some heuristics for API synthesis. For instance, based on Java semantics,  if there does not exist any arguments or intermediate values with the same type of a parameter in the method, this method invocation is ignored as one of its parameters cannot be initialized. Moreover,  we introduce the notion of locality that arguments should be consumed as quickly as possible and the objects generated later in the sequence could use more information generated previously and thus are more likely to be used as return value. Leveraging the test-execution-driven sketching, \tool supports API synthesis for non-straight-line code fragments that have if-branches and while-loops. 
+
+%Given that prior works complete API sequence based on the requirement that synthesized methods should use all of its inputs and any intermediate values should be produced~\cite{jungloid:pldi05, codehint:icse14, isil:sypet17}, \tool introduces several simple pruning strategies to optimize the API completion.  For a sequence of APIs, \tool prunes semantic-equivalent API sequences based on simple program isomorphic analysis and  prunes API calls with  non-consumed intermediate values based on the pre-defined assumption. 
+
+%When \tool reaches a hole as the condition expression, it dynamically selects a method call that returns a \codefont{boolean} value, continues executing the program based on this selection, and backtracks if it encounters a runtime exception or test failures. 
+ 
+To evaluate \tool, we first performed experiments to investigate its efficacy of synthesizing straight-line APIs compared to \spt, a state-of-the-art API synthesis tool based on SAT solver and advanced reachability analysis. We then investigate if our prioritization strategies could effectively expedite  the exploration of correct solutions. Lastly, we demonstrate how \tool handle APIs with if-else-branches and while-loops.  Existing works  do not directly support API synthesis with branches. We extend \spt to handle non-straight-line code synthesis and discuss the lessons we learn with this extension.
+
+ The experimental results show that \tool's synthesis efficacy compares well with \spt. In particular, out of 47 synthesis tasks, \tool completes 39 subjects in an average of 52 seconds, which is very close to the synthesis efficacy of \spt, 42 subjects in an average of 49 seconds.  Our experiments also  illustrate that our prioritization strategies effectively reduce the performance time in 61\% of subjects. Moreover, \tool completes 10 sketching tasks with if-condition and while-loops from open source projects in a reasonable amount of time. 70\% of these non-straight-line synthesis tasks are completed in one minute with 5 methods sketched on average.  
+
+
+ This paper makes the following contributions:
+ 
+ \begin{itemize}
+ \item \textbf{Test-execution-driven synthesis of API calls.}  We
+   present a novel approach for synthesizing API calls based on
+   test-execution-driven sketching. Given a partial program and a few
+   test cases, \tool completes the partial program with API calls to
+   conform to the expected behavior represented by the given test
+   cases.
+ \item \textbf{Pruning Strategies.  }  To enhance the efficacy of our
+   approach, we introduce pruning strategies that reduce the search
+   space of candidates based on the semantics of Java.  The
+   experimental results show that our pruning strategies can
+   significantly reduce the search space of API call synthesis.
+ \item \textbf{API call synthesis with conditional branching and
+   loops.  }  Our approach supports sketches that have conditional
+   branches and while loops, and completes holes for conditions and
+   statements using sequences of API calls.  \Comment{-driven
+     sketching, \tool can successfully complete API call ``holes'' for
+     conditions and statements.  To compare non-straight-line API
+     synthesis with existing API completion tools, we extend \spt with
+     test partition and demonstrate that \tool is more effective in
+     synthesizing non-straight-line APIs than the extension of \spt.}
+ \item \textbf{Experimental Evaluation.  }  We experimentally evaluate
+   \tool and compare it with \spt, a recently developed
+   state-of-the-art technique designed for synthesis of straight-line
+   code. The results show that our approach can effectively handle
+   non-trivial sketches with non-strainght-line code, and compares
+   favorably with \spt for straight-line code.
+  \end{itemize}
+
+
+\Comment{
+The rest of the paper is organized as followed: Section~\ref{sec:motivate} presents a motivating example to illustrate our  approach. Section~\ref{sec:approach} describes how we perform execution-driven sketching for API calls and how we prune the search space for efficient search, followed by the evaluation in Section~\ref{sec:eval}. We discuss related work in Section~\ref{sec:related} and conclude at Section~\ref{sec:conclude}.
+}
+
+
+
+
+
+

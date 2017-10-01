@@ -1,0 +1,73 @@
+\documentclass[10pt,conference]{IEEEtran}
+
+\input{macros}
+
+\begin{document}
+
+\title{Test-Execution-Driven Sketching for Complex APIs}
+
+
+% author names and affiliations
+% use a multiple column layout for up to three different
+% affiliations
+%\author{\IEEEauthorblockN{,  Sarfraz Khurshid}
+%\IEEEauthorblockA{The University of Texas at Austin\\
+%Email: \{, khurshid\}@utexas.edu}}
+
+% make the title area
+\maketitle
+
+\begin{abstract}
+
+  We introduce the \tool framework for synthesizing code fragments
+  with respect to test cases that specify expected program behavior.
+  Given a skeletal implementation, aka a \emph{sketch}, that has
+  \emph{holes}, i.e., placeholders for desired fragments, and a test
+  suite as inputs, \tool outputs sequences of Java APIs that
+  complete the holes such that all tests pass.  \tool is based on a
+  \emph{test-execution-driven} approach that effectively explores
+  potentially very large spaces of candidate programs.  \tool executes
+  each given test and uses the test executions to guide the
+  exploration and prune large parts of the space.  Our focus is
+  synthesis of method call sequences over given libraries.  Our
+  approach handles sketches with non-straight-line code, e.g.,
+  while-loops and if-else statements.  We embody our approach in a prototype tool, and perform an
+  experimental evaluation using a number of sketching tasks for
+  complex APIs.  We also compare \tool with \spt, which is a recently
+  developed state-of-the-art tool using Petri nets and SAT
+  solving, but is designed to only synthesize straight-line code.  The
+  experimental results show that \tool can efficiently complete
+  non-trivial sketches with non-straight-line code, and can sometimes
+  even outperform \spt for subjects with straight-line code.
+
+  \Comment{
+To achieve a task of interest, developers always need to combine complex APIs together. Most tools that help programmers find code fragments follow a generate-and-validate style that first generate search space based on pre-defined or mined templates and validate these candidates against  correctness properties. 
+
+To help programmers use APIs more easily, we present \tool,  a novel approach that dynamically generates program candidates for API sequences during the test execution and backtracks whenever the candidate encounters any test failures or runtime exceptions. We introduce effective pruning strategies to explore the actual program behavior with an execution-driven synthesis engine. Taken a partial program and a given test suite as the specification,  \tool completes the partial program with API sequences that satisfy all test cases. We further illustrate that based on execution-driven sketching, \tool could synthesize non-straight-line APIs with if-branches and while-loops.   Experimental results show that \tool compares well with another SAT-based API completion tool, SyPet, and moreover,  \tool could synthesize API sequences with if-branches and while-loops efficiently. 
+}
+
+
+
+\end{abstract}
+
+% no keywords
+\input{intro}
+\input{motivate}
+\input{approach}
+\input{evaluation}
+\input{related}
+\input{conclusion}
+%\IEEEpeerreviewmaketitle
+
+
+% use section* for acknowledgment
+%\section{Acknowledgment}
+
+\bibliographystyle{IEEEtran}
+\bibliography{synthesis,other}  
+
+
+% that's all folks
+\end{document}
+
+

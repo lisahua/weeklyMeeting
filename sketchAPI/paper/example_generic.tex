@@ -1,0 +1,48 @@
+
+
+
+\begin{figure}[t!]
+\footnotesize
+      \begin{minipage}{0.5\textwidth}
+      \begin{tabular}{@{}p{0.9\textwidth}}
+        \\ \hline
+  \multicolumn{1}{c}{(B) A program sketch written by users under synthesis} \\ \hline
+  \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+1. public void visit (...) \{...
+2.  T type = ...;
+3.  if ((Boolean) TedSketch.INVOKE(0)
+     .addArgument(Object.class, type)...) \{
+4.   TedSketch.INVOKE(1)
+      .addArgument(Object.class, type)
+      .setReturnType(null)...;
+5.  \} else \{
+6.  TedSketch.INVOKE(2)
+     .addArgument(Object.class, type)
+     .setReturnType(null)...;
+7. \}
+ \end{Verbatim}
+   \\ \hline
+  \multicolumn{1}{c}{(B) A sample test case that defines the program's correct behavior} \\ \hline
+  \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+1. public void testTypedExterns() \{
+2.  testSets(false, externs, js, output, 
+     "\{alert=[[Foo.prototype]]\}");
+3. \} 
+\end{Verbatim}  
+ \\  \hline
+   \multicolumn{1}{c}{(C) A solution found by \tool that satisfies all test cases } \\ \hline
+  \begin{Verbatim}[commandchars=\\\{\}, tabsize=2]
+1. TedSketch.INVOKE(0): 
+2.  typeSystem.isInvalidatingType(type)
+3. TedSketch.INVOKE(1): 
+4.  prop.invalidate();
+5. TedSketch.INVOKE(2): 
+6.  prop.addTypeToSkip(type);
+\end{Verbatim}  
+ \\  \hline
+ \end{tabular}
+  \end{minipage}
+   \caption{ A synthesis task that uses arguments with generic types }
+ \label{fig:generic}
+
+ \end{figure}

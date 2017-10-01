@@ -1,0 +1,69 @@
+\begin{algorithm}[t!]
+\small
+\SetKwInOut{Input}{Input}
+\SetKwInOut{Output}{Output} 
+\SetKwProg{Prog}{Title}{ is}{end}
+\SetKwProg{Fn}{Function}{ is}{end}
+\SetKw{New}{new}
+\SetKw{Throw}{throw}
+\SetKw{Continue}{continue}
+\SetKwIF{Trying}{Catch}{Catching}{try}{}{catch}{}{catch}{}%
+%\SetKwIF{Try}{Catch}{try}{catch}{}%
+\SetKwRepeat{Do}{do}{while}{}{}%
+\Input {Maximum Length of the sequence $len$, Input arguments $args$}
+\Output{ API Sequence candidate $sequence$ and the Return Value $returnVal$ }
+\SetKwProg{Fn}{Function}{ is}{end}
+\Fn{ genAPISequence (hole)  }{
+rule $\leftarrow$ genConstraints(hole.len).choose()\label{line:chooseRule}\;
+sequence  $\leftarrow  \varnothing$, args $\leftarrow$ hole.args\;
+\For {int i=0; i$<$rule.stmt; i++}{
+call $\leftarrow $ genCall(rule, hole, i)\label{line:genCall}\;
+\Trying{}{ 
+res $\leftarrow$ invoke(call, args)\;  
+args $\leftarrow$  args $\cup$ res\;  }
+\Catch{Exception e}{\Throw BacktrackException\label{line:genBacktrack};}
+sequence $\leftarrow$ sequence  $\cup$  call\;
+\Return $\langle$sequence, getReturnVal(rule, args)$\rangle$;
+}}
+\Fn{genCall(rule, hole, i)}{
+\tcp{Generate API sketch}\
+\If{hole.mtdCandidates ==  $\varnothing$}{
+methods $\leftarrow$ fetchMethods(hole.sourceTypes)\label{line:fetchMethod}\;
+\ForEach{ m $\in$ methods}{\If{violateConstraint(hole, rule, i)}{\Continue;}
+%\If{cannotFitRequiredArgs(m, hole.args)}{\Continue;}
+hole.mtdCandidates $\leftarrow $ hole.mtdCandidates $\cup$ m;
+} 
+}
+\tcp{Complete expressions holes in methods}\
+method $\leftarrow $ hole.mtdCandidates.choose()\;
+call $\leftarrow$fillMethod(method, hole, i, rule).choose()~\label{line:fillExpr}\;
+\Return call;
+}
+\Fn{ execute (hole)  }{
+\If{hole.sequence==null}{\label{alg:candNull}
+hole.len $\leftarrow$ hole.len $== -1 ?$ b: hole.len\label{line:holeLen}\;
+$\langle$sequence, returnVal$\rangle  \leftarrow$ genSequence(hole)\;
+hole.sequence $\leftarrow$ sequence\;
+\Return returnVal;
+}\Else{
+\Return invokeAndReturn(hole);
+}
+}
+\Fn{ genConstraints ($len$) \label{line:genrule} }{
+\tcp{\#stmt, \#return, \#consume, \#repetition}
+List$<$int[]$>$ rules $\leftarrow   \varnothing$\;
+\For{int stmt=1; stmt$<$len; stmt++}{
+\For{int rtn=stmt; rtn$>$0; rtn$--$}{\For{int vc=1; vc$<$stmt; vc++}{
+\For{int rep=1; rep$<$stmt; rep++}{
+rules $\leftarrow $ rules $\cup$ \{stmt, rtn, vc, rep\};
+}}}}
+sort(rules)\;
+\Return rules;
+}
+\caption{API Candidate Generation}
+\label{alm:genCandidate}
+\end{algorithm}
+
+
+
+ 
